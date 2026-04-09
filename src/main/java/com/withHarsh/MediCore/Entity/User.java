@@ -29,7 +29,7 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
-    private RoleType role;
+    private RoleType role=RoleType.PATIENT;
 
     @UpdateTimestamp
     private LocalDateTime updated_At;
@@ -38,7 +38,7 @@ public class User {
     private LocalDateTime created_at;
 
     //bydivercify mapping
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private Patient patient;
 
     @OneToOne(mappedBy = "user")
