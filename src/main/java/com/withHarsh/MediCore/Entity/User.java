@@ -1,5 +1,6 @@
 package com.withHarsh.MediCore.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.withHarsh.MediCore.Entity.type.RoleType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,7 @@ public class User implements UserDetails {
     private LocalDateTime created_at;
 
     //bydivercify mapping
+    @JsonIgnore
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
     private Patient patient;
 

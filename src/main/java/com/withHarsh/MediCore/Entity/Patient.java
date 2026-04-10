@@ -1,5 +1,6 @@
 package com.withHarsh.MediCore.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,9 +40,11 @@ public class Patient {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+    @JsonIgnore
+    @OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE })
     private List<Appointment> appointment = new ArrayList<>();
 
-    @OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE}, fetch = FetchType.EAGER)
+    @JsonIgnore
+    @OneToMany(mappedBy = "patient", cascade = {CascadeType.REMOVE} )
     private List<Medical_Records> medicalRecords = new ArrayList<>();
 }
