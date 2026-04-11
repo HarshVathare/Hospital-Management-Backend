@@ -29,7 +29,10 @@ public class AdminController {
         return ResponseEntity.ok(adminServices.fetchAllDocters());
     }
 
-
+    @DeleteMapping("/docter/{id}")
+    public ResponseEntity<String> deleteDocterById(@PathVariable Long id) {
+        return ResponseEntity.ok(adminServices.deleteDocterById(id));
+    }
 
 
 

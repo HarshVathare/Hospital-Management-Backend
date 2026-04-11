@@ -74,5 +74,22 @@ public class AdminServiceImpl implements AdminServices {
 
     }
 
+    @Override
+    public String deleteDocterById(Long id) {
+
+        //get docter id
+        Docter docter = docterRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException("Docter not found by Id : "+id));
+
+        Long user_Id = docter.getUser().getId(); //getting User_Id : 12
+
+        User user = userRepository.findById(user_Id).orElseThrow(()->
+                new IllegalArgumentException("User not found by Id : "+user_Id));
+
+        userRepository.delete(user);
+
+        return "Docter deleted Successfully ..!";
+    }
+
 
 }
