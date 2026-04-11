@@ -1,15 +1,17 @@
 package com.withHarsh.MediCore.Services.ImplService;
 
-import com.withHarsh.MediCore.DTO.PatientResponceDTO;
-import com.withHarsh.MediCore.DTO.ProfileRequestDTO;
-import com.withHarsh.MediCore.DTO.ProfileResponceDTO;
+import com.withHarsh.MediCore.DTO.*;
+import com.withHarsh.MediCore.Entity.Appointment;
 import com.withHarsh.MediCore.Entity.Docter;
 import com.withHarsh.MediCore.Entity.Patient;
 import com.withHarsh.MediCore.Entity.User;
+import com.withHarsh.MediCore.Entity.type.AppointType;
+import com.withHarsh.MediCore.Repository.AppointmentRepository;
 import com.withHarsh.MediCore.Repository.DocterRepository;
 import com.withHarsh.MediCore.Repository.PatientRepository;
 import com.withHarsh.MediCore.Repository.UserRepository;
 import com.withHarsh.MediCore.Services.PatientServices;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ public class PatientServiceImpl implements PatientServices {
     private final UserRepository userRepository;
     private final PatientRepository patientRepository;
     private final DocterRepository docterRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Override
     public ProfileResponceDTO getProfile(Authentication authentication) {
@@ -126,6 +129,68 @@ public class PatientServiceImpl implements PatientServices {
                 .toList();
 
         return responceDTOList;
+    }
+
+    @Transactional
+    @Override
+    public AppointmentResponceDTO createAppointment(AppointmentRequestDTO requestDTO) {
+        Docter doctor = docterRepository.findById(requestDTO.getDocter_Id())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Doctor not found by id: " + requestDTO.getDocter_Id()));
+
+        Patient patient = patientRepository.findById(requestDTO.getPatient_Id())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Patient not found by id: " + requestDTO.getPatient_Id()));
+
+        if (requestDTO.getAppointment_Date() == null) {
+            throw new IllegalArgumentException("Appointment date cannot be null");
+        }
+
+        if (!doctor.isAvailibility_stutus()) {
+            throw new RuntimeException("Doctor is not available");
+        }
+
+        Appointment appointment = new Appointment();
+        appointment.setAppointmentTime(requestDTO.getAppointment_Date());
+        appointment.setAppointmentStatus(AppointType.PENDING);
+
+        //  Set relationship (ONLY THIS IS NEEDED)
+        Docter docter1 = new Docter();
+        Patient patient1 = new Patient();
+
+        appointment.setDocter(doctor);
+        appointment.setPatient(patient);
+
+        docter1.setAppointment((List<Appointment>) appointment);
+        patient1.setAppointment((List<Appointment>) appointment);
+
+        //  Save
+        appointmentRepository.save(appointment);
+
+        return new AppointmentResponceDTO(
+                appointment.getId(),
+                doctor.getUser().getName(),
+                patient.getUser().getName(),
+                appointment.getAppointmentTime(),
+                appointment.getAppointmentStatus(),
+                appointment.getCreatedAt()
+        );
+
+    }
+
+    @Override
+    public PatientResponceDTO getDocterById(Long id) {
+
+        Docter docter = docterRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException("Docter not found by Id : "+id));
+
+        return new PatientResponceDTO(
+                docter.getId(),
+                docter.getUser().getName(),
+                docter.getSpecialization(),
+                docter.getExperianceInYears(),
+                docter.isAvailibility_stutus()
+        );
     }
 
 

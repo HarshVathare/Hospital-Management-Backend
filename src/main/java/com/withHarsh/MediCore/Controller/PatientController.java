@@ -1,8 +1,6 @@
 package com.withHarsh.MediCore.Controller;
 
-import com.withHarsh.MediCore.DTO.PatientResponceDTO;
-import com.withHarsh.MediCore.DTO.ProfileRequestDTO;
-import com.withHarsh.MediCore.DTO.ProfileResponceDTO;
+import com.withHarsh.MediCore.DTO.*;
 import com.withHarsh.MediCore.Services.PatientServices;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,8 +33,13 @@ public class PatientController {
         return ResponseEntity.ok(patientServices.fetchAllDocters());
     }
 
+    @GetMapping("/docters/{id}")
+    public ResponseEntity<PatientResponceDTO> getDocterById(@PathVariable Long id) {
+        return ResponseEntity.ok(patientServices.getDocterById(id));
+    }
+
     @PostMapping("/appointments")
-    public ResponseEntity<AppointmentResponceDTO> createAppointment(@RequestBody AppointmentRequestDTO requestDTO) {
+    public ResponseEntity<AppointmentResponceDTO> createAppointment(@Valid @RequestBody AppointmentRequestDTO requestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(patientServices.createAppointment(requestDTO));
     }
 }

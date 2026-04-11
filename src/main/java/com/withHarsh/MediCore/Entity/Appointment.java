@@ -19,11 +19,11 @@ public class Appointment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "patient_Id")
     private Patient patient;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL, CascadeType.REMOVE})
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "docter_Id")
     private Docter docter;
 
@@ -31,7 +31,7 @@ public class Appointment {
     private LocalDateTime appointmentTime;
 
     @Enumerated(EnumType.STRING)
-    private AppointType appointmentStatus=AppointType.PENDING;
+    private AppointType appointmentStatus;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
