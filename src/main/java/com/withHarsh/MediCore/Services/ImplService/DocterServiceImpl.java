@@ -1,12 +1,15 @@
 package com.withHarsh.MediCore.Services.ImplService;
 
 import com.withHarsh.MediCore.DTO.DocterProfileResponceDTO;
+
 import com.withHarsh.MediCore.Entity.Docter;
+
 import com.withHarsh.MediCore.Entity.User;
 import com.withHarsh.MediCore.Repository.DocterRepository;
 import com.withHarsh.MediCore.Repository.UserRepository;
 import com.withHarsh.MediCore.Services.DocterServices;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,19 +26,18 @@ public class DocterServiceImpl implements DocterServices {
 
     @Override
     public DocterProfileResponceDTO getProfile(Authentication authentication) {
-        Object principal = authentication.getPrincipal();
 
-        String email = principal.toString();
+        String email = authentication.getName(); // ✅ BEST WAY
 
         System.out.println("Email: " + email);
 
-        User user = userRepository.findByEmail(email).orElseThrow(()->
-                new IllegalArgumentException("User not found by Email Id : "+email));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        Docter docter = docterRepository.findByUser(user.getId());
+        Docter docter = docterRepository.findByUser_Id(user.getId()); // ✅ FIXED
 
         if (docter == null) {
-            throw new RuntimeException("Patient not found");
+            throw new RuntimeException("Doctor not found");
         }
 
         return new DocterProfileResponceDTO(
@@ -49,4 +51,5 @@ public class DocterServiceImpl implements DocterServices {
                 user.getCreated_at()
         );
     }
+
 }

@@ -17,12 +17,20 @@ public class DocterController {
 
     private final DocterServices docterServices;
 
+//    @GetMapping("/profile")
+//    public ResponseEntity<DocterProfileResponceDTO> getProfile(Authentication authentication) {
+//        return ResponseEntity.ok(docterServices.getProfile(authentication));
+//    }
+
     @GetMapping("/profile")
     public ResponseEntity<DocterProfileResponceDTO> getProfile(Authentication authentication) {
-        return ResponseEntity.ok(docterServices.getProfile(authentication));
+
+        DocterProfileResponceDTO response = docterServices.getProfile(authentication);
+
+        System.out.println("FINAL RESPONSE: " + response); // 🔥 IMPORTANT
+
+        return ResponseEntity.ok(response);
     }
-
-
 
 
 }
