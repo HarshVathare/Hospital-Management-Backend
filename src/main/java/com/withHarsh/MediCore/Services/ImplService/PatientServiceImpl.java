@@ -226,5 +226,16 @@ public class PatientServiceImpl implements PatientServices {
         return responceDTOList;
     }
 
+    @Override
+    public String deleteAppointment(Long id) {
+
+        Appointment appointment = appointmentRepository.findById(id).orElseThrow(()->
+                new IllegalArgumentException("appointment not found by Id : "+id));
+
+        appointmentRepository.delete(appointment);
+
+        return "Appointment deleted Successfully ..!";
+    }
+
 
 }
