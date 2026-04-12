@@ -1,5 +1,6 @@
 package com.withHarsh.MediCore.DTO;
 
+import com.withHarsh.MediCore.Entity.type.AppointType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,4 +21,5 @@ public class DocterAppointmentResponceDTO {
     private String Gender;
     private String Medical_History;
     private LocalDateTime CreatedAt;
+    private AppointType Status;
 }

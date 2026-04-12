@@ -32,4 +32,10 @@ public class DocterController {
     public ResponseEntity<List<DocterAppointmentResponceDTO>> getAppointments(Authentication authentication) {
         return ResponseEntity.ok(docterServices.getAppointments(authentication));
     }
+
+    @PutMapping("/appointments/{id}/status")
+    public ResponseEntity<String> updateAppointmentStatus(@PathVariable Long id, @RequestBody UpdateAppointmentRequestDTO requestDTO) {
+        return ResponseEntity.ok(docterServices.updateAppointmentStatus(id, requestDTO));
+    }
+
 }

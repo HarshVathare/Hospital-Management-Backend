@@ -1,19 +1,18 @@
 package com.withHarsh.MediCore.Services.ImplService;
 
-import com.withHarsh.MediCore.DTO.DocterAppointmentResponceDTO;
-import com.withHarsh.MediCore.DTO.DocterProfileRequestDTO;
-import com.withHarsh.MediCore.DTO.DocterProfileResponceDTO;
+import com.withHarsh.MediCore.DTO.*;
 
-import com.withHarsh.MediCore.DTO.ProfileResponceDTO;
 import com.withHarsh.MediCore.Entity.Appointment;
 import com.withHarsh.MediCore.Entity.Docter;
 
 import com.withHarsh.MediCore.Entity.Patient;
 import com.withHarsh.MediCore.Entity.User;
+import com.withHarsh.MediCore.Entity.type.AppointType;
 import com.withHarsh.MediCore.Repository.AppointmentRepository;
 import com.withHarsh.MediCore.Repository.DocterRepository;
 import com.withHarsh.MediCore.Repository.UserRepository;
 import com.withHarsh.MediCore.Services.DocterServices;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -146,10 +145,34 @@ public class DocterServiceImpl implements DocterServices {
                         appointment.getPatient().getAge(),
                         appointment.getPatient().getGender(),
                         appointment.getPatient().getMedicalHistory(),
-                        appointment.getCreatedAt()
+                        appointment.getCreatedAt(),
+                        appointment.getAppointmentStatus()
                 )).toList();
 
         return responceDTOList;
+    }
+
+    @Override
+    @Transactional
+    public String updateAppointmentStatus(Long id, UpdateAppointmentRequestDTO requestDTO) {
+
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
+
+        // ✅ update appointment
+        if (requestDTO.getAppointment_status() != null) {
+            appointment.setAppointmentStatus(requestDTO.getAppointment_status());
+        }
+
+        // ✅ update doctor availability
+        Docter docter = appointment.getDocter();
+        if (docter != null) {
+            docter.setAvailibility_stutus(requestDTO.isAvailability());
+        }
+
+        appointmentRepository.save(appointment); // cascade should handle doctor
+
+        return "Appointment Confirmed ..!";
     }
 
 

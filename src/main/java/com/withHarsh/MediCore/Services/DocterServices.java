@@ -3,6 +3,7 @@ package com.withHarsh.MediCore.Services;
 import com.withHarsh.MediCore.DTO.DocterAppointmentResponceDTO;
 import com.withHarsh.MediCore.DTO.DocterProfileRequestDTO;
 import com.withHarsh.MediCore.DTO.DocterProfileResponceDTO;
+import com.withHarsh.MediCore.DTO.UpdateAppointmentRequestDTO;
 import jakarta.validation.Valid;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.Authentication;
@@ -17,4 +18,6 @@ public interface DocterServices {
     DocterProfileResponceDTO updateProfile(@Valid DocterProfileRequestDTO docterProfileRequestDTO, Authentication authentication);
 
     List<DocterAppointmentResponceDTO> getAppointments(Authentication authentication);
+
+    String updateAppointmentStatus(Long id, UpdateAppointmentRequestDTO requestDTO);
 }
