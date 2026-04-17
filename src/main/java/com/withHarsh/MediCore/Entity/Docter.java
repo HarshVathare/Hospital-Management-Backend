@@ -46,4 +46,36 @@ public class Docter {
 
     @OneToMany(mappedBy = "docter")
     private List<Medical_Records> medicalRecords = new ArrayList<>();
+
 }
+
+
+
+//    Specialization-List
+//    🏥 Doctor Specializations
+
+//    General Physician
+//    Handles common illnesses, fever, infections, basic health issues
+
+//            Cardiologist
+//    Heart and blood vessel related diseases
+
+//    Dermatologist
+//    Skin, hair, and nail problems
+
+//            Orthopedic
+//    Bones, joints, fractures, and muscles
+
+//    Pediatrician
+//    Child healthcare (infants to teenagers)
+
+//    Neurologist
+//    Brain, nerves, and nervous system
+
+//            Gynecologist
+//    Women’s health and pregnancy
+
+//    Psychiatrist
+//    Mental health, depression, anxiety
+
+//}

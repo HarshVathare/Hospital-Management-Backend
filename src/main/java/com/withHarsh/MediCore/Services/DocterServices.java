@@ -20,4 +20,6 @@ public interface DocterServices {
     MedicalRecordResponceDTO createMedicalRecord(Long appointmentId ,MedicalRecordRequestDTO requestDTO);
 
     List<MedicalRecordResponceDTO> getMedicalRecordByPatientId(Long patientId);
+
+    List<PatientResponceDTO> getDocterBySpecialization(String specialization);
 }
