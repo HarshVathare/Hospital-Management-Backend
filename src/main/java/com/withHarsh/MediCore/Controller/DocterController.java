@@ -7,8 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +29,15 @@ public class DocterController {
     }
 
     @GetMapping("/appointments")
-    public ResponseEntity<List<DocterAppointmentResponceDTO>> getAppointments(Authentication authentication) {
+    public ResponseEntity<List<DocterAppointmentResponceDTO>> getAppointments(
+            @RequestParam(name = "Status", required = false) String Status,
+            Authentication authentication) {
+
+        if (Status != null) {
+            return ResponseEntity.ok(
+                    docterServices.getAppointmentByStatus(Status, authentication));
+        }
+
         return ResponseEntity.ok(docterServices.getAppointments(authentication));
     }
 
@@ -54,5 +60,8 @@ public class DocterController {
     public ResponseEntity<List<PatientResponceDTO>> getDocterBySpecialization(@RequestParam(name = "specialization") String specialization) {
         return ResponseEntity.ok(docterServices.getDocterBySpecialization(specialization));
     }
+
+     
+
 
 }

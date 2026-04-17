@@ -153,6 +153,9 @@ public class DocterServiceImpl implements DocterServices {
         return responceDTOList;
     }
 
+
+
+
     @Override
     @Transactional
     public String updateAppointmentStatus(Long id, UpdateAppointmentRequestDTO requestDTO) {
@@ -267,6 +270,49 @@ public class DocterServiceImpl implements DocterServices {
                 )).toList();
 
         return docterlist;
+    }
+
+    @Override
+    public List<DocterAppointmentResponceDTO> getAppointmentByStatus(String status, Authentication authentication) {
+
+        Object principle = authentication.getPrincipal();
+        String email = principle.toString();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        Docter docter = docterRepository.findByUser(user);
+
+        AppointType appointType;
+
+        try {
+            appointType = AppointType.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid status value");
+        }
+
+        List<Appointment> appointments =
+                appointmentRepository.findByDocterAndAppointmentStatus(docter, appointType);
+
+
+        //Convert to DTO
+        List<DocterAppointmentResponceDTO> responceDTOList = appointments.stream()
+                .map(appointment -> new DocterAppointmentResponceDTO(
+                        appointment.getId(),
+                        appointment.getPatient().getId(),
+                        appointment.getAppointmentTime(),
+                        appointment.getPatient().getUser().getName(),
+                        appointment.getPatient().getUser().getEmail(),
+                        appointment.getPatient().getAge(),
+                        appointment.getPatient().getGender(),
+                        appointment.getPatient().getMedicalHistory(),
+                        appointment.getCreatedAt(),
+                        appointment.getAppointmentStatus()
+                )).toList();
+
+        return responceDTOList;
+
+
     }
 
 
