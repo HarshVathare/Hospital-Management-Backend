@@ -11,9 +11,14 @@ import com.withHarsh.MediCore.Repository.DocterRepository;
 import com.withHarsh.MediCore.Repository.UserRepository;
 import com.withHarsh.MediCore.Services.AdminServices;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
 @Service
@@ -55,24 +60,22 @@ public class AdminServiceImpl implements AdminServices {
     }
 
     @Override
-    public List<PatientResponceDTO> fetchAllDocters() {
+    public List<PatientResponceDTO> fetchAllDocters(int page, int size) {
 
-        List<Docter> docters = docterRepository.findAll();
+        PageRequest request = PageRequest.of(page, size);
 
-        List<PatientResponceDTO> responceDTOList = docters
+        Page<Docter> doctorPage = docterRepository.findAll(request);
+
+        return doctorPage.getContent()
                 .stream()
                 .map(docter -> new PatientResponceDTO(
-                                docter.getId(),
-                                docter.getUser().getName(),
-                                docter.getSpecialization(),
-                                docter.getExperianceInYears(),
-                                docter.isAvailibility_stutus()
-                        )
-                )
+                        docter.getId(),
+                        docter.getUser().getName(),
+                        docter.getSpecialization(),
+                        docter.getExperianceInYears(),
+                        docter.isAvailibility_stutus()
+                ))
                 .toList();
-
-        return responceDTOList;
-
     }
 
     @Override

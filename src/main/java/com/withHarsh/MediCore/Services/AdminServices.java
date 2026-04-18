@@ -12,7 +12,7 @@ public interface AdminServices {
 
     CreateDocterResponceDTO createDocter(CreateDocterRequestDTO requestDTO);
 
-    List<PatientResponceDTO> fetchAllDocters();
+    List<PatientResponceDTO> fetchAllDocters(int page, int size);
 
     String deleteDocterById(Long id);
 
