@@ -27,15 +27,23 @@ public class AdminController {
 
     @GetMapping("/docters")
     public ResponseEntity<List<PatientResponceDTO>> fetchAllDocters(
-            @RequestParam(name = "specialization" ) String specialization,
-            @RequestParam(name = "experience") String experience
+            @RequestParam(required = false) String specialization,
+            @RequestParam(required = false) String experienceInYears
     ) {
 
-       if(specialization != null) {
-           return ResponseEntity.ok(adminServices.getDocterBySpecialization(specialization));
-       } else if (experience != null) {
-           return ResponseEntity.ok(adminServices.getDocterByExperience(experience));
-       }
+        if (specialization != null && experienceInYears != null) {
+            return ResponseEntity.ok(
+                    adminServices.getDoctorBySpecializationAndExperience(specialization, experienceInYears)
+            );
+        }
+
+        if (specialization != null) {
+            return ResponseEntity.ok(adminServices.getDocterBySpecialization(specialization));
+        }
+
+        if (experienceInYears != null) {
+            return ResponseEntity.ok(adminServices.getDocterByExperience(experienceInYears));
+        }
 
         return ResponseEntity.ok(adminServices.fetchAllDocters());
     }

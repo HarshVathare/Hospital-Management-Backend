@@ -18,11 +18,12 @@ public interface DocterRepository extends JpaRepository<Docter, Long> {
 
     List<Docter> findBySpecialization(String specialization);
 
-//    List<Docter> findByExperienceInYears(String experience);
 
-//    List<Docter> findByExperience(String experience);
+//    List<Docter> findByExperienceInYears(String experienceInYears);
 
-    List<Docter> findByExperience_In_Years(String experience);
+    List<Docter> findByExperienceInYears(String experienceInYears);
+
+    List<Docter> findBySpecializationAndExperienceInYears(String specialization, String experienceInYears);
 
 //    Docter findByUser(User user);
 

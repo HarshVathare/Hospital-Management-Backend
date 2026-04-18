@@ -22,5 +22,7 @@ public interface AdminServices {
 
     List<PatientResponceDTO> getDocterBySpecialization(String specialization);
 
-    List<PatientResponceDTO> getDocterByExperience(String experience);
+    List<PatientResponceDTO> getDocterByExperience(String experience_in_years);
+
+    List<PatientResponceDTO> getDoctorBySpecializationAndExperience(String specialization, String experienceInYears);
 }

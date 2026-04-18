@@ -141,9 +141,9 @@ public class AdminServiceImpl implements AdminServices {
     }
 
     @Override
-    public List<PatientResponceDTO> getDocterByExperience(String experience) {
+    public List<PatientResponceDTO> getDocterByExperience(String experience_in_years) {
 
-        List<Docter> docters = docterRepository.findByExperience_In_Years(experience);
+        List<Docter> docters = docterRepository.findByExperienceInYears(experience_in_years);
 
         List<PatientResponceDTO> docterlist = docters
                 .stream()
@@ -159,4 +159,21 @@ public class AdminServiceImpl implements AdminServices {
     }
 
 
+    @Override
+    public List<PatientResponceDTO> getDoctorBySpecializationAndExperience(
+            String specialization,
+            String experienceInYears) {
+
+        return docterRepository
+                .findBySpecializationAndExperienceInYears(specialization, experienceInYears)
+                .stream()
+                .map(doctor -> new PatientResponceDTO(
+                        doctor.getId(),
+                        doctor.getUser().getName(),
+                        doctor.getSpecialization(),
+                        doctor.getExperianceInYears(),
+                        doctor.isAvailibility_stutus()
+                ))
+                .toList();
+    }
 }
