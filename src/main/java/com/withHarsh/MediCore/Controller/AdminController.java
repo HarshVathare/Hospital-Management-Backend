@@ -1,9 +1,6 @@
 package com.withHarsh.MediCore.Controller;
 
-import com.withHarsh.MediCore.DTO.CreateDocterRequestDTO;
-import com.withHarsh.MediCore.DTO.CreateDocterResponceDTO;
-import com.withHarsh.MediCore.DTO.PatientResponceDTO;
-import com.withHarsh.MediCore.DTO.RegisterResponceDTO;
+import com.withHarsh.MediCore.DTO.*;
 import com.withHarsh.MediCore.Services.AdminServices;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -62,7 +59,10 @@ public class AdminController {
         return ResponseEntity.ok(adminServices.deleteUserById(id));
     }
 
-
+    @GetMapping("/dashboard")
+    public ResponseEntity<DashboardResponseDTO> getDashboard() {
+        return ResponseEntity.ok(adminServices.getDashboard());
+    }
 
 
 

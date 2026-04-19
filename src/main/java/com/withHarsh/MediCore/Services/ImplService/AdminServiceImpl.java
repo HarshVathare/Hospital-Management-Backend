@@ -1,13 +1,12 @@
 package com.withHarsh.MediCore.Services.ImplService;
 
-import com.withHarsh.MediCore.DTO.CreateDocterRequestDTO;
-import com.withHarsh.MediCore.DTO.CreateDocterResponceDTO;
-import com.withHarsh.MediCore.DTO.PatientResponceDTO;
-import com.withHarsh.MediCore.DTO.RegisterResponceDTO;
+import com.withHarsh.MediCore.DTO.*;
 import com.withHarsh.MediCore.Entity.Docter;
 import com.withHarsh.MediCore.Entity.User;
 import com.withHarsh.MediCore.Entity.type.RoleType;
+import com.withHarsh.MediCore.Repository.AppointmentRepository;
 import com.withHarsh.MediCore.Repository.DocterRepository;
+import com.withHarsh.MediCore.Repository.PatientRepository;
 import com.withHarsh.MediCore.Repository.UserRepository;
 import com.withHarsh.MediCore.Services.AdminServices;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,6 +27,8 @@ public class AdminServiceImpl implements AdminServices {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final DocterRepository docterRepository;
+    private final PatientRepository patientRepository;
+    private final AppointmentRepository appointmentRepository;
 
     @Override
     public CreateDocterResponceDTO createDocter(CreateDocterRequestDTO requestDTO) {
@@ -162,6 +166,29 @@ public class AdminServiceImpl implements AdminServices {
                 )).toList();
 
         return docterlist;
+    }
+
+    @Override
+    public DashboardResponseDTO getDashboard() {
+
+        long totalPatients = patientRepository.count();
+        long totalDocters = docterRepository.count();
+        long totalAppointments = appointmentRepository.count();
+
+        // For today's appointments
+        LocalDate todayDate = LocalDate.now();
+        LocalDateTime start = todayDate.atStartOfDay();
+        LocalDateTime end = todayDate.atTime(23, 59, 59);
+
+        long todayAppointments = appointmentRepository
+                .countByAppointmentTimeBetween(start, end);
+
+        return new DashboardResponseDTO(
+                totalPatients,
+                totalDocters,
+                totalAppointments,
+                todayAppointments
+        );
     }
 
 

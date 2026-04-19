@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -24,4 +25,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Page<Appointment> findAllByDocter_Id(Long docterId, PageRequest request);
 
     Page<Appointment> findByDocterAndAppointmentStatus(Docter docter, AppointType appointType, PageRequest request);
+
+    long countByAppointmentTimeBetween(LocalDateTime start, LocalDateTime end);
 }
