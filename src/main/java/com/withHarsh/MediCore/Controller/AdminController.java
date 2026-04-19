@@ -34,11 +34,11 @@ public class AdminController {
     ) {
 
         if (specialization != null) {
-            return ResponseEntity.ok(adminServices.getDocterBySpecialization(specialization));
+            return ResponseEntity.ok(adminServices.getDocterBySpecialization(specialization, page, size));
         }
 
         if (experienceInYears != null) {
-            return ResponseEntity.ok(adminServices.getDocterByExperience(experienceInYears));
+            return ResponseEntity.ok(adminServices.getDocterByExperience(experienceInYears, page, size));
         }
 
         return ResponseEntity.ok(adminServices.fetchAllDocters(page, size));
@@ -50,8 +50,11 @@ public class AdminController {
     }
 
     @GetMapping("/users")
-    public ResponseEntity<List<RegisterResponceDTO>> fetchAllUsers() {
-        return ResponseEntity.ok(adminServices.fetchAllUsers());
+    public ResponseEntity<List<RegisterResponceDTO>> fetchAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size
+    ) {
+        return ResponseEntity.ok(adminServices.fetchAllUsers(page, size));
     }
 
     @DeleteMapping("/user/{id}")

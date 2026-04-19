@@ -16,13 +16,13 @@ public interface AdminServices {
 
     String deleteDocterById(Long id);
 
-    List<RegisterResponceDTO> fetchAllUsers();
+    List<RegisterResponceDTO> fetchAllUsers(int page, int size);
 
     String deleteUserById(Long id);
 
-    List<PatientResponceDTO> getDocterBySpecialization(String specialization);
+    List<PatientResponceDTO> getDocterBySpecialization(String specialization,int page, int size);
 
-    List<PatientResponceDTO> getDocterByExperience(String experienceInYears);
+    List<PatientResponceDTO> getDocterByExperience(String experienceInYears,int page, int size);
 
 //    List<PatientResponceDTO> getDocterByExperience(String experience_in_years);
 //

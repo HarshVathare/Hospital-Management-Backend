@@ -8,6 +8,8 @@ import com.withHarsh.MediCore.Entity.type.AppointType;
 import com.withHarsh.MediCore.Repository.*;
 import com.withHarsh.MediCore.Services.DocterServices;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -255,21 +257,22 @@ public class DocterServiceImpl implements DocterServices {
     }
 
     @Override
-    public List<PatientResponceDTO> getDocterBySpecialization(String specialization) {
+    public List<PatientResponceDTO> getDocterBySpecialization(String specialization,int page, int size) {
 
-        List<Docter> docters = docterRepository.findBySpecialization(specialization);
+        PageRequest request = PageRequest.of(page, size);
 
-        List<PatientResponceDTO> docterlist = docters
-                .stream()
-                .map(docter -> new PatientResponceDTO(
-                        docter.getId(),
-                        docter.getUser().getName(),
-                        docter.getSpecialization(),
-                        docter.getExperianceInYears(),
-                        docter.isAvailibility_stutus()
-                )).toList();
+        Page<Docter> docters = docterRepository.findBySpecialization(specialization, request);
 
-        return docterlist;
+        return docters.getContent()
+                .stream().map(
+                        docter -> new PatientResponceDTO(
+                                docter.getId(),
+                                docter.getUser().getName(),
+                                docter.getSpecialization(),
+                                docter.getExperianceInYears(),
+                                docter.isAvailibility_stutus()
+                        )
+                ).toList();
     }
 
     @Override

@@ -14,11 +14,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.awt.print.Pageable;
 import java.util.List;
 
 @Service
@@ -96,11 +93,14 @@ public class AdminServiceImpl implements AdminServices {
     }
 
     @Override
-    public List<RegisterResponceDTO> fetchAllUsers() {
+    public List<RegisterResponceDTO> fetchAllUsers(int page, int size) {
 
-        List<User> users = userRepository.findAll();
+        PageRequest request = PageRequest.of(page, size);
 
-        List<RegisterResponceDTO> responceDTOList = users.stream()
+        Page<User> users = userRepository.findAll(request);
+
+        return users.getContent()
+               .stream()
                 .map(user -> new RegisterResponceDTO(
                         user.getId(),
                         user.getName(),
@@ -110,7 +110,6 @@ public class AdminServiceImpl implements AdminServices {
                         user.getCreated_at()
                 )).toList();
 
-        return responceDTOList;
     }
 
     @Override
@@ -126,27 +125,31 @@ public class AdminServiceImpl implements AdminServices {
 
 
     @Override
-    public List<PatientResponceDTO> getDocterBySpecialization(String specialization) {
+    public List<PatientResponceDTO> getDocterBySpecialization(String specialization,int page, int size) {
 
-        List<Docter> docters = docterRepository.findBySpecialization(specialization);
+        PageRequest request = PageRequest.of(page, size);
 
-        List<PatientResponceDTO> docterlist = docters
-                .stream()
-                .map(docter -> new PatientResponceDTO(
-                        docter.getId(),
-                        docter.getUser().getName(),
-                        docter.getSpecialization(),
-                        docter.getExperianceInYears(),
-                        docter.isAvailibility_stutus()
-                )).toList();
+        Page<Docter> docters = docterRepository.findBySpecialization(specialization,request);
 
-        return docterlist;
+        return docters.getContent()
+                .stream().map(
+                        docter -> new PatientResponceDTO(
+                                docter.getId(),
+                                docter.getUser().getName(),
+                                docter.getSpecialization(),
+                                docter.getExperianceInYears(),
+                                docter.isAvailibility_stutus()
+                        )
+                ).toList();
+
     }
 
     @Override
-    public List<PatientResponceDTO> getDocterByExperience(String experience_in_years) {
+    public List<PatientResponceDTO> getDocterByExperience(String experience_in_years,int page, int size) {
 
-        List<Docter> docters = docterRepository.findByExperianceInYears(experience_in_years);
+        PageRequest request = PageRequest.of(page, size);
+
+        Page<Docter> docters = docterRepository.findByExperianceInYears(experience_in_years, request);
 
         List<PatientResponceDTO> docterlist = docters
                 .stream()
@@ -162,21 +165,4 @@ public class AdminServiceImpl implements AdminServices {
     }
 
 
-//    @Override
-//    public List<PatientResponceDTO> getDoctorBySpecializationAndExperience(
-//            String specialization,
-//            String experienceInYears) {
-//
-//        return docterRepository
-//                .findBySpecializationAndExperienceInYears(specialization, experienceInYears)
-//                .stream()
-//                .map(doctor -> new PatientResponceDTO(
-//                        doctor.getId(),
-//                        doctor.getUser().getName(),
-//                        doctor.getSpecialization(),
-//                        doctor.getExperianceInYears(),
-//                        doctor.isAvailibility_stutus()
-//                ))
-//                .toList();
-//    }
 }

@@ -57,8 +57,12 @@ public class DocterController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<PatientResponceDTO>> getDocterBySpecialization(@RequestParam(name = "specialization") String specialization) {
-        return ResponseEntity.ok(docterServices.getDocterBySpecialization(specialization));
+    public ResponseEntity<List<PatientResponceDTO>> getDocterBySpecialization(
+            @RequestParam(name = "specialization") String specialization,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size
+    ) {
+        return ResponseEntity.ok(docterServices.getDocterBySpecialization(specialization, page, size));
     }
 
 }

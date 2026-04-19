@@ -21,7 +21,7 @@ public interface DocterServices {
 
     List<MedicalRecordResponceDTO> getMedicalRecordByPatientId(Long patientId);
 
-    List<PatientResponceDTO> getDocterBySpecialization(String specialization);
+    List<PatientResponceDTO> getDocterBySpecialization(String specialization,int page, int size);
 
     List<DocterAppointmentResponceDTO> getAppointmentByStatus(String status, Authentication authentication);
 

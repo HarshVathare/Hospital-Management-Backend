@@ -14,7 +14,7 @@ public interface PatientServices {
 
     ProfileResponceDTO updateProfile(@Valid ProfileRequestDTO profileRequestDTO, Authentication authentication);
 
-    List<PatientResponceDTO> fetchAllDocters();
+    List<PatientResponceDTO> fetchAllDocters(int page, int size);
 
     AppointmentResponceDTO createAppointment(AppointmentRequestDTO requestDTO, Authentication authentication);
 
@@ -24,7 +24,7 @@ public interface PatientServices {
 
     String deleteAppointment(Long id);
 
-    List<PatientResponceDTO> getDocterByExperience(String experienceInYears);
+    List<PatientResponceDTO> getDocterByExperience(String experienceInYears,int page, int size);
 
-    List<PatientResponceDTO> getDocterBySpecialization(String specialization);
+    List<PatientResponceDTO> getDocterBySpecialization(String specialization,int page, int size);
 }

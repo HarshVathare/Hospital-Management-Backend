@@ -14,6 +14,8 @@ import com.withHarsh.MediCore.Services.PatientServices;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -112,11 +114,13 @@ public class PatientServiceImpl implements PatientServices {
     }
 
     @Override
-    public List<PatientResponceDTO> fetchAllDocters() {
+    public List<PatientResponceDTO> fetchAllDocters(int page, int size) {
 
-        List<Docter> docters = docterRepository.findAll();
+        PageRequest request = PageRequest.of(page, size);
 
-        List<PatientResponceDTO> responceDTOList = docters
+        Page<Docter> docters = docterRepository.findAll(request);
+
+        return docters.getContent()
                 .stream()
                 .map(docter -> new PatientResponceDTO(
                         docter.getId(),
@@ -127,16 +131,16 @@ public class PatientServiceImpl implements PatientServices {
                                 )
                         )
                 .toList();
-
-        return responceDTOList;
     }
 
     @Override
-    public List<PatientResponceDTO> getDocterBySpecialization(String specialization) {
+    public List<PatientResponceDTO> getDocterBySpecialization(String specialization,int page, int size) {
 
-        List<Docter> docters = docterRepository.findBySpecialization(specialization);
+        PageRequest request = PageRequest.of(page, size);
 
-        List<PatientResponceDTO> docterlist = docters
+        Page<Docter> docters = docterRepository.findBySpecialization(specialization, request);
+
+        return docters.getContent()
                 .stream()
                 .map(docter -> new PatientResponceDTO(
                         docter.getId(),
@@ -146,15 +150,16 @@ public class PatientServiceImpl implements PatientServices {
                         docter.isAvailibility_stutus()
                 )).toList();
 
-        return docterlist;
     }
 
     @Override
-    public List<PatientResponceDTO> getDocterByExperience(String experience_in_years) {
+    public List<PatientResponceDTO> getDocterByExperience(String experience_in_years, int page, int size) {
 
-        List<Docter> docters = docterRepository.findByExperianceInYears(experience_in_years);
+        PageRequest request = PageRequest.of(page, size);
 
-        List<PatientResponceDTO> docterlist = docters
+        Page<Docter> docters = docterRepository.findByExperianceInYears(experience_in_years, request);
+
+        return docters.getContent()
                 .stream()
                 .map(docter -> new PatientResponceDTO(
                         docter.getId(),
@@ -164,7 +169,6 @@ public class PatientServiceImpl implements PatientServices {
                         docter.isAvailibility_stutus()
                 )).toList();
 
-        return docterlist;
     }
 
     @Override
