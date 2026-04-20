@@ -6,6 +6,8 @@ import com.withHarsh.MediCore.Entity.Docter;
 import com.withHarsh.MediCore.Entity.Patient;
 import com.withHarsh.MediCore.Entity.User;
 import com.withHarsh.MediCore.Entity.type.AppointType;
+import com.withHarsh.MediCore.RabbitMQ.AppointmentEmailEventDTO;
+import com.withHarsh.MediCore.RabbitMQ.MessageProducer;
 import com.withHarsh.MediCore.Repository.AppointmentRepository;
 import com.withHarsh.MediCore.Repository.DocterRepository;
 import com.withHarsh.MediCore.Repository.PatientRepository;
@@ -30,6 +32,7 @@ public class PatientServiceImpl implements PatientServices {
     private final PatientRepository patientRepository;
     private final DocterRepository docterRepository;
     private final AppointmentRepository appointmentRepository;
+    private final MessageProducer producer;
 
     @Override
     public ProfileResponceDTO getProfile(Authentication authentication) {
@@ -223,6 +226,18 @@ public class PatientServiceImpl implements PatientServices {
         appointment.setDocter(doctor);
         //  Save
         appointmentRepository.save(appointment);
+
+        // 🔥 STEP 1: Build Event DTO (IMPORTANT)
+        AppointmentEmailEventDTO event = new AppointmentEmailEventDTO(
+                appointment.getId(),
+                patient.getUser().getName(),                     // patient name
+                patient.getUser().getEmail(),                    // patient email
+                doctor.getUser().getName(),                      // doctor name
+                appointment.getAppointmentTime().toString(),     // time
+                appointment.getAppointmentStatus().name()        // status
+        );
+
+        producer.sendMessage(event);
 
         return new AppointmentResponceDTO(
                 appointment.getId(),

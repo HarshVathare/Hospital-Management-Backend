@@ -1,6 +1,7 @@
 package com.withHarsh.MediCore.Controller;
 
 import com.withHarsh.MediCore.DTO.*;
+import com.withHarsh.MediCore.RabbitMQ.MessageProducer;
 import com.withHarsh.MediCore.Services.PatientServices;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.List;
 public class PatientController {
 
     private final PatientServices patientServices;
+    private final MessageProducer producer;
 
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponceDTO> getProfile(Authentication authentication) {
@@ -51,6 +53,12 @@ public class PatientController {
     public ResponseEntity<PatientResponceDTO> getDocterById(@PathVariable Long id) {
         return ResponseEntity.ok(patientServices.getDocterById(id));
     }
+
+
+
+
+
+
 
     @PostMapping("/appointments")
     public ResponseEntity<AppointmentResponceDTO> createAppointment(@RequestBody AppointmentRequestDTO requestDTO , Authentication authentication) {
