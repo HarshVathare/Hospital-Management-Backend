@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="src/main/resources/static/Medicore.png" alt="Medicore Logo" width="250"/>
+</p>
 # 🏥 Medicore - Hospital Management System - Backend API
 
 This project is a **Spring Boot-based Hospital Management System** that provides REST APIs for managing patients, doctors, appointments, medical records, and authentication.
