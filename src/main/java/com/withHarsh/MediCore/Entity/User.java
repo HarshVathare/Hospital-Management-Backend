@@ -42,6 +42,11 @@ public class User implements UserDetails {
     @CreationTimestamp
     private LocalDateTime created_at;
 
+    private boolean isVerified = false;
+
+    private String verificationToken;
+    private String resetToken;
+
     //bydivercify mapping
     @JsonIgnore
     @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)

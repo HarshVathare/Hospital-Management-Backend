@@ -1,5 +1,6 @@
 package com.withHarsh.MediCore.DTO;
 
+import com.withHarsh.MediCore.Entity.RefreshToken;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LoginResponceDTO {
 
-    private String token;
+    private String accessToken;
+    private String refreshToken;
     private Long user_Id;
     private String email;
+
+    public LoginResponceDTO(String accessToken, RefreshToken refreshToken, Long id, String email) {
+    }
 }

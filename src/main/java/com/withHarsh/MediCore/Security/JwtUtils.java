@@ -17,7 +17,7 @@ public class JwtUtils {
 
     private String jwtSecret = "ghjyfghtdsfrhghjuiojklghjukjdftuyjkijklofghuksdfxcvjkliuykh";
 
-    private int JwtExpiration = 172800000; // for 48 hr
+    private int JwtExpiration = 15 * 60 * 1000; // 15 minutes && //172800000; // for 48 hr
 
     public String getJwtFromHeaders(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
