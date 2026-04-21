@@ -5,10 +5,7 @@ import com.withHarsh.MediCore.Services.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -32,6 +29,11 @@ public class AuthController {
         return ResponseEntity.ok(authService.getRefreshToken(refreshTokenRequestDTO));
     }
 
+    @GetMapping("/verify")
+    public ResponseEntity<String> verify(@RequestParam String token) {
+        return ResponseEntity.ok(authService.verify(token));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestBody RefreshTokenRequestDTO request) {
         return ResponseEntity.ok(authService.logout(request));
@@ -47,20 +49,7 @@ public class AuthController {
 
 
 
-//@PostMapping("/register")
-//public String register(@RequestBody User user) {
-//    return service.register(user);
-//}
-//
-//@GetMapping("/verify")
-//public String verify(@RequestParam String token) {
-//    return service.verify(token);
-//}
-//
-//@PostMapping("/login")
-//public String login(@RequestBody User user) {
-//    return service.login(user.getEmail(), user.getPassword());
-//}
+
 //
 //@PostMapping("/forgot-password")
 //public String forgot(@RequestParam String email) {

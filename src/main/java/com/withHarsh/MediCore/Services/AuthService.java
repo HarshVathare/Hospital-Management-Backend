@@ -6,6 +6,7 @@ import com.withHarsh.MediCore.Entity.RefreshToken;
 
 import com.withHarsh.MediCore.Entity.User;
 
+import com.withHarsh.MediCore.RabbitMQ.SmtpEmailService;
 import com.withHarsh.MediCore.Repository.PatientRepository;
 import com.withHarsh.MediCore.Repository.RefreshTokenRepository;
 import com.withHarsh.MediCore.Repository.UserRepository;
@@ -34,6 +35,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtUtils jwtUtils;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final SmtpEmailService emailService;
 
 
     public @Nullable RegisterResponceDTO register(RegisterRequestDTO registerRequestDTO) {
@@ -52,8 +54,17 @@ public class AuthService {
         patient.setUser(user);
         user.setPatient(patient);
 
+        user.setVerificationToken(UUID.randomUUID().toString()); //set verification-token in DB
+
         userRepository.save(user);
 
+        String link = "http://localhost:8080/api/auth/verify?token=" + user.getVerificationToken();
+
+        emailService.sendEmailForVerifyAccount(
+                user.getEmail(),
+                "Verify Your MediCore Account",
+                link
+        );
         return new RegisterResponceDTO(
                 user.getId(),
                 user.getName(),
@@ -76,11 +87,16 @@ public class AuthService {
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String accessToken = jwtUtils.generateTokenFromUsername(userDetails);
-        System.out.println("Token :- "+accessToken);
-
         User user = userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // IMPORTANT CHECK
+        if (!user.isVerified()) {
+            throw new RuntimeException("Please verify your email before login");
+        }
+
+        String accessToken = jwtUtils.generateTokenFromUsername(userDetails);
+        System.out.println("Token :- "+accessToken);
 
 //        create Refresh Token
 
@@ -123,6 +139,16 @@ public class AuthService {
 
         return refreshToken;
     }
+
+    public String verify(String token) {
+         User user = userRepository.findByVerificationToken(token)
+               .orElseThrow();
+         user.setVerified(true);
+         user.setVerificationToken(null);
+         userRepository.save(user);
+
+         return "Account verified";
+}
 
 
     public RefreshTokenResponceDTO getRefreshToken(RefreshTokenRequestDTO request) {
