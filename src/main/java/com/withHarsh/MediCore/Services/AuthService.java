@@ -11,6 +11,7 @@ import com.withHarsh.MediCore.Repository.PatientRepository;
 import com.withHarsh.MediCore.Repository.RefreshTokenRepository;
 import com.withHarsh.MediCore.Repository.UserRepository;
 import com.withHarsh.MediCore.Security.JwtUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.http.ResponseEntity;
@@ -38,7 +39,8 @@ public class AuthService {
     private final SmtpEmailService emailService;
 
 
-    public @Nullable RegisterResponceDTO register(RegisterRequestDTO registerRequestDTO) {
+    @Transactional
+    public RegisterResponceDTO register(RegisterRequestDTO registerRequestDTO) {
 
         User user = new User();
         user.setName(registerRequestDTO.getName());
@@ -76,7 +78,7 @@ public class AuthService {
     }
 
 
-    public @Nullable LoginResponceDTO login(LoginRequestDTO loginRequestDTO) {
+    public LoginResponceDTO login(LoginRequestDTO loginRequestDTO) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -111,7 +113,9 @@ public class AuthService {
     }
 
 
-    private final long refreshTokenDuration = 7 * 24 * 60 * 60 * 1000; // 7 days
+    private final long refreshTokenDuration = 7 * 24 * 60 * 60 * 1000;
+
+    @Transactional// 7 days
     public RefreshToken createRefreshToken(String email) {
 
         User user = userRepository.findByEmail(email)
@@ -140,6 +144,7 @@ public class AuthService {
         return refreshToken;
     }
 
+    @Transactional
     public String verify(String token) {
          User user = userRepository.findByVerificationToken(token)
                .orElseThrow();
@@ -171,6 +176,7 @@ public class AuthService {
         );
     }
 
+    @Transactional
     public String forgotPassword(String email) {
 
         User user = userRepository.findByEmail(email)
@@ -190,6 +196,7 @@ public class AuthService {
         return "Password reset link sent to your email";
     }
 
+    @Transactional
     public String resetPassword(String token, String newPassword) {
         User user = userRepository.findByResetToken(token).orElseThrow();
 
@@ -202,6 +209,7 @@ public class AuthService {
 
     }
 
+    @Transactional
     public String logout(RefreshTokenRequestDTO request) {
 
         RefreshToken token = refreshTokenRepository.findByToken(request.getRefreshToken())
@@ -214,71 +222,3 @@ public class AuthService {
 
 
 }
-
-
-
-
-
-
-
-
-//public String register(User user) {
-//    user.setPassword(encoder.encode(user.getPassword()));
-//    user.setVerificationToken(UUID.randomUUID().toString());
-//
-//    userRepository.save(user);
-//
-//    emailService.sendEmail(user.getEmail(),
-//            "Verify Account",
-//            "Click: http://localhost:8080/api/auth/verify?token=" + user.getVerificationToken());
-//
-//    return "User registered. Check email.";
-//}
-//
-//public String verify(String token) {
-//    User user = userRepository.findByVerificationToken(token)
-//            .orElseThrow();
-//
-//    user.setVerified(true);
-//    user.setVerificationToken(null);
-//    userRepository.save(user);
-//
-//    return "Account verified";
-//}
-//
-//public String login(String email, String password) {
-//    User user = userRepository.findByEmail(email).orElseThrow();
-//
-//    if (!encoder.matches(password, user.getPassword())) {
-//        throw new RuntimeException("Invalid password");
-//    }
-//
-//    if (!user.isVerified()) {
-//        throw new RuntimeException("Email not verified");
-//    }
-//
-//    return jwtUtil.generateToken(email);
-//}
-//
-//public String forgotPassword(String email) {
-//    User user = userRepository.findByEmail(email).orElseThrow();
-//
-//    user.setResetToken(UUID.randomUUID().toString());
-//    userRepository.save(user);
-//
-//    emailService.sendEmail(email,
-//            "Reset Password",
-//            "Click: http://localhost:8080/api/auth/reset?token=" + user.getResetToken());
-//
-//    return "Reset link sent";
-//}
-//
-//public String resetPassword(String token, String newPassword) {
-//    User user = userRepository.findByResetToken(token).orElseThrow();
-//
-//    user.setPassword(encoder.encode(newPassword));
-//    user.setResetToken(null);
-//
-//    userRepository.save(user);
-//
-//    return "Password updated";

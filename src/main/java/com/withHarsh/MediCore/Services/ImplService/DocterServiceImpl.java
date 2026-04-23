@@ -69,6 +69,7 @@ public class DocterServiceImpl implements DocterServices {
         );
     }
 
+    @Transactional
     @Override
     public DocterProfileResponceDTO updateProfile(DocterProfileRequestDTO docterProfileRequestDTO, Authentication authentication) {
 
@@ -161,8 +162,8 @@ public class DocterServiceImpl implements DocterServices {
 
     }
 
-    @Override
     @Transactional
+    @Override
     public String updateAppointmentStatus(Long id, UpdateAppointmentRequestDTO requestDTO) {
 
         Appointment appointment = appointmentRepository.findById(id)

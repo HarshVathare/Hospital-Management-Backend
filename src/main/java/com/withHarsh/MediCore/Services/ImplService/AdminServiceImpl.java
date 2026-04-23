@@ -9,6 +9,7 @@ import com.withHarsh.MediCore.Repository.DocterRepository;
 import com.withHarsh.MediCore.Repository.PatientRepository;
 import com.withHarsh.MediCore.Repository.UserRepository;
 import com.withHarsh.MediCore.Services.AdminServices;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -30,6 +31,7 @@ public class AdminServiceImpl implements AdminServices {
     private final PatientRepository patientRepository;
     private final AppointmentRepository appointmentRepository;
 
+    @Transactional
     @Override
     public CreateDocterResponceDTO createDocter(CreateDocterRequestDTO requestDTO) {
 
@@ -79,6 +81,7 @@ public class AdminServiceImpl implements AdminServices {
                 .toList();
     }
 
+    @Transactional
     @Override
     public String deleteDocterById(Long id) {
 
@@ -116,6 +119,7 @@ public class AdminServiceImpl implements AdminServices {
 
     }
 
+    @Transactional
     @Override
     public String deleteUserById(Long id) {
 

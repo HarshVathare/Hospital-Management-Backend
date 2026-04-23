@@ -63,6 +63,7 @@ public class PatientServiceImpl implements PatientServices {
         );
     }
 
+    @Transactional
     @Override
     public ProfileResponceDTO updateProfile(ProfileRequestDTO profileRequestDTO, Authentication authentication) {
 
@@ -281,6 +282,7 @@ public class PatientServiceImpl implements PatientServices {
 
     }
 
+    @Transactional
     @Override
     public String deleteAppointment(Long id) {
 
