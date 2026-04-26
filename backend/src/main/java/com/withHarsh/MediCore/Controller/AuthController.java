@@ -3,12 +3,15 @@ package com.withHarsh.MediCore.Controller;
 import com.withHarsh.MediCore.DTO.*;
 import com.withHarsh.MediCore.Services.AuthService;
 import com.withHarsh.MediCore.Services.PatientServices;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Auth APIs", description = "Authentication APIs")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class AuthController {
         return ResponseEntity.ok(authService.register(registerRequestDTO));
     }
 
+    @Operation(summary = "User Login", description = "Authenticate user and return JWT token")
     @PostMapping("/login")
     public ResponseEntity<LoginResponceDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         return ResponseEntity.ok(authService.login(loginRequestDTO));

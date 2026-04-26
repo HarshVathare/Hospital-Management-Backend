@@ -5,7 +5,10 @@ import com.withHarsh.MediCore.Entity.Patient;
 import com.withHarsh.MediCore.RabbitMQ.MessageProducer;
 import com.withHarsh.MediCore.Repository.PatientRepository;
 import com.withHarsh.MediCore.Services.PatientServices;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+@Tag(name = "Patient APIs", description = "Operations related to patients")
 @RestController
 @RequestMapping("/api/patients")
 @RequiredArgsConstructor
@@ -27,6 +31,11 @@ public class PatientController {
     private final MessageProducer producer;
     private final PatientRepository patientRepository;
 
+    @Operation(
+            summary = "Get Patient Profile",
+            description = "Fetch logged-in patient profile details",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @GetMapping("/profile")
     public ResponseEntity<ProfileResponceDTO> getProfile(@Parameter(hidden = true) Authentication authentication) {
         return ResponseEntity.ok(patientServices.getProfile(authentication));
@@ -61,6 +70,11 @@ public class PatientController {
         return ResponseEntity.ok(patientServices.getDocterById(id));
     }
 
+    @Operation(
+            summary = "Book Appointment",
+            description = "Patient can book an appointment with a doctor",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @PostMapping("/appointments")
     public ResponseEntity<AppointmentResponceDTO> createAppointment(@RequestBody AppointmentRequestDTO requestDTO , @Parameter(hidden = true) Authentication authentication) {
         return ResponseEntity.status(HttpStatus.CREATED).body(patientServices.createAppointment(requestDTO, authentication));
@@ -80,6 +94,11 @@ public class PatientController {
         return ResponseEntity.ok(patientServices.deleteAppointment(id));
     }
 
+    @Operation(
+            summary = "Change Password",
+            description = "Allows patient to change account password",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
     @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(
             @RequestBody ChangePasswordRequestDTO requestDTO,
