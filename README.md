@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/main/resources/static/Medicore.png" alt="Medicore Logo" width="250"/>
+  <img src="backend/src/main/resources/static/Medicore.png" alt="Medicore Logo" width="250"/>
 </p>
 # 🏥 Medicore - Hospital Management System - Backend API
 
