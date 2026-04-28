@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MediCare Hospital</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar { background: #f8f9fa; height: 100vh; padding: 20px; }
+        .nav-link { color: #333; }
+        .nav-link.active { background: #007bff; color: white; }
+        .dashboard-tab { display: none; }
+        .dashboard-tab.active { display: block; }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand"><i class="fas fa-hospital me-2"></i>MediCare Dashboard</a>
+            <div class="navbar-nav ms-auto">
+                <span id="userName" class="navbar-text me-3"></span>
+                <button class="btn btn-outline-light" onclick="logout()">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <div class="text-center mb-4 p-3 bg-white rounded">
+                        <i class="fas fa-user-circle fa-3x text-primary mb-2"></i>
+                        <h5 id="dashUserName">Loading...</h5>
+                        <span id="dashUserRole" class="badge bg-primary">Loading...</span>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item"><a class="nav-link active" onclick="showTab('profile')"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li class="nav-item"><a class="nav-link" onclick="showTab('appointments')"><i class="fas fa-calendar me-2"></i>Appointments</a></li>
+                        <li class="nav-item"><a class="nav-link" onclick="showTab('doctors')"><i class="fas fa-stethoscope me-2"></i>Doctors</a></li>
+                        <li class="nav-item" id="adminNav" style="display:none;"><a class="nav-link" onclick="showTab('admin')"><i class="fas fa-chart-bar me-2"></i>Admin</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 p-4">
+                <!-- Profile Tab -->
+                <div id="profileTab" class="dashboard-tab active">
+                    <div class="card">
+
+  <div id="profileView" class="card p-3">
+    <h5>My Profile</h5>
+    <hr>
+
+    <p><strong>Name:</strong> <span id="viewName"></span></p>
+    <p><strong>Email:</strong> <span id="viewEmail"></span></p>
+    <p><strong>Age:</strong> <span id="viewAge"></span></p>
+    <p><strong>Gender:</strong> <span id="viewGender"></span></p>
+    <p><strong>Medical Record:</strong> <span id="viewMedical"></span></p>
+
+    <button class="btn btn-warning mt-2" onclick="showEditForm()">Edit</button>
+</div>
+
+
+                        <div class="card-header"><i class="fas fa-user me-2"></i>My Profile</div>
+                        <div class="card-body">
+
+                          
+                            <form id="profileForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control mb-3" id="profileName" placeholder="Name">
+                                        <input type="email" class="form-control mb-3" id="profileEmail" placeholder="Email">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="number" class="form-control mb-3" id="profileAge" placeholder="Age">
+                                        <select class="form-control mb-3" id="profileGender">
+                                            <option value="MALE">Male</option>
+                                            <option value="FEMALE">Female</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <textarea class="form-control mb-3" id="profileMedical" rows="3" placeholder="Medical Record"></textarea>
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointments Tab -->
+                <div id="appointmentsTab" class="dashboard-tab">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <span><i class="fas fa-calendar me-2"></i>My Appointments</span>
+                            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#bookModal">
+                                <i class="fas fa-plus me-1"></i>Book New
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="appointmentsList">Loading appointments...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Doctors Tab -->
+                <div id="doctorsTab" class="dashboard-tab">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-stethoscope me-2"></i>Available Doctors</div>
+                        <div class="card-body">
+                            <div id="doctorsList">Loading doctors...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tab -->
+                <div id="adminTab" class="dashboard-tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header"><i class="fas fa-chart-bar me-2"></i>Dashboard Stats</div>
+                                <div class="card-body">
+                                    <div id="adminStats">Loading stats...</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header"><i class="fas fa-users me-2"></i>Actions</div>
+                                <div class="card-body">
+                                    <button class="btn btn-primary w-100 mb-3" onclick="loadUsers()">View Users</button>
+                                    <button class="btn btn-success w-100 mb-3" onclick="loadAllDoctors()">View Doctors</button>
+                                    <button class="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#createDoctorModal">+ Add Doctor</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Appointment Modal -->
+    <div class="modal fade" id="bookModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="bookForm">
+                    <div class="modal-header">
+                        <h5>Book Appointment</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label>Doctor</label>
+                            <select class="form-control" id="bookDoctor" required></select>
+                        </div>
+                        <div class="mb-3">
+                            <label>Date & Time</label>
+                            <input type="datetime-local" class="form-control" id="bookDate" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Book Now</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Doctor Modal -->
+    <div class="modal fade" id="createDoctorModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="createDoctorForm">
+                    <div class="modal-header">
+                        <h5>Add New Doctor</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3"><input type="text" class="form-control" id="doctorName" placeholder="Name" required></div>
+                        <div class="mb-3"><input type="email" class="form-control" id="doctorEmail" placeholder="Email" required></div>
+                        <div class="mb-3"><input type="password" class="form-control" id="doctorPassword" placeholder="Password" required></div>
+                        <div class="mb-3"><input type="text" class="form-control" id="doctorSpecialization" placeholder="Specialization" required></div>
+                        <div class="mb-3"><input type="number" class="form-control" id="doctorExperience" placeholder="Experience (years)" required></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Create Doctor</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+ 
+
+
+
+
+
+ 
+
+function fillProfileForm(user) {
+    document.getElementById('profileName').value = user.name || '';
+    document.getElementById('profileEmail').value = user.email || '';
+    document.getElementById('profileAge').value = user.age || '';
+    document.getElementById('profileGender').value = user.gender || 'MALE';
+    document.getElementById('profileMedical').value = user.medicalRecord || '';
+}
+
+async function loadProfile() {
+    try {
+        const user = await apiRequest('GET', 'http://localhost:8080/api/patients/profile');
+
+        fillProfileForm(user); // 👈 THIS LINE IS IMPORTANT
+
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProfile();
+});
+
+
+    const API_URL = 'http://localhost:8080/api';
+    let currentUser = null;
+    let allDoctors = [];
+
+    // Get token
+    function getToken() {
+        return localStorage.getItem('accessToken');
+    }
+
+    // API call with auth
+    async function apiCall(url, options = {}) {
+        const token = getToken();
+        return fetch(url, {
+            ...options,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                ...options.headers
+            }
+        });
+    }
+
+    // ✅ FIXED LOGIN CHECK - Uses PROFILE endpoint
+    async function checkLogin() {
+        const token = getToken();
+        if (!token) {
+            window.location.href = 'login.html';
+            return;
+        }
+
+        try {
+            const response = await apiCall(`${API_URL}/patients/profile`);
+            
+            if (response.ok) {
+                currentUser = await response.json();
+                startDashboard();
+            } else {
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
+        } catch (e) {
+            console.error('Login check failed:', e);
+            localStorage.clear();
+            window.location.href = 'login.html';
+        }
+    }
+
+    function startDashboard() {
+        // Update UI with real user data
+        document.getElementById('userName').textContent = currentUser.name;
+        document.getElementById('dashUserName').textContent = currentUser.name;
+        document.getElementById('dashUserRole').textContent = currentUser.role || 'PATIENT';
+        
+        // Show admin nav if admin
+        if (currentUser.role === 'ROLE_ADMIN') {
+            document.getElementById('adminNav').style.display = 'block';
+        }
+        
+        // Load all data
+        loadAppointments();
+        loadDoctors();
+    }
+
+    // Tab Navigation
+    function showTab(tabName) {
+        document.querySelectorAll('.dashboard-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        document.getElementById(tabName + 'Tab').classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    // Profile - Already loaded in checkLogin, but form is filled
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = {
+            name: document.getElementById('profileName').value,
+            email: document.getElementById('profileEmail').value,
+            age: parseInt(document.getElementById('profileAge').value),
+            gender: document.getElementById('profileGender').value,
+            medicalRecord: document.getElementById('profileMedical').value
+        };
+        
+        try {
+            const response = await apiCall(`${API_URL}/patients/profile`, {
+                method: 'PUT',
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                alert('Profile updated!');
+                currentUser = { ...currentUser, ...data };
+                document.getElementById('userName').textContent = data.name;
+                document.getElementById('dashUserName').textContent = data.name;
+            }
+        } catch (e) {
+            alert('Update failed');
+        }
+    });
+
+    // Load Appointments
+    async function loadAppointments() {
+        try {
+            const response = await apiCall(`${API_URL}/patients/appointments`);
+            const appointments = await response.json();
+            showAppointments(appointments);
+        } catch (e) {
+            document.getElementById('appointmentsList').innerHTML = 'No appointments';
+        }
+    }
+
+   function showAppointments(apps) {
+    const html = apps.map(app => `
+        <div class="card mb-3">
+            <div class="card-body">
+                <h6>${app.docter?.name || 'Doctor'}</h6>
+                <p>${new Date(app.appointment_Date).toLocaleString()}</p>
+                
+                <span class="badge bg-${app.status === 'CONFIRMED' ? 'success' : 'warning'}">
+                    ${app.status}
+                </span>
+
+                <br><br>
+
+                <!-- ✅ Cancel Button -->
+                <button 
+                    class="btn btn-danger btn-sm"
+                    onclick="cancelAppointment(${app.appointment_Id})">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `).join('') || 'No appointments found';
+
+    document.getElementById('appointmentsList').innerHTML = html;
+}
+
+async function cancelAppointment(id) {
+    if (!confirm("Are you sure you want to cancel this appointment?")) return;
+
+    try {
+        await fetch(`http://localhost:8080/api/patients/appointments/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+            }
+        });
+
+        alert('Appointment cancelled');
+
+        // ✅ reload appointments
+        loadAppointments();
+
+    } catch (error) {
+        console.log(error);
+        alert('Cancel failed');
+    }
+}
+
+    // Load Doctors
+    async function loadDoctors() {
+        try {
+            const response = await apiCall(`${API_URL}/patients/docters`);
+            allDoctors = await response.json();
+            showDoctors(allDoctors);
+            fillDoctorDropdown();
+        } catch (e) {
+            document.getElementById('doctorsList').innerHTML = 'No doctors found';
+        }
+    }
+
+    function showDoctors(doctors) {
+        const html = doctors.map(doc => `
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="fas fa-user-md fa-2x text-primary mb-2"></i>
+                        <h5>${doc.name}</h5>
+                        <p class="text-primary">${doc.specialization}</p>
+                        <p>${doc.experianceInYears} years exp</p>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        document.getElementById('doctorsList').innerHTML = `<div class="row">${html}</div>`;
+    }
+
+    function fillDoctorDropdown() {
+        const select = document.getElementById('bookDoctor');
+        select.innerHTML = allDoctors.map(doc => 
+            `<option value="${doc.id}">${doc.name} - ${doc.specialization}</option>`
+        ).join('');
+    }
+
+    // Book Appointment
+    document.getElementById('bookForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const data = {
+            appointment_Date: document.getElementById('bookDate').value,
+            docter_Id: document.getElementById('bookDoctor').value
+        };
+        
+        try {
+            const response = await apiCall(`${API_URL}/patients/appointments`, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            });
+            if (response.ok) {
+                bootstrap.Modal.getInstance(document.getElementById('bookModal')).hide();
+                alert('✅ Appointment booked!');
+                loadAppointments();
+                document.getElementById('bookForm').reset();
+            }
+        } catch (e) {
+            alert('Booking failed');
+        }
+    });
+
+    // Admin functions (only if admin)
+    async function loadAdminStats() {
+        try {
+            const response = await apiCall(`${API_URL}/admin/dashboard`);
+            const stats = await response.json();
+            document.getElementById('adminStats').innerHTML = `
+                <div class="row">
+                    <div class="col-6 mb-3">
+                        <div class="card bg-primary text-white text-center">
+                            <div class="card-body">
+                                <h3>${stats.totalPatients}</h3>
+                                <p>Patients</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="card bg-success text-white text-center">
+                            <div class="card-body">
+                                <h3>${stats.totalDocters}</h3>
+                                <p>Doctors</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } catch (e) {}
+    }
+
+    window.onload = checkLogin;
+
+    //logout function
+   async function logout() {
+    if (!confirm("Are you sure you want to logout?")) return;
+
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    try {
+        await fetch('http://localhost:8080/api/auth/logout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ refreshToken })
+        });
+    } catch (e) {
+        console.log("Logout API failed");
+    }
+
+    localStorage.clear();
+    window.location.href = 'login.html';
+}
+
+    </script>
+</body>
+</html>
