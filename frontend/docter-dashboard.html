@@ -138,7 +138,7 @@ async function loadProfile(){
     document.getElementById("sideName").innerText = data.name;
     document.getElementById("sideSpec").innerText = data.specialization;
 
-         document.getElementById("id").value = data.id; // readonly
+         document.getElementById("id").value = data.docter_id; // readonly
         document.getElementById("name").value = data.name;
         document.getElementById("email").value = data.email;
         document.getElementById("specialization").value = data.specialization;
@@ -207,8 +207,12 @@ async function loadAppointments(){
     const html = data.map(a=>`
         <div class="card mb-2">
         <div class="card-body">
-            <h6>Patient ID: ${a.patientId}</h6>
-            <p>${new Date(a.appointment_Date).toLocaleString()}</p>
+            <h6>Appointment ID: ${a.appointment_Id}</h6>
+            <h6>Patient ID: ${a.patient_Id}</h6>
+            <h6>Patient Name: ${a.name}</h6>
+            <h6>Email: ${a.email_Id}</h6>
+            <p><h6>Appointment Time: ${(a.appointment_Time).toLocaleString()}</h6></p>
+            <h6>Medical History: ${a.medical_History}</h6>
 
             <span class="badge bg-${a.status==='CONFIRMED'?'success':'warning'}">${a.status}</span>
 

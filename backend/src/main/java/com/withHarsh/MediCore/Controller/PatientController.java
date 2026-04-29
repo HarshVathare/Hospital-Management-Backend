@@ -51,7 +51,7 @@ public class PatientController {
             @RequestParam(required = false) String specialization,
             @RequestParam(required = false) String experienceInYears,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size
+            @RequestParam(defaultValue = "50") int size
     ) {
 
         if (specialization != null) {
