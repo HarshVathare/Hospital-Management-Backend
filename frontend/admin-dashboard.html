@@ -15,7 +15,10 @@
 
 <div class="container py-4">
 
-<h2 class="mb-4">Admin Dashboard</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Admin Dashboard</h2>
+  <button class="btn btn-danger" onclick="logout()">Logout</button>
+</div>
 
 <!-- DASHBOARD STATS -->
 <div class="row mb-4">
@@ -29,11 +32,25 @@
 <div class="card mb-4">
   <div class="card-header">Create Doctor</div>
   <div class="card-body">
+
     <input id="dname" class="form-control mb-2" placeholder="Name">
+
     <input id="demail" class="form-control mb-2" placeholder="Email">
+
+    <input id="dpassword" type="password" class="form-control mb-2" placeholder="Password">
+
     <input id="dspec" class="form-control mb-2" placeholder="Specialization">
-    <input id="dexp" class="form-control mb-2" placeholder="Experience">
+
+    <input id="dexp" class="form-control mb-2" placeholder="Experience (e.g. 8 years)">
+
+    <!-- Availability -->
+    <select id="dstatus" class="form-control mb-2">
+      <option value="true">Available</option>
+      <option value="false">Not Available</option>
+    </select>
+
     <button class="btn btn-success" onclick="createDoctor()">Create</button>
+
   </div>
 </div>
 
@@ -77,24 +94,40 @@ async function loadDashboard(){
 }
 
 // ================= CREATE DOCTOR =================
-async function createDoctor(){
+async function createDoctor() {
+
   const payload = {
-    name: dname.value,
-    email: demail.value,
-    specialization: dspec.value,
-    experienceInYears: dexp.value
+    name: document.getElementById("dname").value,
+    email: document.getElementById("demail").value,
+    password: document.getElementById("dpassword").value,
+    specialization: document.getElementById("dspec").value,
+    experianceInYears: document.getElementById("dexp").value, // ⚠️ match backend spelling
+    availibility_stutus: document.getElementById("dstatus").value === "true"
   };
 
+  console.log("Payload:", payload);
+
   const res = await apiCall(API + "/admin/docter", {
-    method:"POST",
+    method: "POST",
     body: JSON.stringify(payload)
   });
 
-  if(res.ok){
-    alert("Doctor Created");
+  const data = await res.json().catch(() => null);
+
+  if (res.ok) {
+    alert("✅ Doctor Created Successfully");
+
+    // clear form
+    document.getElementById("dname").value = "";
+    document.getElementById("demail").value = "";
+    document.getElementById("dpassword").value = "";
+    document.getElementById("dspec").value = "";
+    document.getElementById("dexp").value = "";
+    document.getElementById("dstatus").value = "true";
+
     loadDoctors();
   } else {
-    alert("Error creating doctor");
+    alert("❌ Error: " + (data?.message || "Failed"));
   }
 }
 
@@ -141,6 +174,28 @@ async function deleteUser(id){
   await apiCall(API + "/admin/user/" + id, { method:"DELETE" });
   loadUsers();
 }
+
+//================== LOGOUT =================
+async function logout() {
+        if (!confirm("Are you sure you want to logout?")) return;
+
+        const refreshToken = localStorage.getItem("refreshToken");
+
+        try {
+          await fetch("http://localhost:8080/api/auth/logout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ refreshToken }),
+          });
+        } catch (e) {
+          console.log("Logout API failed");
+        }
+
+        localStorage.clear();
+        window.location.href = "login.html";
+      }
 
 // INIT
 window.onload = () => {
