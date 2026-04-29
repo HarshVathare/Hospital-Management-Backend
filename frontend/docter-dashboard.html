@@ -125,34 +125,43 @@
           </div>
 
           <!-- MEDICAL RECORDS -->
-          <div id="recordsTab" class="dashboard-tab">
-            <div class="card">
-              <div class="card-header">Medical Records</div>
-              <div class="card-body">
-                <input
-                  id="patientId"
-                  class="form-control mb-2"
-                  placeholder="Enter Patient ID"
-                />
+           <div id="recordsTab" class="dashboard-tab">
+             <div class="card">
+               <div class="card-header">Medical Records</div>
+               <div class="card-body">
+           
+                 <!-- GET RECORDS -->
+                 <input id="patientId" class="form-control mb-2" placeholder="Enter Patient ID" />
+           
+                 <button class="btn btn-info mb-3" onclick="getRecords()">
+                   Get Records
+                 </button>
+           
+                 <div id="recordsList"></div>
+           
+                 <hr />
+           
+                 <!-- ADD RECORD -->
+                 <h6>Add Medical Record</h6>
+           
+                 <input id="appointmentId" class="form-control mb-2" placeholder="Appointment ID" />
+           
+                 <input id="diagnosis" class="form-control mb-2" placeholder="Diagnosis" />
+           
+                 <input id="prescription" class="form-control mb-2" placeholder="Prescription / Medicine" />
+           
+                 <textarea id="notes" class="form-control mb-2" placeholder="Notes"></textarea>
+           
+                 <button class="btn btn-success" onclick="addRecord()">
+                   Add Record
+                 </button>
+           
+               </div>
+             </div>
+           </div>
 
-                <button class="btn btn-info mb-3" onclick="getRecords()">
-                  Get Records
-                </button>
 
-                <div id="recordsList"></div>
 
-                <hr />
-
-                <h6>Add Record</h6>
-                <textarea id="recordText" class="form-control mb-2"></textarea>
-
-                <button class="btn btn-success" onclick="addRecord()">
-                  Add Record
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -400,40 +409,92 @@
 
  
       // ================= MEDICAL RECORD =================
-      async function getRecords() {
+    async function getRecords() {
+    try {
         const patientId = document.getElementById("patientId").value;
 
         const res = await apiCall(
-          API + `/docters/medical-records/${patientId}`,
+            API + `/docters/medical-record/${patientId}`
         );
+
         const data = await res.json();
 
-        const html = data
-          .map(
-            (r) => `
-        <div class="card mb-2">
-            <div class="card-body">${r.description}</div>
-        </div>
-    `,
-          )
-          .join("");
+        if (!data || data.length === 0) {
+            document.getElementById("recordsList").innerHTML =
+                "<p>No records found</p>";
+            return;
+        }
+
+        const html = data.map(r => `
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h6>Patient ID: ${r.patient_Id}</h6>
+                    <h6>Patient Name: ${r.patient_Name}</h6>
+
+                    <h6>Diagnosis: ${r.diagnosis}</h6>
+                    <h6>Medicine: ${r.medicine}</h6>
+ 
+                    <h6>Notes: ${r.notes}</h6>
+
+                    <h6>Doctor: ${r.docter_Name}</h6>
+
+                    <h6>Date: 
+                        ${new Date(r.createdAt).toLocaleString()}
+                    </h6>
+                </div>
+            </div>
+        `).join("");
 
         document.getElementById("recordsList").innerHTML = html;
-      }
 
-      // ADD RECORD
-      async function addRecord() {
-        const patientId = document.getElementById("patientId").value;
-        const text = document.getElementById("recordText").value;
+    } catch (error) {
+        console.error(error);
+        alert("❌ Error fetching records");
+    }
+}
 
-        await apiCall(API + "/docters/medical-records", "POST", {
-          patientId: patientId,
-          description: text,
-        });
+ async function addRecord() {
+    try {
+        const appointmentId = document.getElementById("appointmentId").value;
 
-        alert("Record Added");
-        getRecords();
-      }
+        const payload = {
+            diagnoses: document.getElementById("diagnosis").value,
+
+            // ✅ MUST be object (NOT string)
+            prescription: {
+                medicine: document.getElementById("prescription").value,
+                notes: document.getElementById("notes").value
+            }
+        };
+
+        console.log("POST Payload:", payload);
+
+        const res = await apiCall(
+            API + `/docters/${appointmentId}/medical-record`,
+            {
+                method: "POST",
+                body: JSON.stringify(payload)
+            }
+        );
+
+        const data = await res.json().catch(() => null);
+
+        if (res.ok) {
+            alert("✅ Medical record added successfully!");
+
+            document.getElementById("diagnosis").value = "";
+            document.getElementById("prescription").value = "";
+            document.getElementById("notes").value = "";
+
+        } else {
+            alert("❌ Failed: " + (data?.message || "Error adding record"));
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("❌ Error adding medical record");
+    }
+}
 
       // ================= LOGOUT =================
 
