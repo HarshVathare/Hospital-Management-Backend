@@ -453,18 +453,15 @@
     }
 }
 
- async function addRecord() {
+async function addRecord() {
     try {
         const appointmentId = document.getElementById("appointmentId").value;
 
+        // ✅ CORRECTED: Matches MedicalRecordRequestDTO structure
         const payload = {
-            diagnoses: document.getElementById("diagnosis").value,
-
-            // ✅ MUST be object (NOT string)
-            prescription: {
-                medicine: document.getElementById("prescription").value,
-                notes: document.getElementById("notes").value
-            }
+            diagnosis: document.getElementById("diagnosis").value,
+            prescription: document.getElementById("prescription").value, // Simple string
+            notes: document.getElementById("notes").value
         };
 
         console.log("POST Payload:", payload);
@@ -473,6 +470,9 @@
             API + `/docters/${appointmentId}/medical-record`,
             {
                 method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(payload)
             }
         );
@@ -481,11 +481,11 @@
 
         if (res.ok) {
             alert("✅ Medical record added successfully!");
-
+            
+            // Clear form fields
             document.getElementById("diagnosis").value = "";
             document.getElementById("prescription").value = "";
             document.getElementById("notes").value = "";
-
         } else {
             alert("❌ Failed: " + (data?.message || "Error adding record"));
         }
@@ -495,7 +495,6 @@
         alert("❌ Error adding medical record");
     }
 }
-
       // ================= LOGOUT =================
 
       async function logout() {
