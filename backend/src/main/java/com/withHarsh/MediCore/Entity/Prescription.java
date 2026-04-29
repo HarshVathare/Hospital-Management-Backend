@@ -19,8 +19,12 @@ public class Prescription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
-    @OneToOne(mappedBy = "prescription")
+//    @JsonIgnore
+//    @OneToOne(mappedBy = "prescription")
+//    private Medical_Records medicalRecords;
+// ✅ OWNER SIDE
+    @OneToOne
+    @JoinColumn(name = "medical_record_id")
     private Medical_Records medicalRecords;
 
     @Column(nullable = false, length = 500)

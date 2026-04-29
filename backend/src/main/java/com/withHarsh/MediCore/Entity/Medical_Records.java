@@ -25,11 +25,13 @@ public class Medical_Records {
     @JoinColumn(name = "docter_Id")
     private Docter docter;
 
-    @Column(nullable = false)
     private String diagnoses;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "prescription_Id")
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "prescription_Id")
+//    private Prescription prescription;
+// ✅ FIX: Add cascade here
+    @OneToOne(mappedBy = "medicalRecords", cascade = CascadeType.ALL)
     private Prescription prescription;
 
     @OneToOne
@@ -42,10 +44,4 @@ public class Medical_Records {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Lob
-    @Column(name = "medical_report", columnDefinition = "LONGBLOB")
-    private byte[] medicalReport;
-
-    private String fileName;
-    private String fileType;
 }
