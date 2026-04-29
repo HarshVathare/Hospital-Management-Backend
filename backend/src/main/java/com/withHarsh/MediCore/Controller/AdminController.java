@@ -27,7 +27,7 @@ public class AdminController {
             @RequestParam(required = false) String specialization,
             @RequestParam(required = false) String experienceInYears,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size
+            @RequestParam(defaultValue = "50") int size
     ) {
 
         if (specialization != null) {
@@ -49,7 +49,7 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<List<RegisterResponceDTO>> fetchAllUsers(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size
+            @RequestParam(defaultValue = "50") int size
     ) {
         return ResponseEntity.ok(adminServices.fetchAllUsers(page, size));
     }
