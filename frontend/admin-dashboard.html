@@ -116,7 +116,7 @@ async function loadDoctors(){
 
 // ================= DELETE DOCTOR =================
 async function deleteDoctor(id){
-  await apiCall(API + "/admin/docters/" + id, { method:"DELETE" });
+  await apiCall(API + "/admin/docter/" + id, { method:"DELETE" });
   loadDoctors();
 }
 
