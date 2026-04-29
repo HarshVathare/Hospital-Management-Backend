@@ -68,8 +68,20 @@
                     localStorage.setItem('refreshToken', result.refreshToken);
                     localStorage.setItem('userId', result.user_Id);
                     localStorage.setItem('email', result.email);
+                    localStorage.setItem('role',result.role);
                     
-                    window.location.href = 'dashboard.html';
+                   if (result.role === 'PATIENT') {
+                        window.location.href = 'dashboard.html';
+                    } 
+                   else if (result.role === 'DOCTOR') {
+                        window.location.href = 'docter-dashboard.html';
+                    } 
+                   else if (result.role === 'ADMIN') {
+                        window.location.href = 'admin-dashboard.html';
+                    } 
+                   else {
+                        alert("Unknown role");
+                    }
                 } else {
                     alert('Login failed: ' + (result.message || 'Try again'));
                 }

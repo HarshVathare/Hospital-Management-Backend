@@ -1,6 +1,6 @@
 package com.withHarsh.MediCore.DTO;
 
-import com.withHarsh.MediCore.Entity.RefreshToken;
+import com.withHarsh.MediCore.Entity.type.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +14,6 @@ public class LoginResponceDTO {
     private String refreshToken;
     private Long user_Id;
     private String email;
-
+    private RoleType role;
 
 }

@@ -59,6 +59,7 @@ public class DocterServiceImpl implements DocterServices {
 
         return new DocterProfileResponceDTO(
                 user.getId(),
+                user.getDocter().getId(),
                 user.getName(),
                 user.getEmail(),
                 docter.getSpecialization(),
@@ -112,6 +113,7 @@ public class DocterServiceImpl implements DocterServices {
 
         return new DocterProfileResponceDTO(
                 user.getId(),
+                user.getDocter().getId(),
                 user.getName(),
                 user.getEmail(),
                 docter.getSpecialization(),

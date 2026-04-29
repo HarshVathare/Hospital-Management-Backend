@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class DocterProfileResponceDTO {
 
     private Long id; //user_id
+    private Long docter_id;
     private String name;
     private String email;
     private String specialization;

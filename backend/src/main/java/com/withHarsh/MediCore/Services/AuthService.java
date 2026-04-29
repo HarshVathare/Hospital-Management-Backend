@@ -108,7 +108,9 @@ public class AuthService {
                 accessToken,
                 refreshToken.getToken(),
                 user.getId(),
-                user.getEmail());
+                user.getEmail(),
+                user.getRole()
+                );
     }
 
 
