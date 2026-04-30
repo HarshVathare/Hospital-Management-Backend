@@ -186,7 +186,8 @@ public class AuthService {
         user.setResetToken(UUID.randomUUID().toString());
         userRepository.save(user);
 
-        String link = "http://localhost:8080/api/auth/reset?token=" + user.getResetToken();
+        // ✅ IMPORTANT: frontend URL (NOT backend)
+        String link = "http://localhost:5500/reset-password.html?token=" + user.getResetToken();
 
         emailService.sendEmailForForgotPassword(
                 user.getEmail(),
@@ -199,16 +200,54 @@ public class AuthService {
 
     @Transactional
     public String resetPassword(String token, String newPassword) {
-        User user = userRepository.findByResetToken(token).orElseThrow();
+
+        if (token == null || token.isEmpty()) {
+            throw new RuntimeException("Token is missing");
+        }
+
+        User user = userRepository.findByResetToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid or expired token"));
 
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setResetToken(null);
 
         userRepository.save(user);
 
-        return "Password updated";
-
+        return "Password updated successfully";
     }
+
+//    @Transactional
+//    public String forgotPassword(String email) {
+//
+//        User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new IllegalArgumentException("User not found..!"));
+//
+//        user.setResetToken(UUID.randomUUID().toString());
+//        userRepository.save(user);
+//
+//        String link = "http://localhost:8080/api/auth/reset-password.html?token=" + user.getResetToken();
+//
+//        emailService.sendEmailForForgotPassword(
+//                user.getEmail(),
+//                "Reset Your MediCore Password",
+//                link
+//        );
+//
+//        return "Password reset link sent to your email";
+//    }
+
+//    @Transactional
+    ////    public String resetPassword(String token, String newPassword) {
+    ////        User user = userRepository.findByResetToken(token).orElseThrow();
+    ////
+    ////        user.setPassword(passwordEncoder.encode(newPassword));
+    ////        user.setResetToken(null);
+    ////
+    ////        userRepository.save(user);
+    ////
+    ////        return "Password updated";
+    ////
+    ////    }
 
     @Transactional
     public String logout(RefreshTokenRequestDTO request) {
