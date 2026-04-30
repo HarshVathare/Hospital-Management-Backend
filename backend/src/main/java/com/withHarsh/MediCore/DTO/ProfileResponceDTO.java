@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 public class ProfileResponceDTO {
 
     private Long id;
+    private Long patient_Id;
     private String name;
     private String email;
     private String age;

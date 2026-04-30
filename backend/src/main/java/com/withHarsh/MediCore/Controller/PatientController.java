@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -130,9 +131,12 @@ public class PatientController {
                 .orElseThrow(() -> new RuntimeException("Patient not found"));
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=" + patient.getFileName())
-                .header(HttpHeaders.CONTENT_TYPE, patient.getFileType())
+                .contentType(MediaType.APPLICATION_PDF) // or image/jpeg
                 .body(patient.getMedicalReport());
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.CONTENT_DISPOSITION,
+//                        "attachment; filename=" + patient.getFileName())
+//                .header(HttpHeaders.CONTENT_TYPE, patient.getFileType())
+//                .body(patient.getMedicalReport());
     }
 }

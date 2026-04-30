@@ -53,6 +53,7 @@ public class PatientServiceImpl implements PatientServices {
 
         return new ProfileResponceDTO(
                 user.getId(),
+                user.getPatient().getId(),
                 user.getName(),
                 user.getEmail(),
                 patient.getAge(),
@@ -106,6 +107,7 @@ public class PatientServiceImpl implements PatientServices {
 
         return new ProfileResponceDTO(
                 user.getId(),
+                user.getPatient().getId(),
                 user.getName(),
                 user.getEmail(),
                 patient.getAge(),
