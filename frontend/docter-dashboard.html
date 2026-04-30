@@ -105,7 +105,7 @@
                   />
                   <b> Experience : </b
                   ><input
-                    id="experience"
+                    id="experianceInYears"
                     class="form-control mb-2"
                     placeholder="Experience"
                   />
@@ -226,22 +226,6 @@
         document.getElementById(tab + "Tab").classList.add("active");
       }
 
-      // ================= PROFILE =================
-      async function loadProfile() {
-        const res = await apiCall(API + "/docters/profile");
-        const data = await res.json();
-
-        document.getElementById("doctorName").innerText = data.name;
-        document.getElementById("sideName").innerText = data.name;
-        document.getElementById("sideSpec").innerText = data.specialization;
-
-        document.getElementById("id").value = data.docter_id; // readonly
-        document.getElementById("name").value = data.name;
-        document.getElementById("email").value = data.email;
-        document.getElementById("specialization").value = data.specialization;
-        document.getElementById("experience").value = data.experienceInYears;
-      }
-
       // UPDATE DOCTOR PROFILE
       document
         .getElementById("profileForm")
@@ -253,7 +237,7 @@
             name: document.getElementById("name").value,
             email: document.getElementById("email").value,
             specialization: document.getElementById("specialization").value,
-            experienceInYears: document.getElementById("experience").value,
+            experienceInYears: document.getElementById("experianceInYears").value,
           };
 
           try {
@@ -272,7 +256,7 @@
               document.getElementById("sideSpec").innerText =
                 data.specialization;
               document.getElementById("email").value = data.email;
-              document.getElementById("experience").value =
+              document.getElementById("experianceInYears").value =
                 data.experienceInYears;
             } else {
               const err = await response.json();
@@ -283,6 +267,85 @@
             alert("❌ Server error");
           }
         });
+
+
+      // const API = "http://localhost:8080/api";
+
+// ✅ Common API call helper
+async function apiCall(url, method = "GET", data = null) {
+    return fetch(url, {
+        method,
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + localStorage.getItem("accessToken")
+        },
+        body: data ? JSON.stringify(data) : null
+    });
+}
+
+
+//       // ================= LOAD PROFILE =================
+async function loadProfile() {
+    try {
+        const res = await apiCall(API + "/docters/profile");
+        const data = await res.json();
+
+ document.getElementById("doctorName").innerText = data.name;
+        document.getElementById("sideName").innerText = data.name;
+        document.getElementById("sideSpec").innerText = data.role;
+
+        console.log("PROFILE DATA:", data);
+
+        // Fill UI
+        document.getElementById("id").value = data.docter_id || data.id || "";
+        document.getElementById("name").value = data.name || "";
+        document.getElementById("email").value = data.email || "";
+        document.getElementById("specialization").value = data.specialization || "";
+
+        // ✅ Fix spelling issue (handles both cases)
+        document.getElementById("experianceInYears").value =
+            data.experienceInYears || data.experianceInYears || "";
+
+    } catch (error) {
+        console.error(error);
+        alert("❌ Failed to load profile");
+    }
+}
+
+// ================= UPDATE PROFILE =================
+document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const data = {
+        name: document.getElementById("name").value,
+        email: document.getElementById("email").value,
+        specialization: document.getElementById("specialization").value,
+
+        // ✅ send correct key (backend should use this)
+        experienceInYears: document.getElementById("experianceInYears").value
+    };
+
+    try {
+        const res = await apiCall(API + "/docters/profile", "PUT", data);
+
+        if (res.ok) {
+            alert("✅ Profile Updated");
+
+            // Reload updated data
+            loadProfile();
+
+        } else {
+            const err = await res.json();
+            alert("❌ Update failed: " + (err.message || "Error"));
+        }
+
+    } catch (error) {
+        console.error(error);
+        alert("❌ Server error");
+    }
+});
+
+ 
 
       // ================= APPOINTMENTS =================
       async function loadAppointments() {
