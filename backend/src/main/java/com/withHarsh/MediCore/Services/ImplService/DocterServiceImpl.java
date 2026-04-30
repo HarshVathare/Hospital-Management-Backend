@@ -255,57 +255,6 @@ public class DocterServiceImpl implements DocterServices {
         );
     }
 
-//    @Transactional
-//    @Override
-//    public MedicalRecordResponceDTO createMedicalRecord(Long appointmentId, MedicalRecordRequestDTO requestDTO) {
-//
-//        Appointment appointment = appointmentRepository.findById(appointmentId)
-//                .orElseThrow(() -> new IllegalArgumentException("Appointment not found"));
-//
-//        if (appointment.getAppointmentStatus() == AppointType.COMPLETED) {
-//            throw new IllegalStateException("Medical record already created");
-//        }
-//
-//        Docter doctor = appointment.getDocter();
-//        Patient patient = appointment.getPatient();
-//
-//        Prescription prescription = new Prescription();
-//        prescription.setMedicine(requestDTO.getPrescription());
-//        prescription.setNotes(requestDTO.getNotes());
-//
-//        Medical_Records record = new Medical_Records();
-//        record.setDiagnoses(requestDTO.getDiagnosis());
-//        record.setDocter(doctor);
-//        record.setPatient(patient);
-//        record.setAppointment(appointment);
-//        record.setPrescription(prescription);
-//
-//        prescription.setMedicalRecords(record);
-//
-//        medical_RecordsRepository.save(record);
-//
-//        // ✅ Update appointment
-//        appointment.setAppointmentStatus(AppointType.COMPLETED);
-//
-//        // ✅ Update doctor
-//        doctor.setAvailibility_stutus(true);
-//
-//        // ✅ Save both explicitly
-//        appointmentRepository.save(appointment);
-//        docterRepository.save(doctor);
-//
-//        return new MedicalRecordResponceDTO(
-//                record.getId(),
-//                patient.getId(),
-//                doctor.getUser().getName(),
-//                patient.getUser().getName(),
-//                record.getDiagnoses(),
-//                prescription.getMedicine(),
-//                prescription.getNotes(),
-//                record.getCreatedAt()
-//        );
-//
-//    }
 
     @Override
     public List<MedicalRecordResponceDTO> getMedicalRecordByPatientId(Long patientId) {
