@@ -52,20 +52,7 @@
                 <!-- Profile Tab -->
                 <div id="profileTab" class="dashboard-tab active">
                     <div class="card">
-
-  <!-- <div id="profileView" class="card p-3">
-    <h5>My Profile</h5>
-    <hr>
-
-    <p><strong>Name:</strong> <span id="viewName"></span></p>
-    <p><strong>Email:</strong> <span id="viewEmail"></span></p>
-    <p><strong>Age:</strong> <span id="viewAge"></span></p>
-    <p><strong>Gender:</strong> <span id="viewGender"></span></p>
-    <p><strong>Medical Record:</strong> <span id="viewMedical"></span></p>
-
-    <button class="btn btn-warning mt-2" onclick="showEditForm()">Edit</button>
-</div> -->
-
+ 
 
                         <div class="card-header"><i class="fas fa-user me-2"></i>My Profile</div>
                         <div class="card-body">
@@ -89,7 +76,8 @@
     <!-- ✅ File Upload (PDF / Image) -->
     <b>If you have medical records, please upload them:</b>
     <input type="file" class="form-control mb-3" id="medicalFile" accept=".pdf,image/*">
-
+    <!-- ✅ Show existing file -->
+    <div id="medicalRecordPreview" class="mb-3"></div>
     <button type="submit" class="btn btn-primary">Update Profile</button>
 </form>
                         </div>
@@ -202,27 +190,7 @@
  
 const token = localStorage.getItem("accessToken");
 
-// fetch("http://localhost:8080/api/patients/profile", {
-//   method: "GET",
-//   headers: {
-//     "Authorization": "Bearer " + token,
-//     "Content-Type": "application/json"
-//   }
-// })
-// .then(response => response.json())
-// .then(data => {
-//   document.getElementById("viewName").innerText = data.name;
-//   document.getElementById("viewEmail").innerText = data.email;
-//   document.getElementById("viewAge").innerText = data.age;
-//   document.getElementById("viewGender").innerText = data.gender;
-//   document.getElementById("viewMedical").innerText = data.medicalRecord;
-//   document.getElementById("viewRole").innerText = data.role;
-// })
-// .catch(error => console.error("Error:", error));
-
-
-
-
+ 
  
 
 function fillProfileForm(user) {
@@ -232,17 +200,6 @@ function fillProfileForm(user) {
     document.getElementById('profileGender').value = user.gender || 'MALE';
     document.getElementById('profileMedical').value = user.medicalRecord || '';
 }
-
-// async function loadProfile() {
-//     try {
-//         const user = await apiRequest('GET', 'http://localhost:8080/api/patients/profile');
-
-//         fillProfileForm(user); // 👈 THIS LINE IS IMPORTANT
-
-//     } catch (e) {
-//         console.log(e);
-//     }
-// }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadProfile();
@@ -324,20 +281,20 @@ document.addEventListener('DOMContentLoaded', () => {
         event.target.classList.add('active');
     }
 
-
-    async function loadProfile() {
+async function loadProfile() {
     try {
         const response = await apiCall(`${API_URL}/patients/profile`);
         const data = await response.json();
 
-        // ✅ Store user (important for file upload id)
         currentUser = data;
 
-        // ✅ Fill form fields
         document.getElementById('profileName').value = data.name || '';
         document.getElementById('profileEmail').value = data.email || '';
         document.getElementById('profileAge').value = data.age || '';
         document.getElementById('profileGender').value = data.gender || 'MALE';
+
+        // ✅ After profile, fetch report
+        loadMedicalReport(data.patient_Id);
 
     } catch (error) {
         console.error(error);
@@ -345,83 +302,152 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 }
 
-    // Profile - Already loaded in checkLogin, but form is filled
-    // document.getElementById('profileForm').addEventListener('submit', async function(e) {
-    //     e.preventDefault();
-    //     const data = {
-    //         name: document.getElementById('profileName').value,
-    //         email: document.getElementById('profileEmail').value,
-    //         age: parseInt(document.getElementById('profileAge').value),
-    //         gender: document.getElementById('profileGender').value,
-    //         medicalRecord: document.getElementById('profileMedical').value
-    //     };
-        
-    //     try {
-    //         const response = await apiCall(`${API_URL}/patients/profile`, {
-    //             method: 'PUT',
-    //             body: JSON.stringify(data)
-    //         });
-    //         if (response.ok) {
-    //             alert('Profile updated!');
-    //             currentUser = { ...currentUser, ...data };
-    //             document.getElementById('userName').textContent = data.name;
-    //             document.getElementById('dashUserName').textContent = data.name;
-    //         }
-    //     } catch (e) {
-    //         alert('Update failed');
-    //     }
-    // });
-
-    document.getElementById('profileForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const userId = currentUser.id;
-
-    const data = {
-        name: document.getElementById('profileName').value,
-        email: document.getElementById('profileEmail').value,
-        age: parseInt(document.getElementById('profileAge').value),
-        gender: document.getElementById('profileGender').value
-    };
+async function loadMedicalReport(patient_Id) {
+    const preview = document.getElementById('medicalRecordPreview');
 
     try {
-        // ✅ 1. Update profile
-        const response = await apiCall(`${API_URL}/patients/profile`, {
-            method: 'PUT',
-            body: JSON.stringify(data)
+        const res = await fetch(`${API_URL}/patients/${patient_Id}/report`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+            }
         });
 
-        if (!response.ok) throw new Error("Profile update failed");
-
-        // ✅ 2. Upload file
-        const fileInput = document.getElementById('medicalFile');
-        const file = fileInput.files[0];
-
-        if (file) {
-            const formData = new FormData();
-            formData.append("file", file);
-
-            const uploadRes = await fetch(`${API_URL}/patients/${userId}/report`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-                },
-                body: formData
-            });
-
-            if (!uploadRes.ok) throw new Error("File upload failed");
+        // ✅ If no file
+        if (!res.ok) {
+            preview.innerHTML = `<p class="text-muted">No medical record uploaded</p>`;
+            return;
         }
 
-        alert('Profile & Medical record updated!');
+        const blob = await res.blob();
+        const fileURL = URL.createObjectURL(blob);
 
-        // ✅ reload latest data from DB
-        loadProfile();
+        // ✅ FIX: handle null content-type
+        const contentType = res.headers.get("content-type") || "";
 
-    } catch (e) {
-        console.error(e);
-        alert('Update failed');
+        if (contentType.includes("image")) {
+            preview.innerHTML = `
+                <img src="${fileURL}" width="120" class="mb-2"/><br>
+                <a href="${fileURL}" target="_blank">Open Image</a>
+            `;
+        } else if (contentType.includes("pdf")) {
+            preview.innerHTML = `
+                <a href="${fileURL}" target="_blank" class="btn btn-outline-primary btn-sm">
+                    View PDF Report
+                </a>
+            `;
+        } else {
+            preview.innerHTML = `
+                <a href="${fileURL}" target="_blank">Download File</a>
+            `;
+        }
+
+    } catch (error) {
+        console.error("REPORT ERROR:", error);
+        preview.innerHTML = `<p class="text-danger">Error loading report</p>`;
     }
-});
+}
+ 
+
+// async function loadMedicalReport(patient_Id) {
+//     const preview = document.getElementById('medicalRecordPreview');
+
+//     try {
+//         const res = await fetch(`${API_URL}/patients/${patient_Id}/report`, {
+//             method: 'GET',
+//             headers: {
+//                 'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+//             }
+//         });
+
+//         if (!res.ok) {
+//             preview.innerHTML = `<p class="text-muted">No medical record uploaded</p>`;
+//             return;
+//         }
+
+//         // ✅ Convert file to blob URL
+//         const blob = await res.blob();
+//         const fileURL = URL.createObjectURL(blob);
+
+//         // ✅ Detect file type
+//         const contentType = res.headers.get("content-type");
+
+//         if (contentType.includes("image")) {
+//             preview.innerHTML = `
+//                 <img src="${fileURL}" width="120" class="mb-2"/><br>
+//                 <a href="${fileURL}" target="_blank">Open Image</a>
+//             `;
+//         } else if (contentType.includes("pdf")) {
+//             preview.innerHTML = `
+//                 <a href="${fileURL}" target="_blank" class="btn btn-outline-primary btn-sm">
+//                     View PDF Report
+//                 </a>
+//             `;
+//         } else {
+//             preview.innerHTML = `
+//                 <a href="${fileURL}" target="_blank">Download File</a>
+//             `;
+//         }
+
+//     } catch (error) {
+//         console.error(error);
+//         preview.innerHTML = `<p class="text-danger">Error loading report</p>`;
+//     }
+// }
+
+
+
+
+//     document.getElementById('profileForm').addEventListener('submit', async function(e) {
+//     e.preventDefault();
+
+//     const userId = currentUser.id;
+
+//     const data = {
+//         name: document.getElementById('profileName').value,
+//         email: document.getElementById('profileEmail').value,
+//         age: parseInt(document.getElementById('profileAge').value),
+//         gender: document.getElementById('profileGender').value
+//     };
+
+//     try {
+//         // ✅ 1. Update profile
+//         const response = await apiCall(`${API_URL}/patients/profile`, {
+//             method: 'PUT',
+//             body: JSON.stringify(data)
+//         });
+
+//         if (!response.ok) throw new Error("Profile update failed");
+
+//         // ✅ 2. Upload file
+//         const fileInput = document.getElementById('medicalFile');
+//         const file = fileInput.files[0];
+
+//         if (file) {
+//             const formData = new FormData();
+//             formData.append("file", file);
+
+//             const uploadRes = await fetch(`${API_URL}/patients/${userId}/report`, {
+//                 method: 'POST',
+//                 headers: {
+//                     'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+//                 },
+//                 body: formData
+//             });
+
+//             if (!uploadRes.ok) throw new Error("File upload failed");
+//         }
+
+//         alert('Profile & Medical record updated!');
+
+//         // ✅ reload latest data from DB
+//         loadProfile();
+
+//     } catch (e) {
+//         console.error(e);
+//         alert('Update failed');
+//     }
+// });
 
     // Load Appointments
     async function loadAppointments() {
