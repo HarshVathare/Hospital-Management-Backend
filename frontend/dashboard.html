@@ -1,537 +1,1042 @@
-<!DOCTYPE html>
+
+
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard - MediCare Hospital</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      rel="stylesheet"
+    />
     <style>
-        .sidebar { background: #f8f9fa; height: 100vh; padding: 20px; }
-        .nav-link { color: #333; }
-        .nav-link.active { background: #007bff; color: white; }
-        .dashboard-tab { display: none; }
-        .dashboard-tab.active { display: block; }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container-fluid">
-            <a class="navbar-brand"><i class="fas fa-hospital me-2"></i>MediCare Dashboard</a>
-            <div class="navbar-nav ms-auto">
-                <span id="userName" class="navbar-text me-3"></span>
-                <button class="btn btn-outline-light" onclick="logout()">
-                    <i class="fas fa-sign-out-alt me-1"></i>Logout
-                </button>
-            </div>
-        </div>
-    </nav>
+/* ================= ROOT & GLOBAL ================= */
+:root {
+    --primary-color: #2563eb;    /* Modern Royal Blue */
+    --secondary-color: #1e293b;  /* Slate Dark */
+    --accent-color: #38bdf8;     /* Sky Blue */
+    --bg-light: #f1f5f9;         /* Soft Gray Blue */
+    --sidebar-width: 280px;
+    --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3">
-                <div class="sidebar">
-                    <div class="text-center mb-4 p-3 bg-white rounded">
-                        <i class="fas fa-user-circle fa-3x text-primary mb-2"></i>
-                        <h5 id="dashUserName">Loading...</h5>
-                        <span id="dashUserRole" class="badge bg-primary">Loading...</span>
-                    </div>
-                    <ul class="nav flex-column">
-                        <li class="nav-item"><a class="nav-link active" onclick="showTab('profile')"><i class="fas fa-user me-2"></i>Profile</a></li>
-                        <li class="nav-item"><a class="nav-link" onclick="showTab('appointments')"><i class="fas fa-calendar me-2"></i>Appointments</a></li>
-                        <li class="nav-item"><a class="nav-link" onclick="showTab('doctors')"><i class="fas fa-stethoscope me-2"></i>Doctors</a></li>
-                        <li class="nav-item" id="adminNav" style="display:none;"><a class="nav-link" onclick="showTab('admin')"><i class="fas fa-chart-bar me-2"></i>Admin</a></li>
-                    </ul>
-                </div>
-            </div>
+body {
+    background-color: var(--bg-light);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #334155;
+    letter-spacing: -0.01em;
+}
 
-            <!-- Main Content -->
-            <div class="col-md-9 p-4">
-                <!-- Profile Tab -->
-                <div id="profileTab" class="dashboard-tab active">
-                    <div class="card">
- 
+/* ================= NAVIGATION BAR ================= */
+.navbar {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px); /* Glass effect */
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 0.75rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 1010;
+}
 
-                        <div class="card-header"><i class="fas fa-user me-2"></i>My Profile</div>
-                        <div class="card-body">
+.navbar-brand {
+    font-weight: 700;
+    color: var(--primary-color) !important;
+    font-size: 1.25rem;
+}
 
-                          
-                            <form id="profileForm">
-    <div class="row">
-        <div class="col-md-6">
-            <input type="text" class="form-control mb-3" id="profileName" placeholder="Name">
-            <input type="email" class="form-control mb-3" id="profileEmail" placeholder="Email">
-        </div>
-        <div class="col-md-6">
-            <input type="number" class="form-control mb-3" id="profileAge" placeholder="Age">
-            <select class="form-control mb-3" id="profileGender">
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-            </select>
-        </div>
+/* ================= SIDEBAR ================= */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: var(--secondary-color);
+    padding-top: 20px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1050;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+}
+
+/* User Info Section in Sidebar */
+.sidebar .text-center.bg-white {
+    background: rgba(255, 255, 255, 0.05) !important; /* Semi-transparent */
+    margin: 0 20px 25px 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: white;
+}
+
+.sidebar h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* Navigation Links */
+.sidebar .nav-link {
+    color: #94a3b8 !important;
+    padding: 12px 24px;
+    margin: 4px 15px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-link i {
+    font-size: 1.1rem;
+    width: 28px;
+}
+
+.sidebar .nav-link:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+}
+
+.sidebar .nav-link.active {
+    background: var(--primary-color) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* ================= MAIN CONTENT ================= */
+.col-md-9.p-4 {
+    margin-left: 300px; /* Bootstrap grid handling */
+    padding: 30px !important;
+}
+
+/* CARDS */
+.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    background: #ffffff;
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+.card-header {
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 18px 24px;
+    font-weight: 700;
+    color: var(--secondary-color);
+    display: flex;
+    align-items: center;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* FORM STYLING */
+.form-control {
+    border-radius: 10px;
+    padding: 12px 15px;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    transition: all 0.2s;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    border-color: var(--primary-color);
+}
+
+/* BUTTONS */
+.btn-primary {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+/* ================= TAB ANIMATION ================= */
+.dashboard-tab {
+    display: none;
+}
+
+.dashboard-tab.active {
+    display: block;
+    animation: slideUp 0.5s ease forwards;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ================= RESPONSIVE DESIGN ================= */
+
+/* Tablet & Mobile */
+@media (max-width: 991.98px) {
+    .sidebar {
+        left: -100%;
+    }
+    
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* Since your HTML uses col-md-3 and col-md-9 */
+    .col-md-9 {
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+    
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+}
+
+/* Mobile Specific Tweaks */
+@media (max-width: 576px) {
+    .card-body {
+        padding: 15px;
+    }
+    
+    .p-4 {
+        padding: 15px !important;
+    }
+}
+
+/* Custom Table Styling for Appointments */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+#appointmentsList div, #doctorsList div {
+    background: white;
+    padding: 15px;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    margin-bottom: 10px;
+    transition: 0.2s;
+}
+
+#appointmentsList div:hover {
+    border-color: var(--primary-color);
+    background: #f8fafc;
+}
+
+/* Hide the actual checkbox */
+.menu-checkbox {
+  display: none;
+}
+
+/* Style the 3-line Hamburger */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  cursor: pointer;
+}
+
+.hamburger span {
+  height: 3px;
+  width: 100%;
+  background-color: #333;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+/* Hide menu by default */
+.nav-menu {
+  display: none; /* Or use transform: translateX(-100%) for animation */
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+/* =========================================== */
+/* THE MAGIC: Display menu when checked        */
+/* =========================================== */
+.menu-checkbox:checked ~ .nav-menu {
+  display: block;
+}
+
+/* Optional: Turn hamburger into an 'X' when checked */
+.menu-checkbox:checked ~ .hamburger span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+.menu-checkbox:checked ~ .hamburger span:nth-child(2) {
+  opacity: 0;
+}
+.menu-checkbox:checked ~ .hamburger span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* ================= TOGGLE BUTTON ================= */
+.menu-toggle {
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  height: 3px;
+  width: 25px;
+  background: #333;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+/* Animate to X */
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translateY(8px);
+}
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translateY(-8px);
+}
+
+/* ================= SIDEBAR ================= */
+.sidebar {
+  width: 260px;
+  height: calc(100vh - 60px);
+  position: fixed;
+  top: 60px;
+  left: 0;
+  background: #1e293b;
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 1000;
+}
+
+/* Hide on mobile */
+@media (max-width: 1000px) {
+  .sidebar {
+    left: -260px;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+}
+
+/* ================= MAIN ================= */
+.main-content {
+  margin-left: 260px;
+  padding: 20px;
+  transition: 0.3s;
+}
+
+@media (max-width: 1000px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+/* ================= OVERLAY ================= */
+.overlay {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 900;
+}
+
+.overlay.active {
+  display: block;
+}
+
+/* ================= NAV LINKS ================= */
+.nav-link {
+  color: #94a3b8;
+  padding: 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  background: #2563eb;
+  color: white;
+}
+
+/* ================= LOGOUT ================= */
+.logout-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border-radius: 10px;
+  padding: 8px 14px;
+}
+
+.logout-btn:hover {
+  background: #b91c1c;
+  transform: scale(1.05);
+}
+
+/* ================= SIDEBAR DEFAULT (DESKTOP) ================= */
+.sidebar {
+  width: 260px;
+  height: calc(100vh - 60px);
+  position: fixed;
+  top: 60px;
+  left: 0;
+  background: #1e293b;
+  padding: 20px;
+  transition: 0.3s;
+  z-index: 1000;
+}
+
+/* Desktop: ALWAYS visible */
+@media (min-width: 1000px) {
+  .sidebar {
+    left: 0 !important;
+  }
+}
+
+/* Mobile: hidden by default */
+@media (max-width: 999px) {
+  .sidebar {
+    left: -260px;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+}
+
+.main-content {
+  margin-left: 260px;
+  padding: 20px;
+  transition: 0.3s;
+}
+
+/* Mobile: full width */
+@media (max-width: 999px) {
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+.overlay {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 900;
+}
+
+.overlay.active {
+  display: block;
+}
+
+/* Disable overlay on desktop */
+@media (min-width: 1000px) {
+  .overlay {
+    display: none !important;
+  }
+}
+
+</style>
+  </head>
+  <body>
+
+
+<!-- ================= NAVBAR ================= -->
+<nav class="navbar">
+  <div class="container-fluid d-flex justify-content-between align-items-center">
+
+    <!-- LEFT: Toggle + Logo -->
+    <div class="d-flex align-items-center gap-3">
+      <button id="toggleBtn" class="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <span class="navbar-brand">
+        <i class="fas fa-hospital me-2"></i>MediCare
+      </span>
     </div>
 
-    <!-- ✅ File Upload (PDF / Image) -->
-    <b>If you have medical records, please upload them:</b>
-    <input type="file" class="form-control mb-3" id="medicalFile" accept=".pdf,image/*">
-    <!-- ✅ Show existing file -->
-    <div id="medicalRecordPreview" class="mb-3"></div>
-    <button type="submit" class="btn btn-primary">Update Profile</button>
-</form>
-                        </div>
-                    </div>
-                </div>
+    <!-- RIGHT: USER + LOGOUT -->
+    <div class="d-flex align-items-center gap-3">
+     <b> <span style="color: black;" id="userName"></span> </b>
+    
 
-                <!-- Appointments Tab -->
-                <div id="appointmentsTab" class="dashboard-tab">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between">
-                            <span><i class="fas fa-calendar me-2"></i>My Appointments</span>
-                            <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#bookModal">
-                                <i class="fas fa-plus me-1"></i>Book New
-                            </button>
-                        </div>
-                        <div class="card-body">
-                            <div id="appointmentsList">Loading appointments...</div>
-                        </div>
-                    </div>
-                </div>
+      <button class="btn logout-btn" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        Logout
+      </button>
+    </div>
+  </div>
+</nav>
 
-                <!-- Doctors Tab -->
-                <div id="doctorsTab" class="dashboard-tab">
-                    <div class="card">
-                        <div class="card-header"><i class="fas fa-stethoscope me-2"></i>Available Doctors</div>
-                        <div class="card-body">
-                            <div id="doctorsList">Loading doctors...</div>
-                        </div>
-                    </div>
-                </div>
+<!-- ================= SIDEBAR ================= -->
+<div id="sidebar" class="sidebar">
+  <div class="sidebar-user text-center">
+    <i class="fas fa-user-circle fa-3x text-white mb-2"></i>
+    <h6 style="color: white;" id="dashUserName">Loading...</h6>
+    <span id="dashUserRole" class="badge bg-primary">Role</span>
+  </div>
 
-                <!-- Admin Tab -->
-                <div id="adminTab" class="dashboard-tab">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header"><i class="fas fa-chart-bar me-2"></i>Dashboard Stats</div>
-                                <div class="card-body">
-                                    <div id="adminStats">Loading stats...</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header"><i class="fas fa-users me-2"></i>Actions</div>
-                                <div class="card-body">
-                                    <button class="btn btn-primary w-100 mb-3" onclick="loadUsers()">View Users</button>
-                                    <button class="btn btn-success w-100 mb-3" onclick="loadAllDoctors()">View Doctors</button>
-                                    <button class="btn btn-info w-100" data-bs-toggle="modal" data-bs-target="#createDoctorModal">+ Add Doctor</button>
-                                </div>
-                            </div>
-                        </div>
+  <ul class="nav flex-column">
+    <li><a class="nav-link active" onclick="showTab('profile')"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+    <li><a class="nav-link" onclick="showTab('appointments')"><i class="fas fa-calendar"></i> <span>Appointments</span></a></li>
+    <li><a class="nav-link" onclick="showTab('doctors')"><i class="fas fa-stethoscope"></i> <span>Doctors</span></a></li>
+    <li id="adminNav" style="display:none;">
+      <a class="nav-link" onclick="showTab('admin')"><i class="fas fa-chart-bar"></i> <span>Admin</span></a>
+    </li>
+  </ul>
+</div>
+
+<!-- Overlay -->
+<div id="overlay" class="overlay"></div>
+
+<!-- ================= MAIN =================
+<div class="main-content" id="mainContent">
+  <!- KEEP YOUR EXISTING TABS HERE --
+</div> -->
+        <!-- Main Content -->
+        <div class="col-md-9 p-4">
+          <!-- Profile Tab -->
+          <div id="profileTab" class="dashboard-tab active">
+            <div class="card">
+              <div class="card-header">
+                <i class="fas fa-user me-2"></i>My Profile
+              </div>
+              <div class="card-body">
+                <form id="profileForm">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <input
+                        type="text"
+                        class="form-control mb-3"
+                        id="profileName"
+                        placeholder="Name"
+                      />
+                      <input
+                        type="email"
+                        class="form-control mb-3"
+                        id="profileEmail"
+                        placeholder="Email"
+                      />
                     </div>
-                </div>
+                    <div class="col-md-6">
+                      <input
+                        type="number"
+                        class="form-control mb-3"
+                        id="profileAge"
+                        placeholder="Age"
+                      />
+                      <select class="form-control mb-3" id="profileGender">
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- ✅ File Upload (PDF / Image) -->
+                  <b>If you have medical records, please upload them:</b>
+                  <input
+                    type="file"
+                    class="form-control mb-3"
+                    id="medicalFile"
+                    accept=".pdf,image/*"
+                  />
+                  <!-- ✅ Show existing file -->
+                  <div id="medicalRecordPreview" class="mb-3"></div>
+                  <button type="submit" class="btn btn-primary">
+                    Update Profile
+                  </button>
+                </form>
+              </div>
             </div>
+          </div>
+
+          <!-- Appointments Tab -->
+          <div id="appointmentsTab" class="dashboard-tab">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between">
+                <span><i class="fas fa-calendar me-2"></i>My Appointments</span>
+                <button
+                  class="btn btn-success btn-sm"
+                  data-bs-toggle="modal"
+                  data-bs-target="#bookModal"
+                >
+                  <i class="fas fa-plus me-1"></i>Book New
+                </button>
+              </div>
+              <div class="card-body">
+                <div id="appointmentsList">Loading appointments...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Doctors Tab -->
+          <div id="doctorsTab" class="dashboard-tab">
+            <div class="card">
+              <div class="card-header">
+                <i class="fas fa-stethoscope me-2"></i>Available Doctors
+              </div>
+              <div class="card-body">
+                <div id="doctorsList">Loading doctors...</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Tab -->
+          <div id="adminTab" class="dashboard-tab">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <i class="fas fa-chart-bar me-2"></i>Dashboard Stats
+                  </div>
+                  <div class="card-body">
+                    <div id="adminStats">Loading stats...</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card">
+                  <div class="card-header">
+                    <i class="fas fa-users me-2"></i>Actions
+                  </div>
+                  <div class="card-body">
+                    <button
+                      class="btn btn-primary w-100 mb-3"
+                      onclick="loadUsers()"
+                    >
+                      View Users
+                    </button>
+                    <button
+                      class="btn btn-success w-100 mb-3"
+                      onclick="loadAllDoctors()"
+                    >
+                      View Doctors
+                    </button>
+                    <button
+                      class="btn btn-info w-100"
+                      data-bs-toggle="modal"
+                      data-bs-target="#createDoctorModal"
+                    >
+                      + Add Doctor
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Book Appointment Modal -->
     <div class="modal fade" id="bookModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="bookForm">
-                    <div class="modal-header">
-                        <h5>Book Appointment</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label>Doctor</label>
-                            <select class="form-control" id="bookDoctor" required></select>
-                        </div>
-                        <div class="mb-3">
-                            <label>Date & Time</label>
-                            <input type="datetime-local" class="form-control" id="bookDate" required>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-success">Book Now</button>
-                    </div>
-                </form>
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="bookForm">
+            <div class="modal-header">
+              <h5>Book Appointment</h5>
             </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label>Doctor</label>
+                <select class="form-control" id="bookDoctor" required></select>
+              </div>
+              <div class="mb-3">
+                <label>Date & Time</label>
+                <input
+                  type="datetime-local"
+                  class="form-control"
+                  id="bookDate"
+                  required
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-success">Book Now</button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
 
     <!-- Create Doctor Modal -->
     <div class="modal fade" id="createDoctorModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="createDoctorForm">
-                    <div class="modal-header">
-                        <h5>Add New Doctor</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3"><input type="text" class="form-control" id="doctorName" placeholder="Name" required></div>
-                        <div class="mb-3"><input type="email" class="form-control" id="doctorEmail" placeholder="Email" required></div>
-                        <div class="mb-3"><input type="password" class="form-control" id="doctorPassword" placeholder="Password" required></div>
-                        <div class="mb-3"><input type="text" class="form-control" id="doctorSpecialization" placeholder="Specialization" required></div>
-                        <div class="mb-3"><input type="number" class="form-control" id="doctorExperience" placeholder="Experience (years)" required></div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Create Doctor</button>
-                    </div>
-                </form>
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form id="createDoctorForm">
+            <div class="modal-header">
+              <h5>Add New Doctor</h5>
             </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="doctorName"
+                  placeholder="Name"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="doctorEmail"
+                  placeholder="Email"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="doctorPassword"
+                  placeholder="Password"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="doctorSpecialization"
+                  placeholder="Specialization"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="doctorExperience"
+                  placeholder="Experience (years)"
+                  required
+                />
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">
+                Create Doctor
+              </button>
+            </div>
+          </form>
         </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
- 
-const token = localStorage.getItem("accessToken");
+const toggleBtn = document.getElementById("toggleBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
 
- 
- 
+toggleBtn.addEventListener("click", () => {
 
-function fillProfileForm(user) {
-    document.getElementById('profileName').value = user.name || '';
-    document.getElementById('profileEmail').value = user.email || '';
-    document.getElementById('profileAge').value = user.age || '';
-    document.getElementById('profileGender').value = user.gender || 'MALE';
-    document.getElementById('profileMedical').value = user.medicalRecord || '';
-}
+  // ONLY apply toggle for mobile
+  if (window.innerWidth < 1000) {
+    sidebar.classList.toggle("active");
+    overlay.classList.toggle("active");
+  }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadProfile();
+  toggleBtn.classList.toggle("active");
 });
 
+overlay.addEventListener("click", () => {
+  sidebar.classList.remove("active");
+  overlay.classList.remove("active");
+  toggleBtn.classList.remove("active");
+});
+</script>
+    <script>
+ 
 
-    const API_URL = 'http://localhost:8080/api';
-    let currentUser = null;
-    let allDoctors = [];
 
-    // Get token
-    function getToken() {
-        return localStorage.getItem('accessToken');
-    }
+      const token = localStorage.getItem("accessToken");
 
-    // API call with auth
-    async function apiCall(url, options = {}) {
+      function fillProfileForm(user) {
+        document.getElementById("profileName").value = user.name || "";
+        document.getElementById("profileEmail").value = user.email || "";
+        document.getElementById("profileAge").value = user.age || "";
+        document.getElementById("profileGender").value = user.gender || "MALE";
+        document.getElementById("profileMedical").value =
+          user.medicalRecord || "";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        loadProfile();
+      });
+
+      const API_URL = "http://localhost:8080/api";
+      let currentUser = null;
+      let allDoctors = [];
+
+      // Get token
+      function getToken() {
+        return localStorage.getItem("accessToken");
+      }
+
+      // API call with auth
+      async function apiCall(url, options = {}) {
         const token = getToken();
         return fetch(url, {
-            ...options,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                ...options.headers
-            }
+          ...options,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            ...options.headers,
+          },
         });
-    }
+      }
 
-    // ✅ FIXED LOGIN CHECK - Uses PROFILE endpoint
-    async function checkLogin() {
+      // ✅ FIXED LOGIN CHECK - Uses PROFILE endpoint
+      async function checkLogin() {
         const token = getToken();
         if (!token) {
-            window.location.href = 'login.html';
-            return;
+          window.location.href = "login.html";
+          return;
         }
 
         try {
-            const response = await apiCall(`${API_URL}/patients/profile`);
-            
-            if (response.ok) {
-                currentUser = await response.json();
-                startDashboard();
-            } else {
-                localStorage.clear();
-                window.location.href = 'login.html';
-            }
-        } catch (e) {
-            console.error('Login check failed:', e);
-            localStorage.clear();
-            window.location.href = 'login.html';
-        }
-    }
+          const response = await apiCall(`${API_URL}/patients/profile`);
 
-    function startDashboard() {
-        // Update UI with real user data
-        document.getElementById('userName').textContent = currentUser.name;
-        document.getElementById('dashUserName').textContent = currentUser.name;
-        document.getElementById('dashUserRole').textContent = currentUser.role || 'PATIENT';
-        
-        // Show admin nav if admin
-        if (currentUser.role === 'ROLE_ADMIN') {
-            document.getElementById('adminNav').style.display = 'block';
+          if (response.ok) {
+            currentUser = await response.json();
+            startDashboard();
+          } else {
+            localStorage.clear();
+            window.location.href = "login.html";
+          }
+        } catch (e) {
+          console.error("Login check failed:", e);
+          localStorage.clear();
+          window.location.href = "login.html";
         }
-        
+      }
+
+      function startDashboard() {
+        // Update UI with real user data
+        document.getElementById("userName").textContent = currentUser.name;
+        document.getElementById("dashUserName").textContent = currentUser.name;
+        document.getElementById("dashUserRole").textContent =
+          currentUser.role || "PATIENT";
+
+        // Show admin nav if admin
+        if (currentUser.role === "ROLE_ADMIN") {
+          document.getElementById("adminNav").style.display = "block";
+        }
+
         // Load all data
         loadAppointments();
         loadDoctors();
-    }
+      }
 
-    // Tab Navigation
-    function showTab(tabName) {
-        document.querySelectorAll('.dashboard-tab').forEach(tab => {
-            tab.classList.remove('active');
+      // Tab Navigation
+      function showTab(tabName) {
+        document.querySelectorAll(".dashboard-tab").forEach((tab) => {
+          tab.classList.remove("active");
         });
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
+        document.querySelectorAll(".nav-link").forEach((link) => {
+          link.classList.remove("active");
         });
-        document.getElementById(tabName + 'Tab').classList.add('active');
-        event.target.classList.add('active');
-    }
+        document.getElementById(tabName + "Tab").classList.add("active");
+        event.target.classList.add("active");
+      }
 
-async function loadProfile() {
-    try {
-        const response = await apiCall(`${API_URL}/patients/profile`);
-        const data = await response.json();
+      async function loadProfile() {
+        try {
+          const response = await apiCall(`${API_URL}/patients/profile`);
+          const data = await response.json();
 
-        currentUser = data;
+          currentUser = data;
 
-        document.getElementById('profileName').value = data.name || '';
-        document.getElementById('profileEmail').value = data.email || '';
-        document.getElementById('profileAge').value = data.age || '';
-        document.getElementById('profileGender').value = data.gender || 'MALE';
+          document.getElementById("profileName").value = data.name || "";
+          document.getElementById("profileEmail").value = data.email || "";
+          document.getElementById("profileAge").value = data.age || "";
+          document.getElementById("profileGender").value =
+            data.gender || "MALE";
 
-        // ✅ After profile, fetch report
-        loadMedicalReport(data.patient_Id);
+          // ✅ After profile, fetch report
+          loadMedicalReport(data.patient_Id);
+        } catch (error) {
+          console.error(error);
+          alert("Failed to load profile");
+        }
+      }
 
-    } catch (error) {
-        console.error(error);
-        alert("Failed to load profile");
-    }
-}
+      async function loadMedicalReport(patient_Id) {
+        const preview = document.getElementById("medicalRecordPreview");
 
-async function loadMedicalReport(patient_Id) {
-    const preview = document.getElementById('medicalRecordPreview');
-
-    try {
-        const res = await fetch(`${API_URL}/patients/${patient_Id}/report`, {
-            method: 'GET',
+        try {
+          const res = await fetch(`${API_URL}/patients/${patient_Id}/report`, {
+            method: "GET",
             headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-            }
-        });
+              Authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+          });
 
-        // ✅ If no file
-        if (!res.ok) {
+          // ✅ If no file
+          if (!res.ok) {
             preview.innerHTML = `<p class="text-muted">No medical record uploaded</p>`;
             return;
-        }
+          }
 
-        const blob = await res.blob();
-        const fileURL = URL.createObjectURL(blob);
+          const blob = await res.blob();
+          const fileURL = URL.createObjectURL(blob);
 
-        // ✅ FIX: handle null content-type
-        const contentType = res.headers.get("content-type") || "";
+          // ✅ FIX: handle null content-type
+          const contentType = res.headers.get("content-type") || "";
 
-        if (contentType.includes("image")) {
+          if (contentType.includes("image")) {
             preview.innerHTML = `
                 <img src="${fileURL}" width="120" class="mb-2"/><br>
                 <a href="${fileURL}" target="_blank">Open Image</a>
             `;
-        } else if (contentType.includes("pdf")) {
+          } else if (contentType.includes("pdf")) {
             preview.innerHTML = `
                 <a href="${fileURL}" target="_blank" class="btn btn-outline-primary btn-sm">
                     View PDF Report
                 </a>
             `;
-        } else {
+          } else {
             preview.innerHTML = `
                 <a href="${fileURL}" target="_blank">Download File</a>
             `;
+          }
+        } catch (error) {
+          console.error("REPORT ERROR:", error);
+          preview.innerHTML = `<p class="text-danger">Error loading report</p>`;
         }
+      }
 
-    } catch (error) {
-        console.error("REPORT ERROR:", error);
-        preview.innerHTML = `<p class="text-danger">Error loading report</p>`;
-    }
-}
- 
-
-// async function loadMedicalReport(patient_Id) {
-//     const preview = document.getElementById('medicalRecordPreview');
-
-//     try {
-//         const res = await fetch(`${API_URL}/patients/${patient_Id}/report`, {
-//             method: 'GET',
-//             headers: {
-//                 'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-//             }
-//         });
-
-//         if (!res.ok) {
-//             preview.innerHTML = `<p class="text-muted">No medical record uploaded</p>`;
-//             return;
-//         }
-
-//         // ✅ Convert file to blob URL
-//         const blob = await res.blob();
-//         const fileURL = URL.createObjectURL(blob);
-
-//         // ✅ Detect file type
-//         const contentType = res.headers.get("content-type");
-
-//         if (contentType.includes("image")) {
-//             preview.innerHTML = `
-//                 <img src="${fileURL}" width="120" class="mb-2"/><br>
-//                 <a href="${fileURL}" target="_blank">Open Image</a>
-//             `;
-//         } else if (contentType.includes("pdf")) {
-//             preview.innerHTML = `
-//                 <a href="${fileURL}" target="_blank" class="btn btn-outline-primary btn-sm">
-//                     View PDF Report
-//                 </a>
-//             `;
-//         } else {
-//             preview.innerHTML = `
-//                 <a href="${fileURL}" target="_blank">Download File</a>
-//             `;
-//         }
-
-//     } catch (error) {
-//         console.error(error);
-//         preview.innerHTML = `<p class="text-danger">Error loading report</p>`;
-//     }
-// }
-
-
-
-
-//     document.getElementById('profileForm').addEventListener('submit', async function(e) {
-//     e.preventDefault();
-
-//     const userId = currentUser.id;
-
-//     const data = {
-//         name: document.getElementById('profileName').value,
-//         email: document.getElementById('profileEmail').value,
-//         age: parseInt(document.getElementById('profileAge').value),
-//         gender: document.getElementById('profileGender').value
-//     };
-
-//     try {
-//         // ✅ 1. Update profile
-//         const response = await apiCall(`${API_URL}/patients/profile`, {
-//             method: 'PUT',
-//             body: JSON.stringify(data)
-//         });
-
-//         if (!response.ok) throw new Error("Profile update failed");
-
-//         // ✅ 2. Upload file
-//         const fileInput = document.getElementById('medicalFile');
-//         const file = fileInput.files[0];
-
-//         if (file) {
-//             const formData = new FormData();
-//             formData.append("file", file);
-
-//             const uploadRes = await fetch(`${API_URL}/patients/${userId}/report`, {
-//                 method: 'POST',
-//                 headers: {
-//                     'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-//                 },
-//                 body: formData
-//             });
-
-//             if (!uploadRes.ok) throw new Error("File upload failed");
-//         }
-
-//         alert('Profile & Medical record updated!');
-
-//         // ✅ reload latest data from DB
-//         loadProfile();
-
-//     } catch (e) {
-//         console.error(e);
-//         alert('Update failed');
-//     }
-// });
-
-    // Load Appointments
-    async function loadAppointments() {
+      // Load Appointments
+      async function loadAppointments() {
         try {
-            const response = await apiCall(`${API_URL}/patients/appointments`);
-            const appointments = await response.json();
-            showAppointments(appointments);
+          const response = await apiCall(`${API_URL}/patients/appointments`);
+          const appointments = await response.json();
+          showAppointments(appointments);
         } catch (e) {
-            document.getElementById('appointmentsList').innerHTML = 'No appointments';
+          document.getElementById("appointmentsList").innerHTML =
+            "No appointments";
         }
-    }
+      }
 
-   function showAppointments(apps) {
-    const html = apps.map(app => `
+      function showAppointments(apps) {
+        const html =
+          apps
+            .map(
+              (app) => `
         <div class="card mb-3">
             <div class="card-body">
-                <h6>${app.docter?.name || 'Doctor'}</h6>
+                <h6>${app.docter?.name || "Doctor"}</h6>
                 <p>${new Date(app.appointment_Date).toLocaleString()}</p>
                 
               <span class="badge fs-6 px-2 py-1 
-                  ${app.status === 'CONFIRMED' ? 'text-success' : 
-                   app.status === 'COMPLETED' ? 'text-primary' :
-                   app.status === 'CANCELLED' ? 'text-danger' : 
-                   'text-warning'}">
+                  ${
+                    app.status === "CONFIRMED"
+                      ? "text-success"
+                      : app.status === "COMPLETED"
+                        ? "text-primary"
+                        : app.status === "CANCELLED"
+                          ? "text-danger"
+                          : "text-warning"
+                  }">
                   ${app.status}
               </span>
 
                 <br><br>
 
                 <!-- ✅ Cancel Button hidden for COMPLETED & CANCELLED -->
-                ${app.status !== 'COMPLETED' && app.status !== 'CANCELLED' ? `
+                ${
+                  app.status !== "COMPLETED" && app.status !== "CANCELLED"
+                    ? `
                     <button 
                         class="btn btn-danger btn-sm"
                         onclick="cancelAppointment(${app.appointment_Id})">
                         Cancel
                     </button>
-                ` : ''}
+                `
+                    : ""
+                }
             </div>
         </div>
-    `).join('') || 'No appointments found';
+    `,
+            )
+            .join("") || "No appointments found";
 
-    document.getElementById('appointmentsList').innerHTML = html;
-}
+        document.getElementById("appointmentsList").innerHTML = html;
+      }
 
-async function cancelAppointment(id) {
-    if (!confirm("Are you sure you want to cancel this appointment?")) return;
+      async function cancelAppointment(id) {
+        if (!confirm("Are you sure you want to cancel this appointment?"))
+          return;
 
-    try {
-        await fetch(`http://localhost:8080/api/patients/appointments/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-            }
-        });
-
-        alert('Appointment cancelled');
-
-        // ✅ reload appointments
-        loadAppointments();
-
-    } catch (error) {
-        console.log(error);
-        alert('Cancel failed');
-    }
-}
-
-    // Load Doctors
-    async function loadDoctors() {
         try {
-            const response = await apiCall(`${API_URL}/patients/docters`);
-            allDoctors = await response.json();
-            showDoctors(allDoctors);
-            fillDoctorDropdown();
-        } catch (e) {
-            document.getElementById('doctorsList').innerHTML = 'No doctors found';
+          await fetch(`http://localhost:8080/api/patients/appointments/${id}`, {
+            method: "DELETE",
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("accessToken"),
+            },
+          });
+
+          alert("Appointment cancelled");
+
+          // ✅ reload appointments
+          loadAppointments();
+        } catch (error) {
+          console.log(error);
+          alert("Cancel failed");
         }
-    }
- 
+      }
 
+      // Load Doctors
+      async function loadDoctors() {
+        try {
+          const response = await apiCall(`${API_URL}/patients/docters`);
+          allDoctors = await response.json();
+          showDoctors(allDoctors);
+          fillDoctorDropdown();
+        } catch (e) {
+          document.getElementById("doctorsList").innerHTML = "No doctors found";
+        }
+      }
 
-
-
-    function showDoctors(doctors) {
-        const html = doctors.map(doc => `
+      function showDoctors(doctors) {
+        const html = doctors
+          .map(
+            (doc) => `
             <div class="col-md-4 mb-3">
                 <div class="card h-100">
                     <div class="card-body text-center">
@@ -543,50 +1048,57 @@ async function cancelAppointment(id) {
                 </div>
             </div>
             
-        `).join('');
-        document.getElementById('doctorsList').innerHTML = `<div class="row">${html}</div>`;
-    }
- 
+        `,
+          )
+          .join("");
+        document.getElementById("doctorsList").innerHTML =
+          `<div class="row">${html}</div>`;
+      }
 
+      function fillDoctorDropdown() {
+        const select = document.getElementById("bookDoctor");
+        select.innerHTML = allDoctors
+          .map(
+            (doc) =>
+              `<option value="${doc.id}">${doc.name} - ${doc.specialization}</option>`,
+          )
+          .join("");
+      }
 
+      // Book Appointment
+      document
+        .getElementById("bookForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const data = {
+            appointment_Date: document.getElementById("bookDate").value,
+            docter_Id: document.getElementById("bookDoctor").value,
+          };
 
-    function fillDoctorDropdown() {
-        const select = document.getElementById('bookDoctor');
-        select.innerHTML = allDoctors.map(doc => 
-            `<option value="${doc.id}">${doc.name} - ${doc.specialization}</option>`
-        ).join('');
-    }
-
-    // Book Appointment
-    document.getElementById('bookForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const data = {
-            appointment_Date: document.getElementById('bookDate').value,
-            docter_Id: document.getElementById('bookDoctor').value
-        };
-        
-        try {
+          try {
             const response = await apiCall(`${API_URL}/patients/appointments`, {
-                method: 'POST',
-                body: JSON.stringify(data)
+              method: "POST",
+              body: JSON.stringify(data),
             });
             if (response.ok) {
-                bootstrap.Modal.getInstance(document.getElementById('bookModal')).hide();
-                alert('✅ Appointment booked!');
-                loadAppointments();
-                document.getElementById('bookForm').reset();
+              bootstrap.Modal.getInstance(
+                document.getElementById("bookModal"),
+              ).hide();
+              alert("✅ Appointment booked!");
+              loadAppointments();
+              document.getElementById("bookForm").reset();
             }
-        } catch (e) {
-            alert('Booking failed');
-        }
-    });
+          } catch (e) {
+            alert("Booking failed");
+          }
+        });
 
-    // Admin functions (only if admin)
-    async function loadAdminStats() {
+      // Admin functions (only if admin)
+      async function loadAdminStats() {
         try {
-            const response = await apiCall(`${API_URL}/admin/dashboard`);
-            const stats = await response.json();
-            document.getElementById('adminStats').innerHTML = `
+          const response = await apiCall(`${API_URL}/admin/dashboard`);
+          const stats = await response.json();
+          document.getElementById("adminStats").innerHTML = `
                 <div class="row">
                     <div class="col-6 mb-3">
                         <div class="card bg-primary text-white text-center">
@@ -607,35 +1119,31 @@ async function cancelAppointment(id) {
                 </div>
             `;
         } catch (e) {}
-    }
+      }
 
-    window.onload = checkLogin;
+      window.onload = checkLogin;
 
-    //logout function
-   async function logout() {
-    if (!confirm("Are you sure you want to logout?")) return;
+      //logout function
+      async function logout() {
+        if (!confirm("Are you sure you want to logout?")) return;
 
-    const refreshToken = localStorage.getItem('refreshToken');
+        const refreshToken = localStorage.getItem("refreshToken");
 
-    try {
-        await fetch('http://localhost:8080/api/auth/logout', {
-            method: 'POST',
+        try {
+          await fetch("http://localhost:8080/api/auth/logout", {
+            method: "POST",
             headers: {
-                'Content-Type': 'application/json'
+              "Content-Type": "application/json",
             },
-            body: JSON.stringify({ refreshToken })
-        });
-    } catch (e) {
-        console.log("Logout API failed");
-    }
+            body: JSON.stringify({ refreshToken }),
+          });
+        } catch (e) {
+          console.log("Logout API failed");
+        }
 
-    localStorage.clear();
-    window.location.href = 'login.html';
-}
-
+        localStorage.clear();
+        window.location.href = "login.html";
+      }
     </script>
-</body>
+  </body>
 </html>
-
-
- 
