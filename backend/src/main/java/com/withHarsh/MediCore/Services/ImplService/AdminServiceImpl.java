@@ -4,6 +4,7 @@ import com.withHarsh.MediCore.DTO.*;
 import com.withHarsh.MediCore.Entity.Docter;
 import com.withHarsh.MediCore.Entity.User;
 import com.withHarsh.MediCore.Entity.type.RoleType;
+import com.withHarsh.MediCore.RabbitMQ.SmtpEmailService;
 import com.withHarsh.MediCore.Repository.AppointmentRepository;
 import com.withHarsh.MediCore.Repository.DocterRepository;
 import com.withHarsh.MediCore.Repository.PatientRepository;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,7 @@ public class AdminServiceImpl implements AdminServices {
     private final DocterRepository docterRepository;
     private final PatientRepository patientRepository;
     private final AppointmentRepository appointmentRepository;
+    private final SmtpEmailService emailService;
 
     @Transactional
     @Override
@@ -50,7 +53,17 @@ public class AdminServiceImpl implements AdminServices {
         user.setDocter(docter);
         docter.setUser(user);
 
+        user.setVerificationToken(UUID.randomUUID().toString()); //set Verification Token in DB
+
         userRepository.save(user);
+
+        String link = "http://localhost:8080/api/auth/verify?token=" + user.getVerificationToken();
+
+        emailService.sendEmailForVerifyAccount(
+                user.getEmail(),
+                "Verify Your MediCore Account",
+                link
+        );
 
         return new CreateDocterResponceDTO(
                 user.getId(),
