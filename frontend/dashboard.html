@@ -53,7 +53,7 @@
                 <div id="profileTab" class="dashboard-tab active">
                     <div class="card">
 
-  <div id="profileView" class="card p-3">
+  <!-- <div id="profileView" class="card p-3">
     <h5>My Profile</h5>
     <hr>
 
@@ -64,7 +64,7 @@
     <p><strong>Medical Record:</strong> <span id="viewMedical"></span></p>
 
     <button class="btn btn-warning mt-2" onclick="showEditForm()">Edit</button>
-</div>
+</div> -->
 
 
                         <div class="card-header"><i class="fas fa-user me-2"></i>My Profile</div>
@@ -72,22 +72,26 @@
 
                           
                             <form id="profileForm">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <input type="text" class="form-control mb-3" id="profileName" placeholder="Name">
-                                        <input type="email" class="form-control mb-3" id="profileEmail" placeholder="Email">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <input type="number" class="form-control mb-3" id="profileAge" placeholder="Age">
-                                        <select class="form-control mb-3" id="profileGender">
-                                            <option value="MALE">Male</option>
-                                            <option value="FEMALE">Female</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <textarea class="form-control mb-3" id="profileMedical" rows="3" placeholder="Medical Record"></textarea>
-                                <button type="submit" class="btn btn-primary">Update Profile</button>
-                            </form>
+    <div class="row">
+        <div class="col-md-6">
+            <input type="text" class="form-control mb-3" id="profileName" placeholder="Name">
+            <input type="email" class="form-control mb-3" id="profileEmail" placeholder="Email">
+        </div>
+        <div class="col-md-6">
+            <input type="number" class="form-control mb-3" id="profileAge" placeholder="Age">
+            <select class="form-control mb-3" id="profileGender">
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- ✅ File Upload (PDF / Image) -->
+    <b>If you have medical records, please upload them:</b>
+    <input type="file" class="form-control mb-3" id="medicalFile" accept=".pdf,image/*">
+
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+</form>
                         </div>
                     </div>
                 </div>
@@ -198,23 +202,23 @@
  
 const token = localStorage.getItem("accessToken");
 
-fetch("http://localhost:8080/api/patients/profile", {
-  method: "GET",
-  headers: {
-    "Authorization": "Bearer " + token,
-    "Content-Type": "application/json"
-  }
-})
-.then(response => response.json())
-.then(data => {
-  document.getElementById("viewName").innerText = data.name;
-  document.getElementById("viewEmail").innerText = data.email;
-  document.getElementById("viewAge").innerText = data.age;
-  document.getElementById("viewGender").innerText = data.gender;
-  document.getElementById("viewMedical").innerText = data.medicalRecord;
-  document.getElementById("viewRole").innerText = data.role;
-})
-.catch(error => console.error("Error:", error));
+// fetch("http://localhost:8080/api/patients/profile", {
+//   method: "GET",
+//   headers: {
+//     "Authorization": "Bearer " + token,
+//     "Content-Type": "application/json"
+//   }
+// })
+// .then(response => response.json())
+// .then(data => {
+//   document.getElementById("viewName").innerText = data.name;
+//   document.getElementById("viewEmail").innerText = data.email;
+//   document.getElementById("viewAge").innerText = data.age;
+//   document.getElementById("viewGender").innerText = data.gender;
+//   document.getElementById("viewMedical").innerText = data.medicalRecord;
+//   document.getElementById("viewRole").innerText = data.role;
+// })
+// .catch(error => console.error("Error:", error));
 
 
 
@@ -229,16 +233,16 @@ function fillProfileForm(user) {
     document.getElementById('profileMedical').value = user.medicalRecord || '';
 }
 
-async function loadProfile() {
-    try {
-        const user = await apiRequest('GET', 'http://localhost:8080/api/patients/profile');
+// async function loadProfile() {
+//     try {
+//         const user = await apiRequest('GET', 'http://localhost:8080/api/patients/profile');
 
-        fillProfileForm(user); // 👈 THIS LINE IS IMPORTANT
+//         fillProfileForm(user); // 👈 THIS LINE IS IMPORTANT
 
-    } catch (e) {
-        console.log(e);
-    }
-}
+//     } catch (e) {
+//         console.log(e);
+//     }
+// }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadProfile();
@@ -320,32 +324,104 @@ document.addEventListener('DOMContentLoaded', () => {
         event.target.classList.add('active');
     }
 
+
+    async function loadProfile() {
+    try {
+        const response = await apiCall(`${API_URL}/patients/profile`);
+        const data = await response.json();
+
+        // ✅ Store user (important for file upload id)
+        currentUser = data;
+
+        // ✅ Fill form fields
+        document.getElementById('profileName').value = data.name || '';
+        document.getElementById('profileEmail').value = data.email || '';
+        document.getElementById('profileAge').value = data.age || '';
+        document.getElementById('profileGender').value = data.gender || 'MALE';
+
+    } catch (error) {
+        console.error(error);
+        alert("Failed to load profile");
+    }
+}
+
     // Profile - Already loaded in checkLogin, but form is filled
-    document.getElementById('profileForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        const data = {
-            name: document.getElementById('profileName').value,
-            email: document.getElementById('profileEmail').value,
-            age: parseInt(document.getElementById('profileAge').value),
-            gender: document.getElementById('profileGender').value,
-            medicalRecord: document.getElementById('profileMedical').value
-        };
+    // document.getElementById('profileForm').addEventListener('submit', async function(e) {
+    //     e.preventDefault();
+    //     const data = {
+    //         name: document.getElementById('profileName').value,
+    //         email: document.getElementById('profileEmail').value,
+    //         age: parseInt(document.getElementById('profileAge').value),
+    //         gender: document.getElementById('profileGender').value,
+    //         medicalRecord: document.getElementById('profileMedical').value
+    //     };
         
-        try {
-            const response = await apiCall(`${API_URL}/patients/profile`, {
-                method: 'PUT',
-                body: JSON.stringify(data)
+    //     try {
+    //         const response = await apiCall(`${API_URL}/patients/profile`, {
+    //             method: 'PUT',
+    //             body: JSON.stringify(data)
+    //         });
+    //         if (response.ok) {
+    //             alert('Profile updated!');
+    //             currentUser = { ...currentUser, ...data };
+    //             document.getElementById('userName').textContent = data.name;
+    //             document.getElementById('dashUserName').textContent = data.name;
+    //         }
+    //     } catch (e) {
+    //         alert('Update failed');
+    //     }
+    // });
+
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const userId = currentUser.id;
+
+    const data = {
+        name: document.getElementById('profileName').value,
+        email: document.getElementById('profileEmail').value,
+        age: parseInt(document.getElementById('profileAge').value),
+        gender: document.getElementById('profileGender').value
+    };
+
+    try {
+        // ✅ 1. Update profile
+        const response = await apiCall(`${API_URL}/patients/profile`, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+
+        if (!response.ok) throw new Error("Profile update failed");
+
+        // ✅ 2. Upload file
+        const fileInput = document.getElementById('medicalFile');
+        const file = fileInput.files[0];
+
+        if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const uploadRes = await fetch(`${API_URL}/patients/${userId}/report`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
+                },
+                body: formData
             });
-            if (response.ok) {
-                alert('Profile updated!');
-                currentUser = { ...currentUser, ...data };
-                document.getElementById('userName').textContent = data.name;
-                document.getElementById('dashUserName').textContent = data.name;
-            }
-        } catch (e) {
-            alert('Update failed');
+
+            if (!uploadRes.ok) throw new Error("File upload failed");
         }
-    });
+
+        alert('Profile & Medical record updated!');
+
+        // ✅ reload latest data from DB
+        loadProfile();
+
+    } catch (e) {
+        console.error(e);
+        alert('Update failed');
+    }
+});
 
     // Load Appointments
     async function loadAppointments() {
@@ -365,18 +441,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 <h6>${app.docter?.name || 'Doctor'}</h6>
                 <p>${new Date(app.appointment_Date).toLocaleString()}</p>
                 
-                <span class="badge bg-${app.status === 'CONFIRMED' ? 'success' : 'warning'}">
-                    ${app.status}
-                </span>
+              <span class="badge fs-6 px-2 py-1 
+                  ${app.status === 'CONFIRMED' ? 'text-success' : 
+                   app.status === 'COMPLETED' ? 'text-primary' :
+                   app.status === 'CANCELLED' ? 'text-danger' : 
+                   'text-warning'}">
+                  ${app.status}
+              </span>
 
                 <br><br>
 
-                <!-- ✅ Cancel Button -->
-                <button 
-                    class="btn btn-danger btn-sm"
-                    onclick="cancelAppointment(${app.appointment_Id})">
-                    Cancel
-                </button>
+                <!-- ✅ Cancel Button hidden for COMPLETED & CANCELLED -->
+                ${app.status !== 'COMPLETED' && app.status !== 'CANCELLED' ? `
+                    <button 
+                        class="btn btn-danger btn-sm"
+                        onclick="cancelAppointment(${app.appointment_Id})">
+                        Cancel
+                    </button>
+                ` : ''}
             </div>
         </div>
     `).join('') || 'No appointments found';
@@ -528,3 +610,6 @@ async function cancelAppointment(id) {
     </script>
 </body>
 </html>
+
+
+ 
