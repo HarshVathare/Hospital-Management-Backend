@@ -1,75 +1,779 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Admin Dashboard</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - MediCare Hospital</title>
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
-<style>
-.card-box { text-align:center; padding:20px; }
-</style>
-</head>
+    <style>
+      :root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --secondary: #1e293b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-900: #111827;
+    --sidebar-w: 280px;
+    --shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    --shadow-lg: 0 20px 50px -10px rgba(0,0,0,0.15);
+}
 
-<body class="bg-light">
+/* ================= BASE ================= */
+* { box-sizing: border-box; }
 
-<div class="container py-4">
+html { height: 100%; }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-  <h2>Admin Dashboard</h2>
-  <button class="btn btn-danger" onclick="logout()">Logout</button>
-</div>
+body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: linear-gradient(135deg, var(--gray-50) 0%, #9430d6 100%);
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
 
-<!-- DASHBOARD STATS -->
-<div class="row mb-4">
-  <div class="col-md-3"><div class="card card-box"><h5>Total Patients</h5><h3 id="patients">0</h3></div></div>
-  <div class="col-md-3"><div class="card card-box"><h5>Total Doctors</h5><h3 id="doctors">0</h3></div></div>
-  <div class="col-md-3"><div class="card card-box"><h5>Total Appointments</h5><h3 id="appointments">0</h3></div></div>
-  <div class="col-md-3"><div class="card card-box"><h5>Today Appointments</h5><h3 id="today">0</h3></div></div>
-</div>
+/* ================= NAVBAR ================= */
+.navbar-custom {
+    background: white !important;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 1rem 2rem;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 1060;
+}
 
-<!-- CREATE DOCTOR -->
-<div class="card mb-4">
-  <div class="card-header">Create Doctor</div>
-  <div class="card-body">
+.navbar-brand-custom {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary) !important;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
 
-    <input id="dname" class="form-control mb-2" placeholder="Name">
+/* ================= HAMBURGER ================= */
+.hamburger {
+    width: 48px;
+    height: 48px;
+    border: 1px solid #d1d5db;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
 
-    <input id="demail" class="form-control mb-2" placeholder="Email">
+.hamburger:hover {
+    border-color: var(--primary);
+    box-shadow: 0 5px 15px rgba(37,99,235,0.2);
+}
 
-    <input id="dpassword" type="password" class="form-control mb-2" placeholder="Password">
+.hamburger span {
+    height: 3px;
+    width: 24px;
+    background: var(--secondary);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
 
-    <input id="dspec" class="form-control mb-2" placeholder="Specialization">
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
 
-    <input id="dexp" class="form-control mb-2" placeholder="Experience (e.g. 8 years)">
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
 
-    <!-- Availability -->
-    <select id="dstatus" class="form-control mb-2">
-      <option value="true">Available</option>
-      <option value="false">Not Available</option>
-    </select>
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(6px, -6px);
+}
 
-    <button class="btn btn-success" onclick="createDoctor()">Create</button>
+ 
 
-  </div>
-</div>
+/* ================= SIDEBAR ================= */
+.sidebar-custom {
+    width: var(--sidebar-w);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 2rem 0;
+    transition: all 0.3s ease;
+    z-index: 1050;
+    box-shadow: var(--shadow-lg);
+    overflow-y: auto;
+}
 
-<!-- DOCTORS LIST -->
-<div class="card mb-4">
-  <div class="card-header">Docters</div>
-  <div class="card-body" id="doctorList"></div>
-</div>
+.sidebar-user {
+    padding: 2.5rem 2rem;
+    text-align: center;
+    border-bottom: 1px solid #f3f4f6;
+    margin-bottom: 2rem;
+}
 
-<!-- USERS LIST -->
-<div class="card">
-  <div class="card-header">Users</div>
-  <div class="card-body" id="userList"></div>
-</div>
+.sidebar-user i {
+    font-size: 3.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
 
-</div>
+.sidebar-user h3 {
+    color: var(--secondary);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+}
 
+.sidebar-user p {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ================= SIDEBAR LINKS ================= */
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem 2rem;
+    color: #6b7280 !important;
+    text-decoration: none !important;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+    margin: 0 1rem;
+    border-radius: 0 12px 12px 0;
+}
+
+.sidebar-link i {
+    font-size: 1.2rem;
+    width: 24px;
+    text-align: center;
+    color: #9ca3af;
+}
+
+.sidebar-link:hover {
+    color: var(--primary) !important;
+    background: #f8fafc;
+    border-left-color: var(--primary);
+    transform: translateX(8px);
+}
+
+.sidebar-link.active {
+    color: var(--primary) !important;
+    background: linear-gradient(90deg, rgba(37,99,235,0.1), transparent);
+    border-left-color: var(--primary);
+    font-weight: 700;
+}
+
+.sidebar-link.active i {
+    color: var(--primary);
+}
+
+/* ================= MAIN CONTENT ================= */
+.main-wrapper {
+    margin-left: var(--sidebar-w);
+    padding: 2.5rem;
+    min-height: 100vh;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+}
+
+/* ================= STATS CARDS ================= */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2.5rem;
+    text-align: center;
+    border: 1px solid #f3f4f6;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--success), var(--info));
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 2rem;
+    color: white;
+    box-shadow: 0 10px 30px rgba(37,99,235,0.3);
+}
+
+.stat-card:nth-child(2) .stat-icon {
+    background: linear-gradient(135deg, var(--success), #059669);
+    box-shadow: 0 10px 30px rgba(16,185,129,0.3);
+}
+
+.stat-card:nth-child(3) .stat-icon {
+    background: linear-gradient(135deg, var(--info), #0284c7);
+    box-shadow: 0 10px 30px rgba(56,189,248,0.3);
+}
+
+.stat-card:nth-child(4) .stat-icon {
+    background: linear-gradient(135deg, var(--warning), #d97706);
+    box-shadow: 0 10px 30px rgba(245,158,11,0.3);
+}
+
+.stat-label {
+    color: #6b7280;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 1rem;
+}
+
+.stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--secondary);
+    margin: 0;
+    line-height: 1;
+}
+
+/* ================= CONTENT CARDS ================= */
+.card-custom {
+    border: none !important;
+    border-radius: 20px !important;
+    background: white !important;
+    box-shadow: var(--shadow) !important;
+    margin-bottom: 2rem !important;
+    overflow: hidden;
+    text-align: center;
+}
+
+.card-header-custom {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-bottom: 1px solid #e5e7eb;
+    padding: 2rem 2.5rem !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+    color: var(--secondary) !important;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.card-body-custom {
+    padding: 2.5rem !important;
+    overflow-y: auto;
+    max-height: 70vh;
+}
+
+/* ================= FORM ELEMENTS ================= */
+.form-control-custom, .form-select-custom {
+    border-radius: 12px !important;
+    padding: 1rem 1.25rem !important;
+    border: 2px solid #e5e7eb !important;
+    background: white !important;
+    font-size: 1rem !important;
+    transition: all 0.3s ease !important;
+    margin-bottom: 1.5rem !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.form-control-custom:focus, .form-select-custom:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1), var(--shadow);
+    transform: translateY(-2px);
+}
+
+/* ================= BUTTONS ================= */
+.btn-custom {
+    padding: 1rem 2rem !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    border: none !important;
+    transition: all 0.3s ease !important;
+    box-shadow: var(--shadow);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-primary-custom {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)) !important;
+    color: white !important;
+}
+
+.btn-success-custom {
+    background: linear-gradient(135deg, var(--success), #059669) !important;
+    color: white !important;
+}
+
+.btn-danger-custom {
+    background: linear-gradient(135deg, var(--danger), #dc2626) !important;
+    color: white !important;
+}
+
+.btn-custom:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ================= LIST ITEMS ================= */
+.list-item {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 2rem !important;
+    margin-bottom: 1.5rem !important;
+    background: white !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.list-item:hover {
+    border-color: var(--primary) !important;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+/* ================= RESPONSIVE - SCROLL FIXED ================= */
+@media (max-width: 991px) {
+    .sidebar-custom { 
+        transform: translateX(-100%); 
+        z-index: 1050;
+    }
+    
+    .sidebar-custom.active { 
+        transform: translateX(0); 
+    }
+    
+    .main-wrapper { 
+        margin-left: 0 !important; 
+        padding: 2rem 1.5rem !important; 
+        /* ✅ FIXED: Always scrollable */
+        overflow-y: auto !important;
+        height: auto !important;
+    }
+    
+    /* ✅ FIXED: Body scroll lock ONLY when sidebar active */
+    body.sidebar-open {
+        overflow: hidden !important;
+    }
+    
+    /* ✅ FIXED: Overlay covers full screen */
+    .overlay {
+        z-index: 1045 !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-wrapper { 
+        padding: 1.5rem 1rem !important; 
+        overflow-y: auto !important;
+    }
+    
+    .stats-grid { 
+        grid-template-columns: 1fr; 
+        gap: 1.5rem !important;
+    }
+    
+    .card-body-custom { 
+        padding: 2rem 1.5rem !important; 
+        max-height: none !important;
+        overflow-y: auto !important;
+    }
+    
+    .btn-custom { 
+        width: 100%; 
+        margin-bottom: 1rem !important;
+    }
+}
+
+@media (max-width: 576px) {
+    :root { 
+        --sidebar-w: 100vw; 
+    }
+    
+    .sidebar-custom { 
+        width: 100vw !important; 
+        /* ✅ FIXED: Sidebar scrolls independently */
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+    
+    .main-wrapper { 
+        padding: 1rem 0.75rem !important; 
+        /* ✅ FIXED: Main always scrolls */
+        overflow-y: auto !important;
+        height: auto !important;
+    }
+    
+    .list-item { 
+        flex-direction: column; 
+        gap: 1.5rem; 
+        text-align: center; 
+        padding: 1.75rem !important;
+    }
+    
+    /* ✅ FIXED: Mobile card padding */
+    .card-body-custom {
+        padding: 1.75rem 1.25rem !important;
+    }
+    
+    .stat-card {
+        padding: 2.5rem 1.5rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+}
+
+/* ================= SCROLL LOCK - MOBILE ONLY ================= */
+@media (max-width: 991px) {
+    /* ✅ FIXED: Lock body scroll when sidebar open */
+    .sidebar-custom.active ~ .main-wrapper,
+    .sidebar-custom.active ~ body {
+        overflow: hidden !important;
+    }
+    
+    /* ✅ FIXED: Unlock when sidebar closed */
+    .sidebar-custom:not(.active) ~ .main-wrapper,
+    .sidebar-custom:not(.active) ~ body {
+        overflow-y: auto !important;
+    }
+}
+
+/* ================= SECTIONS ================= */
+.section { display: none; }
+.section.active { display: block; }
+
+.col-md-3.col-sm-6 {
+    text-align: center;
+}
+    </style>
+  </head>
+
+  <body>
 <script>
-const API = "http://localhost:8080/api";
+
+</script>
+
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+      <div class="container-fluid">
+        <div class="d-flex align-items-center gap-3">
+          <button id="toggleBtn" class="menu-toggle">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <span class="navbar-brand">
+            <i class="fas fa-chart-line"></i> Admin Dashboard
+          </span>
+        </div>
+        <button class="btn btn-danger" onclick="logout()">
+          <i class="fas fa-sign-out-alt me-2"></i> Logout
+        </button>
+      </div>
+    </nav>
+
+    <!-- OVERLAY -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- SIDEBAR -->
+    <div id="sidebar" class="sidebar">
+      <div class="sidebar-user">
+        <i class="fas fa-user-shield"></i>
+        <h4>Super Admin</h4>
+        <p>System Administrator</p>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#dashboard" class="active" onclick="showSection('dashboard')">
+          <i class="fas fa-tachometer-alt"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="#doctors" onclick="showSection('doctors')">
+          <i class="fas fa-user-md"></i>
+          <span>Doctors</span>
+        </a>
+        <a href="#users" onclick="showSection('users')">
+          <i class="fas fa-users"></i>
+          <span>Users</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <div class="container py-4">
+        <!-- DASHBOARD SECTION -->
+        <section id="dashboardSection" class="section active">
+          <div class="row stats-row mb-5 g-4" id="statsRow">
+            <div class="col-md-3 col-sm-6">
+              <div class="card card-box fade-in">
+                <h5>Total Patients</h5>
+                <h3 id="patients">0</h3>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card card-box fade-in">
+                <h5>Total Doctors</h5>
+                <h3 id="doctors">0</h3>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card card-box fade-in">
+                <h5>Total Appointments</h5>
+                <h3 id="appointments">0</h3>
+              </div>
+            </div>
+            <div class="col-md-3 col-sm-6">
+              <div class="card card-box fade-in">
+                <h5>Today Appointments</h5>
+                <h3 id="today">0</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- CREATE DOCTOR -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <i class="fas fa-user-plus text-primary"></i>
+              Create New Doctor
+            </div>
+            <div class="card-body">
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <input
+                    id="dname"
+                    class="form-control"
+                    placeholder="Doctor Name"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <input
+                    id="demail"
+                    type="email"
+                    class="form-control"
+                    placeholder="Email"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <input
+                    id="dpassword"
+                    type="password"
+                    class="form-control"
+                    placeholder="Password"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <input
+                    id="dspec"
+                    class="form-control"
+                    placeholder="Specialization"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <input
+                    id="dexp"
+                    class="form-control"
+                    placeholder="Experience (e.g. 8 years)"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <select id="dstatus" class="form-select">
+                    <option value="true">Available</option>
+                    <option value="false">Not Available</option>
+                  </select>
+                </div>
+                <div class="col-12">
+                  <button
+                    class="btn btn-success btn-lg"
+                    onclick="createDoctor()"
+                  >
+                    <i class="fas fa-plus me-2"></i> Create Doctor
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- DOCTORS SECTION -->
+        <section id="doctorsSection" class="section">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-user-md text-info"></i>
+              Doctors Management
+            </div>
+            <div class="card-body" id="doctorList">
+              <div class="text-center py-5">
+                <i class="fas fa-spinner fa-spin fa-3x text-muted mb-4"></i>
+                <h5 class="text-muted">Loading doctors...</h5>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- USERS SECTION -->
+        <section id="usersSection" class="section">
+          <div class="card">
+            <div class="card-header">
+              <i class="fas fa-users text-success"></i>
+              Users Management
+            </div>
+            <div class="card-body" id="userList">
+              <div class="text-center py-5">
+                <i class="fas fa-spinner fa-spin fa-3x text-muted mb-4"></i>
+                <h5 class="text-muted">Loading users...</h5>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+      // /* ================= SIDEBAR TOGGLE ================= */
+      // const toggleBtn = document.getElementById("toggleBtn");
+      // const sidebar = document.getElementById("sidebar");
+      // const overlay = document.getElementById("overlay");
+
+      // function toggleSidebar() {
+      //   sidebar.classList.toggle("active");
+      //   overlay.classList.toggle("active");
+      //   toggleBtn.classList.toggle("active");
+      //   document.body.style.overflow = sidebar.classList.contains("active")
+      //     ? "hidden"
+      //     : "";
+      // }
+
+      // toggleBtn.addEventListener("click", toggleSidebar);
+      // overlay.addEventListener("click", toggleSidebar);
+
+      // window.addEventListener("resize", () => {
+      //   if (window.innerWidth >= 992) {
+      //     sidebar.classList.remove("active");
+      //     overlay.classList.remove("active");
+      //     toggleBtn.classList.remove("active");
+      //     document.body.style.overflow = "";
+      //   }
+      // });
+
+      // // Close sidebar on mobile nav click
+      // document.querySelectorAll(".sidebar-nav a").forEach((link) => {
+      //   link.addEventListener("click", () => {
+      //     if (window.innerWidth < 992) toggleSidebar();
+      //   });
+      // });
+
+      // ✅ PERFECT MOBILE SCROLL HANDLER
+function toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar-custom');
+    const overlay = document.querySelector('.overlay');
+    const hamburger = document.querySelector('.hamburger');
+    
+    sidebar.classList.toggle("active");
+    overlay.classList.toggle("active");
+    hamburger.classList.toggle("active");
+    
+    // 🔥 FIXED: Perfect mobile scroll lock
+    if (window.innerWidth <= 991) {
+        if (sidebar.classList.contains("active")) {
+            document.body.classList.add("sidebar-open");
+            document.body.style.overflow = "hidden";
+            document.documentElement.style.overflow = "hidden";
+        } else {
+            document.body.classList.remove("sidebar-open");
+            document.body.style.overflow = "";
+            document.documentElement.style.overflow = "";
+        }
+    }
+}
+
+// 🔥 FIXED: Resize handler
+window.addEventListener("resize", () => {
+    if (window.innerWidth > 991) {
+        document.querySelector('.sidebar-custom').classList.remove("active");
+        document.querySelector('.overlay').classList.remove("active");
+        document.querySelector('.hamburger').classList.remove("active");
+        document.body.classList.remove("sidebar-open");
+        document.body.style.overflow = "";
+        document.documentElement.style.overflow = "";
+    }
+});
+
+// 🔥 FIXED: Touch move prevention on overlay
+document.querySelector('.overlay').addEventListener('touchmove', (e) => {
+    e.preventDefault();
+}, { passive: false });
+
+      /* ================= SECTION SWITCHING ================= */
+      function showSection(sectionName) {
+        document.querySelectorAll(".section").forEach((section) => {
+          section.classList.remove("active");
+        });
+        document
+          .getElementById(sectionName + "Section")
+          .classList.add("active");
+
+        document.querySelectorAll(".sidebar-nav a").forEach((link) => {
+          link.classList.remove("active");
+        });
+        event.target.classList.add("active");
+      }
+
+ const API = "http://localhost:8080/api";
 
 async function apiCall(url, options = {}) {
   const token = localStorage.getItem("accessToken");
@@ -204,7 +908,5 @@ window.onload = () => {
   loadUsers();
 };
 </script>
-
-</body>
+  </body>
 </html>
-
