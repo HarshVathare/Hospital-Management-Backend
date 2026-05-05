@@ -1031,6 +1031,20 @@ async function updateStatus(appointment_Id, status) {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
       // ================= MEDICAL RECORD =================
       async function getRecords() {
         try {
@@ -1079,49 +1093,94 @@ async function updateStatus(appointment_Id, status) {
         }
       }
 
-      async function addRecord() {
-        try {
-          const appointmentId = document.getElementById("appointmentId").value;
+      // async function addRecord() {
+      //   try {
+      //     const appointmentId = document.getElementById("appointmentId").value;
 
-          // ✅ CORRECTED: Matches MedicalRecordRequestDTO structure
-          const payload = {
-            diagnosis: document.getElementById("diagnosis").value,
-            prescription: document.getElementById("prescription").value, // Simple string
-            notes: document.getElementById("notes").value,
-          };
+      //     // ✅ CORRECTED: Matches MedicalRecordRequestDTO structure
+      //     const payload = {
+      //       diagnosis: document.getElementById("diagnosis").value,
+      //       prescription: document.getElementById("prescription").value, // Simple string
+      //       notes: document.getElementById("notes").value,
+      //     };
 
-          console.log("POST Payload:", payload);
+      //     console.log("POST Payload:", payload);
 
-          const res = await apiCall(
-            API + `/docters/${appointmentId}/medical-record`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(payload),
-            },
-          );
+      //     const res = await apiCall(
+      //       API + `/docters/${appointmentId}/medical-record`,
+      //       {
+      //         method: "POST",
+      //         headers: {
+      //           "Content-Type": "application/json",
+      //         },
+      //         body: JSON.stringify(payload),
+      //       },
+      //     );
 
-          const data = await res.json().catch(() => null);
+      //     const data = await res.json().catch(() => null);
 
-          if (res.ok) {
-            alert("✅ Medical record added successfully!");
+      //     if (res.ok) {
+      //       alert("✅ Medical record added successfully!");
 
-            // Clear form fields
-            document.getElementById("diagnosis").value = "";
-            document.getElementById("prescription").value = "";
-            document.getElementById("notes").value = "";
-          } else {
-            alert("❌ Failed: " + (data?.message || "Error adding record"));
-          }
-        } catch (error) {
-          console.error(error);
-          alert("❌ Error adding medical record");
-        }
+      //       // Clear form fields
+      //       document.getElementById("diagnosis").value = "";
+      //       document.getElementById("prescription").value = "";
+      //       document.getElementById("notes").value = "";
+      //     } else {
+      //       alert("❌ Failed: " + (data?.message || "Error adding record"));
+      //     }
+      //   } catch (error) {
+      //     console.error(error);
+      //     alert("❌ Error adding medical record");
+      //   }
+      // }
+
+    async function addRecord() {
+  try {
+    const appointmentId = document.getElementById("appointmentId").value;
+
+    if (!appointmentId) {
+      alert("❌ Please enter Appointment ID");
+      return;
+    }
+
+    const payload = {
+      diagnosis: document.getElementById("diagnosis").value,
+      prescription: document.getElementById("prescription").value, // ✅ IMPORTANT
+      notes: document.getElementById("notes").value,
+    };
+
+    console.log("POST Payload:", payload);
+
+    const res = await apiCall(
+      `${API}/docters/${appointmentId}/medical-record`, // keep same if backend uses docters
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
       }
+    );
 
-     
+    let data = null;
+    try {
+      data = await res.json();
+    } catch {}
+
+    if (res.ok) {
+      alert("✅ Medical record added successfully!");
+
+      document.getElementById("diagnosis").value = "";
+      document.getElementById("prescription").value = "";
+      document.getElementById("notes").value = "";
+    } else {
+      console.error("Backend Error:", data);
+      alert("❌ Failed: " + (data?.message || `HTTP ${res.status}`));
+    }
+
+  } catch (error) {
+    console.error("❌ Error:", error);
+    alert("❌ Error adding medical record");
+  }
+}
 
 
 
