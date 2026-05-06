@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+
+  mysql-db:
+    image: mysql:8
+    container_name: medicore-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Harsh@9595
+      MYSQL_DATABASE: medicore_db
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: medicore-rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"     # RabbitMQ port
+      - "15672:15672"   # Web UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  backend:
+    build: ./backend
+    container_name: medicore-backend
+    depends_on:
+      mysql-db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: always
+    ports:
+      - "8080:8080"
+
+    environment:
+      SERVER_PORT: 8080
+
+      # MySQL
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/medicore_db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Harsh@9595
+
+      # RabbitMQ (IMPORTANT)
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_PORT: 5672
+      SPRING_RABBITMQ_USERNAME: guest
+      SPRING_RABBITMQ_PASSWORD: guest
+
+      # YOUR CUSTOM RABBITMQ CONFIG
+      RABBITMQ_EMAIL_QUEUE_NAME: medicore.email.notification.queue
+      RABBITMQ_EXCHANGE_NAME: medicore.appointment.exchange
+      RABBITMQ_ROUTING_KEY_PENDING: appointment.status.pending
+      RABBITMQ_ROUTING_KEY_CONFIRMED: appointment.status.confirmed
+      RABBITMQ_ROUTING_KEY_CANCELLED: appointment.status.cancelled
+
+      # EMAIL CONFIG (IMPORTANT)
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: medicore.owner@gmail.com
+      SPRING_MAIL_PASSWORD: qtby nmsh tthp qctk
+
+    volumes:
+      - backend-data:/app
+
+
+  frontend:
+    build: ./frontend
+    container_name: medicore-frontend
+    depends_on:
+      - backend
+    restart: always
+    ports:
+      - "3000:80"
+
+volumes:
+  mysql-data:
+  backend-data:

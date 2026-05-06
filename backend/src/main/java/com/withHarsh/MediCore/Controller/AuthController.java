@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:5500")
+//@CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "Auth APIs", description = "Authentication APIs")
 @RestController
 @RequestMapping("/api/auth")
