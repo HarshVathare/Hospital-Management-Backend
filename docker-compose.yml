@@ -55,9 +55,13 @@ services:
       SERVER_PORT: 8080
 
       # MySQL
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/medicore_db
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: Harsh@9595
+      SPRING_DATASOURCE_URL: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:medicore_db}
+      SPRING_DATASOURCE_USERNAME: ${DB_USER:root}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PWD:Harsh@9595}
+
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/medicore_db
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: Harsh@9595
 
       # RabbitMQ (IMPORTANT)
       SPRING_RABBITMQ_HOST: rabbitmq
