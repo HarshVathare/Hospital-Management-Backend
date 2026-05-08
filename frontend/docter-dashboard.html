@@ -1,1136 +1,581 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Doctor Dashboard - MediCare Hospital</title>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCore — Doctor Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#060e1c;--surface:#0b1829;--card:#101f36;--card2:#0d1a2f;
+      --border:rgba(79,172,254,0.12);--border2:rgba(255,255,255,0.06);
+      --teal:#4facfe;--teal-dim:rgba(79,172,254,0.08);--teal-glow:rgba(79,172,254,0.2);
+      --accent:#00c8b4;--text:#dce9f0;--muted:#5a7a8e;--danger:#ff6b8a;
+      --success:#00c8b4;--warn:#ffa552;--sidebar:260px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden;}
+    body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);display:flex;flex-direction:column;}
+    .topbar{height:64px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.4);}
+    .topbar-left{display:flex;align-items:center;gap:16px;}
+    .hamburger{width:40px;height:40px;border:1px solid var(--border);background:var(--card);border-radius:10px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;transition:0.3s;flex-shrink:0;}
+    .hamburger:hover{border-color:var(--teal);}
+    .hamburger span{width:18px;height:2px;background:var(--text);border-radius:2px;transition:0.3s;}
+    .hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--teal),var(--accent));border-radius:9px;display:flex;align-items:center;justify-content:center;color:#060e1c;font-size:16px;}
+    .brand-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text);}
+    .brand-name span{color:var(--teal);}
+    .topbar-right{display:flex;align-items:center;gap:12px;}
+    .user-chip{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 14px 6px 8px;}
+    .user-avatar{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--teal),var(--accent));display:flex;align-items:center;justify-content:center;font-size:13px;color:#060e1c;font-weight:700;}
+    .user-name{font-size:0.875rem;font-weight:500;}
+    .btn-logout{background:rgba(255,107,138,0.1);border:1px solid rgba(255,107,138,0.3);color:var(--danger);border-radius:10px;padding:7px 14px;font-size:0.825rem;font-weight:600;cursor:pointer;transition:0.3s;display:flex;align-items:center;gap:6px;}
+    .btn-logout:hover{background:rgba(255,107,138,0.18);}
+    .layout{display:flex;flex:1;overflow:hidden;}
+    .sidebar{width:var(--sidebar);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);}
+    .sidebar-user{padding:24px 20px;border-bottom:1px solid var(--border);text-align:center;}
+    .sidebar-avatar{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--teal),var(--accent));display:flex;align-items:center;justify-content:center;font-size:22px;color:#060e1c;margin:0 auto 12px;box-shadow:0 8px 20px rgba(79,172,254,0.25);}
+    .sidebar-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:2px;}
+    .sidebar-spec{color:var(--teal);font-size:0.8rem;margin-bottom:6px;}
+    .sidebar-role{font-size:0.75rem;padding:3px 10px;background:var(--teal-dim);color:var(--teal);border:1px solid rgba(79,172,254,0.2);border-radius:20px;display:inline-block;}
+    .nav-section{padding:8px 0;}
+    .nav-label{padding:12px 20px 6px;font-size:0.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;color:var(--muted);text-decoration:none;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;margin:2px 0;}
+    .nav-item i{width:18px;text-align:center;font-size:0.95rem;}
+    .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.04);}
+    .nav-item.active{color:var(--teal);background:var(--teal-dim);border-left-color:var(--teal);}
+    .main{flex:1;overflow-y:auto;padding:28px;}
+    .page{display:none;}
+    .page.active{display:block;animation:fadeUp 0.4s ease;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .page-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:6px;}
+    .page-sub{color:var(--muted);font-size:0.875rem;margin-bottom:24px;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:20px;}
+    .card-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .card-head-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:10px;}
+    .card-head-title i{color:var(--teal);}
+    .card-body{padding:24px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-group{margin-bottom:18px;}
+    .form-group.full{grid-column:1/-1;}
+    .form-group label{display:block;font-size:0.77rem;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px;}
+    .form-group input,.form-group select,.form-group textarea{width:100%;background:var(--surface);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;transition:0.3s;outline:none;}
+    .form-group input[readonly]{opacity:0.6;cursor:not-allowed;}
+    .form-group input::placeholder,.form-group textarea::placeholder{color:var(--muted);}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal);background:rgba(79,172,254,0.04);box-shadow:0 0 0 3px var(--teal-glow);}
+    .form-group select{appearance:none;}
+    .form-group textarea{resize:vertical;min-height:100px;}
+    .btn{border:none;border-radius:10px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.3s;display:inline-flex;align-items:center;gap:7px;}
+    .btn-primary{background:linear-gradient(135deg,var(--teal),#2980b9);color:#fff;}
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(79,172,254,0.35);}
+    .btn-success{background:linear-gradient(135deg,var(--accent),#00a896);color:#060e1c;}
+    .btn-success:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,200,180,0.35);}
+    .btn-info{background:rgba(79,172,254,0.1);border:1px solid rgba(79,172,254,0.2);color:var(--teal);}
+    .btn-info:hover{background:rgba(79,172,254,0.18);}
+    .btn-sm{padding:7px 14px;font-size:0.8rem;}
+    .btn-full{width:100%;}
+    .appt-card{display: flex; background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:18px 20px;margin-bottom:12px;transition:0.3s;}
+    .appt-card:hover{border-color:var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+    .appt-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;gap:12px;}
+    /* .span{margin-left: 0;} */
+    .appt-info h5{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;margin-bottom:4px;}
+    .appt-info p{color:var(--muted);font-size:0.825rem;margin-bottom:3px;}
+    .appt-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--border2);}
+    .badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;}
+    .badge-confirmed{background:rgba(0,200,180,0.1);color:var(--success);border:1px solid rgba(0,200,180,0.2);}
+    .badge-pending{background:rgba(255,165,82,0.1);color:var(--warn);border:1px solid rgba(255,165,82,0.2);}
+    .badge-cancelled{background:rgba(255,107,138,0.1);color:var(--danger);border:1px solid rgba(255,107,138,0.2);}
+    .badge-completed{background:rgba(79,172,254,0.1);color:var(--teal);border:1px solid rgba(79,172,254,0.2);}
+    .record-card{background:var(--card2);border:1px solid var(--border2);border-left:3px solid var(--teal);border-radius:14px;padding:18px 20px;margin-bottom:12px;transition:0.3s;}
+    .record-card:hover{border-color:var(--teal);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+    .record-row{display:flex;gap:8px;margin-bottom:6px;font-size:0.875rem;}
+    .record-label{color:var(--muted);min-width:100px;}
+    .divider{border:none;border-top:1px solid var(--border);margin:24px 0;}
+    .alert{border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.875rem;display:none;align-items:center;gap:8px;}
+    .alert-success{background:rgba(0,200,180,0.08);border:1px solid rgba(0,200,180,0.25);color:var(--success);}
+    .alert-error{background:rgba(255,107,138,0.08);border:1px solid rgba(255,107,138,0.25);color:var(--danger);}
+    .empty{text-align:center;padding:48px 24px;color:var(--muted);}
+    .empty i{font-size:3rem;margin-bottom:16px;opacity:0.4;}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:49;display:none;}
+    .overlay.show{display:block;}
+    @media(max-width:768px){
+      .sidebar{position:fixed;top:64px;left:0;bottom:0;z-index:50;transform:translateX(-100%);width:260px;}
+      .sidebar.open{transform:translateX(0);}
+      .main{padding:20px 16px;}
+      .form-grid{grid-template-columns:1fr;}
+      .form-group.full{grid-column:auto;}
+    }
+    @media(max-width:480px){.topbar{padding:0 16px;}.user-name{display:none;}}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(79,172,254,0.2);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-state{text-align:center;padding:40px;color:var(--muted);}
+    select.status-sel{background:var(--surface);border:1.5px solid var(--border2);border-radius:9px;padding:7px 12px;color:var(--text);font-size:0.8rem;outline:none;cursor:pointer;}
+    select.status-sel:focus{border-color:var(--teal);}
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-      rel="stylesheet"
-    />
 
-    <style>
-      /* ================= ROOT & GLOBAL ================= */
-      :root {
-        --primary-color: #2563eb;
-        --secondary-color: #1e293b;
-        --accent-color: #38bdf8;
-        --success-color: #10b981;
-        --bg-light: #f1f5f9;
-        --sidebar-width: 280px;
-        --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      }
 
-      * {
-        box-sizing: border-box;
-      }
 
-      body {
-        background-color: var(--bg-light);
-        font-family:
-          "Inter",
-          system-ui,
-          -apple-system,
-          sans-serif;
-        color: #334155;
-        letter-spacing: -0.01em;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-      }
 
-      /* ================= NAVBAR ================= */
-      .navbar {
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-        padding: 1rem 1.5rem;
-        position: sticky;
-        top: 0;
-        z-index: 1040;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
+    @media(max-width:768px){
 
-      .navbar-brand {
-        font-weight: 700;
-        color: var(--primary-color) !important;
-        font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding-left: 200px;
-      }
+  .sidebar{
+    position:fixed;
+    top:64px;
+    left:0;
+    bottom:0;
+    z-index:50;
+    transform:translateX(-100%);
+    width:260px;
+  }
 
-      /* ================= HAMBURGER MENU ================= */
-      .menu-toggle {
-        width: 44px;
-        height: 44px;
-        border: none;
-        background: transparent;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-        padding: 0;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-      }
+  .sidebar.open{
+    transform:translateX(0);
+  }
 
-      .menu-toggle:hover {
-        background: rgba(37, 99, 235, 0.1);
-      }
+  .main{
+    padding:20px 16px;
+  }
 
-      .menu-toggle span {
-        height: 3px;
-        width: 24px;
-        background: var(--secondary-color);
-        border-radius: 3px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
+  .form-grid{
+    grid-template-columns:1fr;
+  }
 
-      .menu-toggle.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-      }
+  .form-group.full{
+    grid-column:auto;
+  }
 
-      .menu-toggle.active span:nth-child(2) {
-        opacity: 0;
-      }
+  /* TOPBAR MOBILE FIX */
+  .topbar{
+    padding:0 12px;
+    gap:10px;
+  }
 
-      .menu-toggle.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -6px);
-      }
+  .topbar-left{
+    flex:1;
+    min-width:0;
+  }
 
-      /* ================= SIDEBAR ================= */
-      .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        background: linear-gradient(
-          180deg,
-          var(--secondary-color) 0%,
-          #0f172a 100%
-        );
-        padding: 1.5rem 0;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1050;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
-        overflow-y: auto;
-      }
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+  }
 
-      .sidebar-user {
-        padding: 1.5rem 1.5rem 2rem;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.08);
-        margin: 0 1rem 2rem;
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
+  .brand-name{
+    font-size:1rem;
+    white-space:nowrap;
+  }
 
-      .sidebar-user i {
-        color: rgba(255, 255, 255, 0.9);
-        font-size: 3rem;
-      }
+  .btn-logout{
+    padding:7px 10px;
+    font-size:0.75rem;
+  }
 
-      .sidebar-user h6 {
-        color: white !important;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin: 0.75rem 0 0.5rem;
-      }
+  .btn-logout span{
+    display:none;
+  }
+}
 
-      .sidebar-user p {
-        color: rgba(255, 255, 255, 0.8);
-        margin: 0;
-        font-size: 0.9rem;
-      }
+@media(max-width:480px){
 
-      /* Navigation Links */
-      .sidebar .nav-link {
-        color: #94a3b8 !important;
-        padding: 1rem 1.5rem;
-        margin: 0.25rem 1rem;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-weight: 500;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        text-decoration: none;
-      }
+  .topbar{
+    height:60px;
+    padding:0 10px;
+  }
 
-      .sidebar .nav-link i {
-        font-size: 1.1rem;
-        width: 20px;
-        text-align: center;
-      }
+  .brand-name{
+    font-size:0.9rem;
+  }
 
-      .sidebar .nav-link:hover {
-        color: white !important;
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateX(4px);
-      }
+  .user-chip{
+    padding:4px 8px;
+    display: none;
+  }
 
-      .sidebar .nav-link.active {
-        background: linear-gradient(
-          135deg,
-          var(--primary-color),
-          #1d4ed8
-        ) !important;
-        color: white !important;
-        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
-      }
+  .user-name{
+    display:none;
+  }
 
-      /* ================= MAIN CONTENT ================= */
-      .main-wrapper {
-        min-height: 100vh;
-        transition: all 0.4s ease;
-      }
+  .btn-logout{
+    width:38px;
+    height:38px;
+    padding:0;
+    justify-content:center;
+    border-radius:10px;
+    border-color: transparent;
+  }
 
-      .main-content {
-        margin-left: var(--sidebar-width);
-        padding: 2rem;
-        min-height: 100vh;
-      }
+  .btn-logout i{
+    margin:0;
+    font-size:14px;
+  }
 
-      /* ================= CARDS & FORMS ================= */
-      .card {
-        border: none;
-        border-radius: 20px;
-        box-shadow: var(--card-shadow);
-        background: #ffffff;
-        overflow: hidden;
-        margin-bottom: 2rem;
-        transition: all 0.3s ease;
-      }
+  .appt-card{
+    flex-direction:column;
+  }
+}
+  </style>
+</head>
+<body>
 
-      .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-      }
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </div>
+    <a href="#" class="brand">
+      <div class="brand-icon"><i class="fas fa-heartbeat"></i></div>
+      <div class="brand-name">Medi<span>Core</span></div>
+    </a>
+  </div>
+  <div class="topbar-right">
+    <div class="user-chip">
+      <div class="user-avatar" id="topAvatar">D</div>
+      <span class="user-name" id="topName">Doctor</span>
+    </div>
+    <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</div>
 
-      .card-header {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-bottom: 1px solid #e2e8f0;
-        padding: 1.5rem 2rem;
-        font-weight: 700;
-        color: var(--secondary-color);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-      .card-body {
-        padding: 2rem;
-      }
+<div class="layout">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><i class="fas fa-user-md"></i></div>
+      <div class="sidebar-name" id="sideName">Loading...</div>
+      <div class="sidebar-spec" id="sideSpec">Specialist</div>
+      <div class="sidebar-role">DOCTOR</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Navigation</div>
+      <div class="nav-item active" onclick="showPage('profile',this)"><i class="fas fa-user-md"></i> Profile</div>
+      <div class="nav-item" onclick="showPage('appointments',this)"><i class="fas fa-calendar-check"></i> Appointments</div>
+      <div class="nav-item" onclick="showPage('records',this)"><i class="fas fa-file-medical"></i> Medical Records</div>
+      <div class="nav-item" onclick="showPage('search',this)"><i class="fas fa-search"></i> Search Doctors</div>
+    </div>
+  </div>
 
-      /* FORM STYLING */
-      .form-control,
-      .form-select {
-        border-radius: 12px;
-        padding: 0.875rem 1rem;
-        border: 2px solid #e2e8f0;
-        background-color: #f8fafc;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
-        margin-bottom: 1rem;
-      }
+  <div class="main">
 
-      .form-control:focus,
-      .form-select:focus {
-        background-color: #fff;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
-        border-color: var(--primary-color);
-        transform: translateY(-1px);
-      }
-
-      .form-label {
-        font-weight: 600;
-        color: var(--secondary-color);
-        margin-bottom: 0.5rem;
-        display: block;
-      }
-
-      /* BUTTONS */
-      .btn {
-        padding: 0.75rem 1.75rem;
-        border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: none;
-        margin-right: 0.5rem;
-        margin-bottom: 0.5rem;
-      }
-
-      .btn-primary {
-        background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
-      }
-
-      .btn-success {
-        background: linear-gradient(135deg, var(--success-color), #059669);
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-      }
-
-      .btn-info {
-        background: linear-gradient(135deg, var(--accent-color), #0ea5e9);
-        box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
-      }
-
-      .btn:hover {
-        transform: translateY(-2px);
-      }
-
-      /* ================= TAB ANIMATION ================= */
-      .dashboard-tab {
-        display: none;
-      }
-
-      .dashboard-tab.active {
-        display: block;
-        animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-      }
-
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* ================= OVERLAY ================= */
-      .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
-        display: none;
-        z-index: 1030;
-        opacity: 0;
-        transition: all 0.3s ease;
-      }
-
-      .overlay.active {
-        display: block;
-        opacity: 1;
-      }
-
-      /* ================= RECORDS LIST ================= */
-      .records-item {
-        background: #f8fafc;
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        border-left: 4px solid var(--primary-color);
-        transition: all 0.3s ease;
-      }
-
-      .records-item:hover {
-        transform: translateX(8px);
-        box-shadow: var(--card-shadow);
-      }
-
-      /* ================= RESPONSIVE DESIGN ================= */
-      @media (max-width: 991.98px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-
-        .sidebar.active {
-          transform: translateX(0);
-        }
-
-        .main-content {
-          margin-left: 0 !important;
-          padding: 1.5rem;
-        }
-
-        .navbar-brand {
-          display: block;
-          color: white;
-        }
-      }
-
-      @media (max-width: 767.98px) {
-        .main-content {
-          padding: 1rem;
-        }
-
-        .card-body {
-          padding: 1.5rem;
-        }
-
-        .sidebar {
-          width: 280px;
-        }
-      }
-
-      @media (max-width: 575.98px) {
-        :root {
-          --sidebar-width: 100vw;
-        }
-
-        .sidebar {
-          width: 100vw;
-        }
-
-        .main-content {
-          padding: 1rem 0.75rem;
-        }
-
-        .card-body {
-          padding: 1.25rem;
-        }
-
-        .form-control {
-          margin-bottom: 1rem;
-        }
-      }
-
-      /* ================= UTILITIES ================= */
-      .text-primary {
-        color: var(--primary-color) !important;
-      }
-      .w-100 {
-        width: 100%;
-      }
-      .fs-6 {
-        font-size: 1rem;
-      }
-      .mb-3 {
-        margin-bottom: 1rem;
-      }
-      html {
-        scroll-behavior: smooth;
-      }
-    </style>
-  </head>
-
-  <body>
-    <!-- ================= NAVBAR ================= -->
-    <nav class="navbar">
-      <div class="container-fluid">
-        <div class="d-flex align-items-center gap-3">
-          <button id="toggleBtn" class="menu-toggle">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </div>
-
-        <div class="d-flex align-items-center gap-2">
-          <span
-            class="fw-bold"
-            style="color: var(--secondary-color)"
-            id="doctorName"
-            >Dr. User</span
-          >
-          <button class="btn btn-danger btn-sm logout-btn" onclick="logout()">
-            <i class="fas fa-sign-out-alt me-1"></i> Logout
-          </button>
+    <!-- PROFILE -->
+    <div id="page-profile" class="page active">
+      <div class="page-title">Doctor Profile</div>
+      <p class="page-sub">Manage your professional information</p>
+      <div id="profileAlert" class="alert"></div>
+      <div class="card">
+        <div class="card-head"><div class="card-head-title" style="color: #dce9f0;"><i class="fas fa-id-badge"></i> Professional Details</div></div>
+        <div class="card-body">
+          <form onsubmit="updateProfile(event)">
+            <div class="form-grid">
+              <div class="form-group"><label>Doctor ID</label><input type="text" id="docId" readonly/></div>
+              <div class="form-group"><label>Full Name</label><input type="text" id="docName" placeholder="Your name"/></div>
+              <div class="form-group"><label>Email Address</label><input type="email" id="docEmail" placeholder="Email"/></div>
+              <div class="form-group"><label>Specialization</label><input type="text" id="docSpec" placeholder="e.g. Cardiologist"/></div>
+              <div class="form-group full"><label>Experience (Years)</label><input type="text" id="docExp" placeholder="Years of experience" min="0"/></div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Update Profile</button>
+          </form>
         </div>
       </div>
-    </nav>
+    </div>
 
-    <!-- ================= SIDEBAR ================= -->
-    <div id="sidebar" class="sidebar">
-      <div class="sidebar-user">
-        <i class="fas fa-user-md fa-3x mb-3"></i>
-        <h6 id="sideName">Loading...</h6>
-        <p id="sideSpec">Specialist</p>
-        <span id="dashUserRole" class="badge bg-primary">DOCTER</span>
+    <!-- APPOINTMENTS -->
+    <div id="page-appointments" class="page">
+      <div class="page-title">Appointments</div>
+      <p class="page-sub">Manage patient appointments and update status</p>
+      <div id="apptList"><div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading...</p></div></div>
+    </div>
+
+    <!-- MEDICAL RECORDS -->
+    <div id="page-records" class="page">
+      <div class="page-title">Medical Records</div>
+      <p class="page-sub">View and add patient medical records</p>
+
+      <div class="card">
+        <div class="card-head"><div class="card-head-title" style="color: #dce9f0;"><i class="fas fa-search"></i> View Patient Records</div></div>
+        <div class="card-body">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div style="flex:1;min-width:200px;" class="form-group" style="margin:0"><input type="number" id="patientIdInput" placeholder="Enter Patient ID"/></div>
+            <button class="btn btn-info" onclick="getRecords()"><i class="fas fa-search"></i> Get Records</button>
+          </div>
+          <div id="recordsDisplay" style="margin-top:16px;"></div>
+        </div>
       </div>
 
-      <ul class="nav flex-column px-1">
-        <li>
-          <a class="nav-link active" onclick="showTab('profile')"
-            ><i class="fas fa-user"></i> <span>Profile</span></a
-          >
-        </li>
-        <li>
-          <a class="nav-link" onclick="showTab('appointments')"
-            ><i class="fas fa-calendar-check"></i> <span>Appointments</span></a
-          >
-        </li>
-        <li>
-          <a class="nav-link" onclick="showTab('records')"
-            ><i class="fas fa-file-medical"></i> <span>Medical Records</span></a
-          >
-        </li>
-      </ul>
+      <div class="card">
+        <div class="card-head"><div class="card-head-title" style="color: #dce9f0;"><i class="fas fa-plus-circle"></i> Add Medical Record</div></div>
+        <div class="card-body">
+          <div id="recordAlert" class="alert"></div>
+          <div class="form-grid">
+            <div class="form-group"><label>Appointment ID</label><input type="number" id="apptIdInput" placeholder="Appointment ID"/></div>
+            <div class="form-group"><label>Diagnosis</label><input type="text" id="diagnosisInput" placeholder="Primary diagnosis"/></div>
+            <div class="form-group full"><label>Prescription / Medicine</label><input type="text" id="prescriptionInput" placeholder="Medicines and dosage"/></div>
+            <div class="form-group full"><label>Notes</label><textarea id="notesInput" placeholder="Additional notes, follow-up instructions..."></textarea></div>
+          </div>
+          <button class="btn btn-success" onclick="addRecord()"><i class="fas fa-plus"></i> Add Record</button>
+        </div>
+      </div>
     </div>
 
-    <!-- ================= OVERLAY ================= -->
-    <div id="overlay" class="overlay"></div>
-
-    <!-- ================= MAIN CONTENT ================= -->
-    <div class="main-wrapper">
-      <main class="main-content" id="mainContent">
-        <!-- PROFILE -->
-        <div id="profileTab" class="dashboard-tab active">
-          <div class="card">
-            <div class="card-header">
-              <i class="fas fa-user-md me-2"></i> Doctor Profile
-            </div>
-            <div class="card-body">
-              <form id="profileForm">
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <label class="form-label">Doctor ID</label>
-                    <input id="id" class="form-control" readonly />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Full Name</label>
-                    <input
-                      id="name"
-                      class="form-control"
-                      placeholder="Enter your name"
-                    />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Email</label>
-                    <input
-                      id="email"
-                      type="email"
-                      class="form-control"
-                      placeholder="Enter email"
-                    />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Specialization</label>
-                    <input
-                      id="specialization"
-                      class="form-control"
-                      placeholder="Enter specialization"
-                    />
-                  </div>
-                  <div class="col-12">
-                    <label class="form-label">Experience (Years)</label>
-                    <input
-                      id="experianceInYears"
-                      class="form-control"
-                      placeholder="Enter experience in years"
-                    />
-                  </div>
-                </div>
-                <button
-                  type="submit"
-                  class="btn btn-primary mt-4 w-100 w-md-auto"
-                >
-                  <i class="fas fa-save me-2"></i> Update Profile
-                </button>
-              </form>
-            </div>
+    <!-- SEARCH -->
+    <div id="page-search" class="page">
+      <div class="page-title">Search Doctors</div>
+      <p class="page-sub">Find doctors by name or specialization</p>
+      <div class="card">
+        <div class="card-body">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+            <input type="text" id="searchInput" placeholder="Search by name or specialization..." style="flex:1;background:var(--surface);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;min-width:200px;" oninput="searchDoctors()"/>
           </div>
+          <div id="searchResults"></div>
         </div>
-
-        <!-- APPOINTMENTS -->
-        <div id="appointmentsTab" class="dashboard-tab">
-          <div class="card">
-            <div class="card-header">
-              <i class="fas fa-calendar-check me-2"></i> Today's Appointments
-            </div>
-            <div class="card-body">
-              <div id="appointmentsList" class="text-center py-5">
-                <i class="fas fa-calendar fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">No appointments scheduled</h5>
-                <p class="text-muted">Appointments will appear here</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- MEDICAL RECORDS -->
-        <div id="recordsTab" class="dashboard-tab">
-          <div class="card">
-            <div class="card-header">
-              <i class="fas fa-file-medical me-2"></i> Medical Records
-            </div>
-            <div class="card-body">
-              <!-- GET RECORDS -->
-              <div class="row g-4 mb-4">
-                <div class="col-md-8">
-                  <label class="form-label">Patient ID</label>
-                  <input
-                    id="patientId"
-                    class="form-control"
-                    placeholder="Enter Patient ID"
-                  />
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                  <button class="btn btn-info w-100" onclick="getRecords()">
-                    <i class="fas fa-search me-2"></i> Get Records
-                  </button>
-                </div>
-              </div>
-
-              <div id="recordsList" class="mb-5"></div>
-
-              <!-- ADD RECORD -->
-              <div class="border-top pt-4">
-                <h6 class="mb-4">
-                  <i class="fas fa-plus-circle me-2 text-success"></i>Add New
-                  Medical Record
-                </h6>
-
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <label class="form-label">Appointment ID</label>
-                    <input
-                      id="appointmentId"
-                      class="form-control"
-                      placeholder="Enter Appointment ID"
-                    />
-                  </div>
-                  <div class="col-md-6">
-                    <label class="form-label">Diagnosis</label>
-                    <input
-                      id="diagnosis"
-                      class="form-control"
-                      placeholder="Enter diagnosis"
-                    />
-                  </div>
-                  <div class="col-md-12">
-                    <label class="form-label">Prescription / Medicine</label>
-                    <input
-                      id="prescription"
-                      class="form-control"
-                      placeholder="Enter prescription details"
-                    />
-                  </div>
-                  <div class="col-md-12">
-                    <label class="form-label">Notes</label>
-                    <textarea
-                      id="notes"
-                      class="form-control"
-                      rows="4"
-                      placeholder="Additional notes..."
-                    ></textarea>
-                  </div>
-                </div>
-
-                <button
-                  class="btn btn-success mt-4 w-100 w-md-auto"
-                  onclick="addRecord()"
-                >
-                  <i class="fas fa-plus me-2"></i> Add Medical Record
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // ================= SIDEBAR TOGGLE =================
-      const toggleBtn = document.getElementById("toggleBtn");
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("overlay");
+  </div>
+</div>
 
-      function toggleSidebar() {
-        sidebar.classList.toggle("active");
-        overlay.classList.toggle("active");
-        toggleBtn.classList.toggle("active");
-        document.body.style.overflow = sidebar.classList.contains("active")
-          ? "hidden"
-          : "";
-      }
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API = 'http://localhost:8080/api';
+let doctorData = null;
 
-      toggleBtn.addEventListener("click", toggleSidebar);
-      overlay.addEventListener("click", () => {
-        sidebar.classList.remove("active");
-        overlay.classList.remove("active");
-        toggleBtn.classList.remove("active");
-        document.body.style.overflow = "";
-      });
+function getToken(){ return localStorage.getItem('accessToken'); }
+async function apiCall(url, options={}){
+  const token = getToken();
+  const resp = await fetch(url,{
+    method:options.method||'GET',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,...(options.headers||{})},
+    body:options.body||null
+  });
+  if(resp.status===401){ await refreshToken(); return apiCall(url,options); }
+  return resp;
+}
+async function refreshToken(){
+  const rt=localStorage.getItem('refreshToken');
+  try{
+    const res=await fetch(`${API}/auth/refresh-token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})});
+    const data=await res.json();
+    if(res.ok) localStorage.setItem('accessToken',data.accessToken);
+    else doLogout();
+  } catch(e){ doLogout(); }
+}
+function doLogout(){ localStorage.clear(); window.location.href='index.html'; }
 
-      window.addEventListener("resize", () => {
-        if (window.innerWidth >= 992) {
-          sidebar.classList.remove("active");
-          overlay.classList.remove("active");
-          toggleBtn.classList.remove("active");
-          document.body.style.overflow = "";
-        }
-      });
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
 
-      // Close sidebar on mobile nav click
-      function closeSidebarOnMobile() {
-        if (window.innerWidth < 992) {
-          sidebar.classList.remove("active");
-          overlay.classList.remove("active");
-          toggleBtn.classList.remove("active");
-          document.body.style.overflow = "";
-        }
-      }
+function showPage(name, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  closeSidebar();
+  if(name==='appointments') loadAppointments();
+}
 
-      // ================= TAB SWITCHING =================
-      function showTab(tabName) {
-        document.querySelectorAll(".dashboard-tab").forEach((tab) => {
-          tab.classList.remove("active");
-        });
-        document.getElementById(tabName + "Tab").classList.add("active");
+async function init(){
+  const token = getToken();
+  if(!token){ window.location.href='index.html'; return; }
+  await loadProfile();
+  loadAppointments();
+}
 
-        document.querySelectorAll(".sidebar .nav-link").forEach((link) => {
-          link.classList.remove("active");
-        });
-        event.target.classList.add("active");
+async function loadProfile(){
+  try{
+    const res = await apiCall(`${API}/docters/profile`);
+    if(!res.ok){ doLogout(); return; }
+    doctorData = await res.json();
+    document.getElementById('docId').value = doctorData.docter_id||doctorData.id||'';
+    document.getElementById('docName').value = doctorData.name||'';
+    document.getElementById('docEmail').value = doctorData.email||'';
+    document.getElementById('docSpec').value = doctorData.specialization||'';
+    document.getElementById('docExp').value = doctorData.experienceInYears||doctorData.experianceInYears||'';
+    document.getElementById('topName').textContent = doctorData.name||'Doctor';
+    document.getElementById('topAvatar').textContent = (doctorData.name||'D')[0].toUpperCase();
+    document.getElementById('sideName').textContent = doctorData.name||'Doctor';
+    document.getElementById('sideSpec').textContent = doctorData.specialization||'Specialist';
+  } catch(e){ console.error(e); }
+}
 
-        closeSidebarOnMobile();
-      }
-
-      const API = "http://localhost:8080/api";
-
-      async function apiCall(url, options = {}) {
-        let accessToken = localStorage.getItem("accessToken");
-
-        // Default headers
-        options.headers = {
-          ...options.headers,
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + accessToken,
-        };
-
-        try {
-          let response = await fetch(url, options);
-
-          // 🔁 Handle token expiry
-          if (response.status === 401) {
-            const refreshToken = localStorage.getItem("refreshToken");
-
-            const refreshRes = await fetch(API + "/auth/refresh-token", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ refreshToken }),
-            });
-
-            const refreshData = await refreshRes.json();
-
-            if (refreshRes.ok) {
-              // Save new token
-              localStorage.setItem("accessToken", refreshData.accessToken);
-
-              // Retry original request
-              options.headers["Authorization"] =
-                "Bearer " + refreshData.accessToken;
-              return fetch(url, options);
-            } else {
-              alert("Session expired. Please login again.");
-              localStorage.clear();
-              window.location.href = "index.html";
-              return;
-            }
-          }
-
-          return response;
-        } catch (error) {
-          console.error("API Error:", error);
-          throw error;
-        }
-      }
-
-      // TAB SWITCH
-      function showTab(tab) {
-        document
-          .querySelectorAll(".dashboard-tab")
-          .forEach((t) => t.classList.remove("active"));
-        document.getElementById(tab + "Tab").classList.add("active");
-      }
-
-      // const API = "http://localhost:8080/api";
-
-      //  Common API helper
-      async function apiCall(url, method = "GET", data = null) {
-        return fetch(url, {
-          method: method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + localStorage.getItem("accessToken"),
-          },
-          body: data ? JSON.stringify(data) : null,
-        });
-      }
-
-      // ================= LOAD PROFILE =================
-      async function loadProfile() {
-        try {
-          const res = await apiCall(API + "/docters/profile");
-          const data = await res.json();
-
-          console.log("PROFILE DATA:", data);
-
-          // Fill UI
-          document.getElementById("id").value = data.docter_id || data.id || "";
-          document.getElementById("name").value = data.name || "";
-          document.getElementById("email").value = data.email || "";
-          document.getElementById("specialization").value =
-            data.specialization || "";
-
-          document.getElementById("experianceInYears").value =
-            data.experienceInYears || data.experianceInYears || "";
-
-          // Sidebar/UI update
-          document.getElementById("doctorName").innerText = data.name || "";
-          document.getElementById("sideName").innerText = data.name || "";
-          document.getElementById("sideSpec").innerText =
-            data.specialization || "";
-        } catch (error) {
-          console.error(error);
-          alert("❌ Failed to load profile");
-        }
-      }
-
-      // ================= UPDATE PROFILE =================
-      document
-        .getElementById("profileForm")
-        .addEventListener("submit", async (e) => {
-          e.preventDefault();
-
-          const updatedData = {
-            // Do NOT send doctorId unless backend needs it
-            name: document.getElementById("name").value,
-            email: document.getElementById("email").value,
-            specialization: document.getElementById("specialization").value,
-
-            // correct key (IMPORTANT)
-            experienceInYears:
-              document.getElementById("experianceInYears").value,
-          };
-
-          try {
-            const res = await apiCall(
-              API + "/docters/profile",
-              "PUT",
-              updatedData,
-            );
-
-            if (res.ok) {
-              alert("✅ Profile Updated");
-
-              // Reload fresh data from backend
-              loadProfile();
-            } else {
-              const err = await res.text(); // safer than json
-              console.log(err);
-              alert("❌ Update failed");
-            }
-          } catch (error) {
-            console.error(error);
-            alert("❌ Server error");
-          }
-        });
-
-      // Load on page start
+async function updateProfile(e){
+  e.preventDefault();
+  const payload = {
+    name: document.getElementById('docName').value,
+    email: document.getElementById('docEmail').value,
+    specialization: document.getElementById('docSpec').value,
+    experienceInYears: document.getElementById('docExp').value
+  };
+  try{
+    const res = await apiCall(`${API}/docters/profile`,{method:'PUT',body:JSON.stringify(payload)});
+    if(res.ok){
+      showAlert('profileAlert','success','Profile updated successfully!');
       loadProfile();
+    } else {
+      const e2=await res.json().catch(()=>({}));
+      showAlert('profileAlert','error',e2.message||'Update failed');
+    }
+  } catch(err){ showAlert('profileAlert','error','Network error'); }
+}
 
-      // ================= APPOINTMENTS =================
-
-      async function apiCall(url, options = {}) {
-        const token = localStorage.getItem("accessToken");
-
-        return fetch(url, {
-          method: options.method || "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: token ? `Bearer ${token}` : "",
-            ...(options.headers || {}),
-          },
-          body: options.body || null, // IMPORTANT
-        });
-      }
-
-      // ================= APPOINTMENTS =================
-      async function loadAppointments() {
-        try {
-          const res = await apiCall(`${API}/docters/appointments`);
-
-          if (!res.ok) {
-            throw new Error(`HTTP ${res.status}`);
-          }
-
-          let data = [];
-          try {
-            data = await res.json();
-          } catch {
-            throw new Error("Invalid JSON response");
-          }
-
-          if (!Array.isArray(data)) {
-            throw new Error("Invalid data format");
-          }
-
-          const html = data
-            .map((a) => {
-              const statusColor =
-                a.status === "CONFIRMED"
-                  ? "success"
-                  : a.status === "COMPLETED"
-                    ? "primary"
-                    : a.status === "CANCELLED"
-                      ? "danger"
-                      : "warning";
-
-              return `
-        <div class="card mb-2">
-          <div class="card-body">
-            <h6>Appointment ID: ${a.appointment_Id || "N/A"}</h6>
-            <h6>Patient ID: ${a.patient_Id || "N/A"}</h6>
-            <h6>Patient Name: ${a.name || "N/A"}</h6>
-            <h6>Email: ${a.email_Id || "N/A"}</h6>
-
-            <h6>Appointment Time: 
-              ${
-                a.appointment_Time
-                  ? new Date(a.appointment_Time).toLocaleString()
-                  : "N/A"
-              }
-            </h6>
-
-            <h6>Medical History: ${a.medical_History || "N/A"}</h6>
-
-            <!-- STATUS -->
-            <span class="badge bg-${statusColor}">
-              ${a.status || "UNKNOWN"}
-            </span>
-
-            <br><br>
-
-            <!-- STATUS SELECT -->
-            <select id="status-${a.appointment_Id}" class="form-select form-select-sm w-50">
-              <option value="CONFIRMED" ${
-                a.status === "CONFIRMED" ? "selected" : ""
-              }>CONFIRMED</option>
-              <option value="COMPLETED" ${
-                a.status === "COMPLETED" ? "selected" : ""
-              }>COMPLETED</option>
-              <option value="CANCELLED" ${
-                a.status === "CANCELLED" ? "selected" : ""
-              }>CANCELLED</option>
-            </select>
-
-            <br>
-
-            <!-- BUTTON -->
-            <button class="btn btn-primary btn-sm mt-2"
-              onclick="updateStatusFromSelect(${a.appointment_Id})">
-              Update Status
-            </button>
+async function loadAppointments(){
+  document.getElementById('apptList').innerHTML = `<div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading appointments...</p></div>`;
+  try{
+    const res = await apiCall(`${API}/docters/appointments`);
+    if(!res.ok) throw new Error();
+    const data = await res.json();
+    if(!data||!data.length){
+      document.getElementById('apptList').innerHTML = `<div class="empty"><i class="fas fa-calendar-times"></i><p>No appointments found</p></div>`;
+      return;
+    }
+    const statusBadge = s => {
+      const map = {CONFIRMED:'confirmed',COMPLETED:'completed',CANCELLED:'cancelled'};
+      return `<span class="badge badge-${map[s]||'pending'}">${s||'PENDING'}</span>`;
+    };
+    document.getElementById('apptList').innerHTML = data.map(a=>`
+      <div class="appt-card">
+        <div class="appt-header">
+          <div class="appt-info">
+            <h5><i class="fas fa-user" style="color:var(--teal);margin-right:8px;"></i>${a.name||'Patient'}</h5>
+            <p><i class="fas fa-id-badge" style="margin-right:6px;color:var(--muted);"></i>Patient ID: ${a.patient_Id||'—'}</p>
+            <span style="color:var(--muted);font-size:0.78rem;"> Appointment Id: ${a.appointment_Id}</span>
+            <p><i class="fas fa-envelope" style="margin-right:6px;color:var(--muted);"></i>${a.email_Id||'—'}</p>
+            <p><i class="fas fa-clock" style="margin-right:6px;color:var(--muted);"></i>${a.appointment_Time?new Date(a.appointment_Time).toLocaleString():'—'}</p>
+            ${a.medical_History?`<p><i class="fas fa-notes-medical" style="margin-right:6px;color:var(--muted);"></i>${a.medical_History}</p>`:''}
           </div>
+          <div>${statusBadge(a.status)}</div>
         </div>
-      `;
-            })
-            .join("");
+        <div class="appt-actions">
+          <select class="status-sel" id="sel-${a.appointment_Id}">
+            <option value="CONFIRMED" ${a.status==='CONFIRMED'?'selected':''}>CONFIRMED</option>
+            <option value="COMPLETED" ${a.status==='COMPLETED'?'selected':''}>COMPLETED</option>
+            <option value="CANCELLED" ${a.status==='CANCELLED'?'selected':''}>CANCELLED</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="updateStatus(${a.appointment_Id})"><i class="fas fa-sync-alt"></i> Update Status</button>
+          
+        </div>
+      </div>
+    `).join('');
+  } catch(e){
+    document.getElementById('apptList').innerHTML = `<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Failed to load appointments</p></div>`;
+  }
+}
 
-          document.getElementById("appointmentsList").innerHTML =
-            html || "<p>No appointments found</p>";
-        } catch (error) {
-          console.error("❌ Load Error:", error);
-          document.getElementById("appointmentsList").innerHTML =
-            "<p class='text-danger'>Failed to load appointments</p>";
-        }
-      }
+async function updateStatus(id){
+  const sel = document.getElementById(`sel-${id}`);
+  const status = sel.value;
+  try{
+    const res = await apiCall(`${API}/docters/appointments/${id}/status`,{
+      method:'PUT',
+      body:JSON.stringify({appointment_status:status,availability:true})
+    });
+    if(res.ok){ loadAppointments(); } else { alert('Status update failed'); }
+  } catch(e){ alert('Network error'); }
+}
 
-      // ================= UPDATE STATUS =================
-      async function updateStatusFromSelect(appointment_Id) {
-        const select = document.getElementById(`status-${appointment_Id}`);
+async function getRecords(){
+  const pid = document.getElementById('patientIdInput').value;
+  if(!pid){ alert('Enter a Patient ID'); return; }
+  document.getElementById('recordsDisplay').innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
+  try{
+    const res = await apiCall(`${API}/docters/medical-record/${pid}`);
+    const data = await res.json();
+    if(!data||!data.length){
+      document.getElementById('recordsDisplay').innerHTML = `<div class="empty"><i class="fas fa-file-medical"></i><p>No records found for this patient</p></div>`;
+      return;
+    }
+    document.getElementById('recordsDisplay').innerHTML = data.map(r=>`
+      <div class="record-card">
+        <div class="record-row" style="color: #dce9f0;"><span class="record-label">Patient:</span><span>${r.patient_Name||r.patient_Id}</span></div>
+        <div class="record-row" style="color: #dce9f0;"><span class="record-label">Diagnosis:</span><span>${r.diagnosis||'—'}</span></div>
+        <div class="record-row" style="color: #dce9f0;"><span class="record-label">Medicine:</span><span>${r.medicine||r.prescription||'—'}</span></div>
+        <div class="record-row" style="color: #dce9f0;"><span class="record-label">Notes:</span><span>${r.notes||'—'}</span></div>
+        <div class="record-row" style="color: #dce9f0;"><span class="record-label">Doctor:</span><span>${r.docter_Name||'—'}</span></div>
+        <div class="record-row" style="color: #dce9f0;"><span class="record-label">Date:</span><span>${r.createdAt?new Date(r.createdAt).toLocaleString():'—'}</span></div>
+      </div>
+    `).join('');
+  } catch(e){
+    document.getElementById('recordsDisplay').innerHTML = `<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Error fetching records</p></div>`;
+  }
+}
 
-        if (!select) {
-          alert("❌ Status dropdown not found");
-          return;
-        }
+async function addRecord(){
+  const apptId = document.getElementById('apptIdInput').value;
+  if(!apptId){ showAlert('recordAlert','error','Please enter an Appointment ID'); return; }
+  const payload = {
+    diagnosis: document.getElementById('diagnosisInput').value,
+    prescription: document.getElementById('prescriptionInput').value,
+    notes: document.getElementById('notesInput').value
+  };
+  try{
+    const res = await apiCall(`${API}/docters/${apptId}/medical-record`,{method:'POST',body:JSON.stringify(payload)});
+    if(res.ok){
+      showAlert('recordAlert','success','Medical record added successfully!');
+      document.getElementById('apptIdInput').value='';
+      document.getElementById('diagnosisInput').value='';
+      document.getElementById('prescriptionInput').value='';
+      document.getElementById('notesInput').value='';
+    } else {
+      const e2=await res.json().catch(()=>({}));
+      showAlert('recordAlert','error',e2.message||'Failed to add record');
+    }
+  } catch(e){ showAlert('recordAlert','error','Network error'); }
+}
 
-        const status = select.value;
-        await updateStatus(appointment_Id, status);
-      }
+async function searchDoctors(){
+  const q = document.getElementById('searchInput').value.trim();
+  if(!q){ document.getElementById('searchResults').innerHTML=''; return; }
+  try{
+    const res = await apiCall(`${API}/docters/search?query=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if(!data||!data.length){
+      document.getElementById('searchResults').innerHTML = `<div class="empty"><i class="fas fa-search"></i><p>No doctors found for "${q}"</p></div>`;
+      return;
+    }
+    document.getElementById('searchResults').innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;">
+      ${data.map(d=>`
+        <div style="background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:20px;text-align:center;">
+          <div style="width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--teal),#2980b9);display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;margin:0 auto 12px;"><i class="fas fa-user-md"></i></div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:4px;">${d.name}</div>
+          <div style="color:var(--teal);font-size:0.8rem;margin-bottom:4px;">${d.specialization}</div>
+          <div style="color:var(--muted);font-size:0.78rem;">${d.experianceInYears||d.experienceInYears||0} yrs exp</div>
+        </div>
+      `).join('')}
+    </div>`;
+  } catch(e){}
+}
 
-      async function updateStatus(appointment_Id, status) {
-        try {
-          if (!appointment_Id || !status) {
-            alert("❌ Invalid input");
-            return;
-          }
+function showAlert(id, type, msg){
+  const el=document.getElementById(id);
+  el.className=`alert alert-${type}`;
+  el.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
+  el.style.display='flex';
+  setTimeout(()=>el.style.display='none',5000);
+}
 
-          const res = await apiCall(
-            `${API}/docters/appointments/${appointment_Id}/status`,
-            {
-              method: "PUT",
-              body: JSON.stringify({
-                appointment_status: status,
-                availability: true,
-              }),
-            },
-          );
+async function logout(){
+  if(!confirm('Sign out of MediCore?')) return;
+  const rt=localStorage.getItem('refreshToken');
+  try{ await fetch(`${API}/auth/logout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})}); } catch(e){}
+  doLogout();
+}
 
-          let data = null;
-          try {
-            data = await res.json();
-          } catch {}
-
-          if (res.ok) {
-            alert("✅ Status updated successfully");
-            loadAppointments();
-          } else {
-            alert("❌ Failed: " + (data?.message || `HTTP ${res.status}`));
-          }
-        } catch (error) {
-          console.error("❌ Update Error:", error);
-          alert("❌ Error: " + error.message);
-        }
-      }
-
-      // ================= MEDICAL RECORD =================
-      async function getRecords() {
-        try {
-          const patientId = document.getElementById("patientId").value;
-
-          const res = await apiCall(
-            API + `/docters/medical-record/${patientId}`,
-          );
-
-          const data = await res.json();
-
-          if (!data || data.length === 0) {
-            document.getElementById("recordsList").innerHTML =
-              "<p>No records found</p>";
-            return;
-          }
-
-          const html = data
-            .map(
-              (r) => `
-            <div class="card mb-2">
-                <div class="card-body">
-                    <h6>Patient ID: ${r.patient_Id}</h6>
-                    <h6>Patient Name: ${r.patient_Name}</h6>
-
-                    <h6>Diagnosis: ${r.diagnosis}</h6>
-                    <h6>Medicine: ${r.medicine}</h6>
- 
-                    <h6>Notes: ${r.notes}</h6>
-
-                    <h6>Doctor: ${r.docter_Name}</h6>
-
-                    <h6>Date: 
-                        ${new Date(r.createdAt).toLocaleString()}
-                    </h6>
-                </div>
-            </div>
-        `,
-            )
-            .join("");
-
-          document.getElementById("recordsList").innerHTML = html;
-        } catch (error) {
-          console.error(error);
-          alert("❌ Error fetching records");
-        }
-      }
-
-      async function addRecord() {
-        try {
-          const appointmentId = document.getElementById("appointmentId").value;
-
-          if (!appointmentId) {
-            alert("❌ Please enter Appointment ID");
-            return;
-          }
-
-          const payload = {
-            diagnosis: document.getElementById("diagnosis").value,
-            prescription: document.getElementById("prescription").value, // IMPORTANT
-            notes: document.getElementById("notes").value,
-          };
-
-          console.log("POST Payload:", payload);
-
-          const res = await apiCall(
-            `${API}/docters/${appointmentId}/medical-record`, // keep same if backend uses docters
-            {
-              method: "POST",
-              body: JSON.stringify(payload),
-            },
-          );
-
-          let data = null;
-          try {
-            data = await res.json();
-          } catch {}
-
-          if (res.ok) {
-            alert("✅ Medical record added successfully!");
-
-            document.getElementById("diagnosis").value = "";
-            document.getElementById("prescription").value = "";
-            document.getElementById("notes").value = "";
-          } else {
-            console.error("Backend Error:", data);
-            alert("❌ Failed: " + (data?.message || `HTTP ${res.status}`));
-          }
-        } catch (error) {
-          console.error("❌ Error:", error);
-          alert("❌ Error adding medical record");
-        }
-      }
-
-      // Initialize
-      document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll(".sidebar .nav-link").forEach((link) => {
-          link.addEventListener("click", closeSidebarOnMobile);
-        });
-      });
-
-      // INIT
-      window.onload = () => {
-        loadProfile();
-        loadAppointments();
-      };
-
-      // ================= LOGOUT =================
-
-      async function logout() {
-        if (!confirm("Are you sure you want to logout?")) return;
-
-        const refreshToken = localStorage.getItem("refreshToken");
-
-        try {
-          await fetch("http://localhost:8080/api/auth/logout", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refreshToken }),
-          });
-        } catch (e) {
-          console.log("Logout API failed");
-        }
-
-        localStorage.clear();
-        window.location.href = "index.html";
-      }
-    </script>
-  </body>
+window.addEventListener('resize',()=>{ if(window.innerWidth>768) closeSidebar(); });
+init();
+</script>
+</body>
 </html>

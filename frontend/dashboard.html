@@ -1,1268 +1,719 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dashboard - MediCare Hospital</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-      rel="stylesheet"
-    />
-    <style>
-      /* ================= ROOT & GLOBAL ================= */
-      :root {
-        --primary-color: #2563eb;
-        --secondary-color: #1e293b;
-        --accent-color: #38bdf8;
-        --bg-light: #f1f5f9;
-        --sidebar-width: 280px;
-        --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        background-color: var(--bg-light);
-        font-family:
-          "Inter",
-          system-ui,
-          -apple-system,
-          sans-serif;
-        color: #334155;
-        letter-spacing: -0.01em;
-        margin: 0;
-        padding: 0;
-        overflow-x: hidden;
-      }
-
-      /* ================= NAVBAR ================= */
-      .navbar {
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(20px);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-        padding: 1rem 1.5rem;
-        position: sticky;
-        top: 0;
-        z-index: 1040;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .navbar-brand {
-        font-weight: 700;
-        color: var(--primary-color) !important;
-        font-size: clamp(1.1rem, 2.5vw, 1.4rem);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      /* ================= HAMBURGER MENU ================= */
-      .menu-toggle {
-        width: 44px;
-        height: 44px;
-        border: none;
-        background: transparent;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 5px;
-        cursor: pointer;
-        padding: 0;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-      }
-
-      .menu-toggle:hover {
-        background: rgba(37, 99, 235, 0.1);
-      }
-
-      .menu-toggle span {
-        height: 3px;
-        width: 24px;
-        background: var(--secondary-color);
-        border-radius: 3px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      }
-
-      .menu-toggle.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-      }
-
-      .menu-toggle.active span:nth-child(2) {
-        opacity: 0;
-      }
-
-      .menu-toggle.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(7px, -6px);
-      }
-
-      /* ================= SIDEBAR ================= */
-      .sidebar {
-        width: var(--sidebar-width);
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        background: linear-gradient(
-          180deg,
-          var(--secondary-color) 0%,
-          #0f172a 100%
-        );
-        padding: 1.5rem 0;
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        z-index: 1050;
-        box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
-        overflow-y: auto;
-      }
-
-      .sidebar-user {
-        padding: 1.5rem 1.5rem 2rem;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.08);
-        margin: 0 1rem 2rem;
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .sidebar-user i {
-        color: rgba(255, 255, 255, 0.9);
-      }
-
-      .sidebar-user h6 {
-        color: white !important;
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin: 0.75rem 0 0.5rem;
-      }
-
-      .badge {
-        font-size: 0.75rem;
-      }
-
-      /* Navigation Links */
-      .sidebar .nav-link {
-        color: #94a3b8 !important;
-        padding: 1rem 1.5rem;
-        margin: 0.25rem 1rem;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        font-weight: 500;
-        font-size: 0.95rem;
-        transition: all 0.3s ease;
-        text-decoration: none;
-      }
-
-      .sidebar .nav-link i {
-        font-size: 1.1rem;
-        width: 20px;
-        text-align: center;
-      }
-
-      .sidebar .nav-link:hover {
-        color: white !important;
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateX(4px);
-      }
-
-      .sidebar .nav-link.active {
-        background: linear-gradient(
-          135deg,
-          var(--primary-color),
-          #1d4ed8
-        ) !important;
-        color: white !important;
-        box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
-      }
-
-      /* ================= MAIN CONTENT ================= */
-      .main-wrapper {
-        min-height: 100vh;
-        transition: all 0.4s ease;
-      }
-
-      .main-content {
-        margin-left: var(--sidebar-width);
-        padding: 2rem;
-        min-height: 100vh;
-      }
-
-      /* ================= CARDS & FORMS ================= */
-      .card {
-        border: none;
-        border-radius: 20px;
-        box-shadow: var(--card-shadow);
-        background: #ffffff;
-        overflow: hidden;
-        margin-bottom: 2rem;
-        transition: all 0.3s ease;
-      }
-
-      .card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-      }
-
-      .card-header {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-bottom: 1px solid #e2e8f0;
-        padding: 1.5rem 2rem;
-        font-weight: 700;
-        color: var(--secondary-color);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      .card-body {
-        padding: 2rem;
-      }
-
-      /* FORM STYLING */
-      .form-control,
-      .form-select {
-        border-radius: 12px;
-        padding: 0.875rem 1rem;
-        border: 2px solid #e2e8f0;
-        background-color: #f8fafc;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
-      }
-
-      .form-control:focus,
-      .form-select:focus {
-        background-color: #fff;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
-        border-color: var(--primary-color);
-        transform: translateY(-1px);
-      }
-
-      /* BUTTONS */
-      .btn {
-        padding: 0.75rem 1.75rem;
-        border-radius: 12px;
-        font-weight: 600;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: none;
-      }
-
-      .btn-primary {
-        background: linear-gradient(135deg, var(--primary-color), #1d4ed8);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-      }
-
-      .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
-      }
-
-      .btn-success {
-        background: linear-gradient(135deg, #10b981, #059669);
-      }
-
-      .btn-danger {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-      }
-
-      .logout-btn {
-        background: linear-gradient(135deg, #ef4444, #dc2626) !important;
-        padding: 0.75rem 1.5rem !important;
-      }
-
-      .logout-btn:hover {
-        transform: translateY(-2px) scale(1.02);
-      }
-
-      /* ================= TAB ANIMATION ================= */
-      .dashboard-tab {
-        display: none;
-      }
-
-      .dashboard-tab.active {
-        display: block;
-        animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-      }
-
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(30px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      /* ================= OVERLAY ================= */
-      .overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100vh;
-        background: rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(4px);
-        display: none;
-        z-index: 1030;
-        opacity: 0;
-        transition: all 0.3s ease;
-      }
-
-      .overlay.active {
-        display: block;
-        opacity: 1;
-      }
-
-      /* ================= RESPONSIVE DESIGN ================= */
-
-      /* Tablet (768px - 991px) */
-      @media (max-width: 991.98px) {
-        .sidebar {
-          transform: translateX(-100%);
-        }
-
-        .sidebar.active {
-          transform: translateX(0);
-        }
-
-        .main-content {
-          margin-left: 0 !important;
-          padding: 1.5rem;
-        }
-      }
-
-      /* Mobile Large (576px - 767px) */
-      @media (max-width: 767.98px) {
-        .navbar {
-          padding: 1rem;
-        }
-
-        .main-content {
-          padding: 1rem;
-        }
-
-        .card-body {
-          padding: 1.5rem;
-        }
-
-        .card-header {
-          padding: 1.25rem 1.5rem;
-        }
-
-        .sidebar {
-          width: 280px;
-        }
-
-        .sidebar .nav-link {
-          padding: 1rem;
-          margin: 0.25rem 0.75rem;
-          font-size: 0.95rem;
-        }
-      }
-
-      /* Mobile Small (<576px) */
-      @media (max-width: 575.98px) {
-        :root {
-          --sidebar-width: 100vw;
-        }
-
-        .sidebar {
-          width: 100vw;
-          border-radius: 0;
-        }
-
-        .main-content {
-          padding: 1rem 0.75rem;
-        }
-
-        .card {
-          margin-bottom: 1.5rem;
-        }
-
-        .card-body {
-          padding: 1.25rem;
-        }
-
-        .card-header {
-          padding: 1rem 1.25rem;
-          font-size: 1.1rem;
-        }
-
-        .form-control,
-        .form-select {
-          padding: 0.75rem 1rem;
-          font-size: 1rem;
-        }
-
-        .btn {
-          padding: 0.75rem 1.25rem;
-          font-size: 0.9rem;
-        }
-
-        /* Stack form fields */
-        .row > .col-md-6 {
-          margin-bottom: 1rem;
-        }
-
-        /* Single column doctors */
-        #doctorsList .col-md-4 {
-          flex: 0 0 100%;
-          max-width: 100%;
-        }
-      }
-
-      /* ================= APPOINTMENTS & DOCTORS ================= */
-      #appointmentsList > div,
-      #doctorsList > div {
-        background: white;
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        border: 1px solid #f1f5f9;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-      }
-
-      #appointmentsList > div:hover {
-        border-color: var(--primary-color);
-        box-shadow: var(--card-shadow);
-        transform: translateY(-2px);
-      }
-
-      /* ================= UTILITIES ================= */
-      .text-primary {
-        color: var(--primary-color) !important;
-      }
-      .w-100 {
-        width: 100%;
-      }
-      .fs-6 {
-        font-size: 1rem;
-      }
-      .mb-3 {
-        margin-bottom: 1rem;
-      }
-
-      /* Smooth scrolling */
-      html {
-        scroll-behavior: smooth;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- ================= NAVBAR ================= -->
-    <nav class="navbar">
-      <div class="container-fluid">
-        <div class="d-flex align-items-center gap-3">
-          <button id="toggleBtn" class="menu-toggle">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-          <span class="navbar-brand">
-            <i class="fas fa-hospital"></i> MediCare
-          </span>
-        </div>
-
-        <div class="d-flex align-items-center gap-2">
-          <span
-            class="fw-bold"
-            style="color: var(--secondary-color)"
-            id="userName"
-            >User</span
-          >
-          <button class="btn logout-btn btn-sm" onclick="logout()">
-            <i class="fas fa-sign-out-alt me-1"></i> Logout
-          </button>
-        </div>
-      </div>
-    </nav>
-
-    <!-- ================= SIDEBAR ================= -->
-    <div id="sidebar" class="sidebar">
-      <div class="sidebar-user">
-        <i class="fas fa-user-circle fa-3x mb-3"></i>
-        <h6 id="dashUserName">Loading...</h6>
-        <span id="dashUserRole" class="badge bg-primary">Role</span>
-      </div>
-
-      <ul class="nav flex-column px-1">
-        <li>
-          <a class="nav-link active" onclick="showTab('profile')"
-            ><i class="fas fa-user"></i> <span>Profile</span></a
-          >
-        </li>
-        <li>
-          <a class="nav-link" onclick="showTab('appointments')"
-            ><i class="fas fa-calendar"></i> <span>Appointments</span></a
-          >
-        </li>
-        <li>
-          <a class="nav-link" onclick="showTab('doctors')"
-            ><i class="fas fa-stethoscope"></i> <span>Doctors</span></a
-          >
-        </li>
-        <li id="adminNav" style="display: none">
-          <a class="nav-link" onclick="showTab('admin')"
-            ><i class="fas fa-chart-bar"></i> <span>Admin</span></a
-          >
-        </li>
-      </ul>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCore — Patient Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#060e1c;--surface:#0b1829;--card:#101f36;--card2:#0d1a2f;
+      --border:rgba(0,200,180,0.12);--border2:rgba(255,255,255,0.06);
+      --teal:#00c8b4;--teal-dim:rgba(0,200,180,0.08);--teal-glow:rgba(0,200,180,0.2);
+      --accent:#4facfe;--text:#dce9f0;--muted:#5a7a8e;--danger:#ff6b8a;
+      --success:#00c8b4;--warn:#ffa552;--sidebar:260px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden;}
+    body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);display:flex;flex-direction:column;}
+
+    /* ── TOP BAR ── */
+    .topbar{
+      height:64px;background:var(--surface);border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;
+      padding:0 24px;flex-shrink:0;z-index:100;
+      box-shadow:0 2px 20px rgba(0,0,0,0.4);
+    }
+    .topbar-left{display:flex;align-items:center;gap:16px;}
+    .hamburger{width:40px;height:40px;border:1px solid var(--border);background:var(--card);border-radius:10px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;transition:0.3s;flex-shrink:0;}
+    .hamburger:hover{border-color:var(--teal);box-shadow:0 0 12px var(--teal-glow);}
+    .hamburger span{width:18px;height:2px;background:var(--text);border-radius:2px;transition:0.3s;}
+    .hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .brand-icon{width:36px;height:36px;background:var(--teal);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#060e1c;font-size:16px;}
+    .brand-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text);}
+    .brand-name span{color:var(--teal);}
+    .topbar-right{display:flex;align-items:center;gap:12px;}
+    .user-chip{ display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:6px 14px 6px 8px;}
+    .user-avatar{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--teal),var(--accent));display:flex;align-items:center;justify-content:center;font-size:13px;color:#060e1c;font-weight:700;}
+    .user-name{font-size:0.875rem;font-weight:500;}
+    .btn-logout{background:rgba(255,107,138,0.1);border:1px solid rgba(255,107,138,0.3);color:var(--danger);border-radius:10px;padding:7px 14px;font-size:0.825rem;font-weight:600;cursor:pointer;transition:0.3s;display:flex;align-items:center;gap:6px;}
+    .btn-logout:hover{background:rgba(255,107,138,0.18);transform:translateY(-1px);}
+
+    /* ── LAYOUT ── */
+    .layout{display:flex;flex:1;overflow:hidden;}
+
+    /* ── SIDEBAR ── */
+    .sidebar{
+      width:var(--sidebar);flex-shrink:0;
+      background:var(--surface);border-right:1px solid var(--border);
+      display:flex;flex-direction:column;overflow-y:auto;
+      transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+    }
+    .sidebar-user{padding:24px 20px;border-bottom:1px solid var(--border);text-align:center;}
+    .sidebar-avatar{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--teal),var(--accent));display:flex;align-items:center;justify-content:center;font-size:24px;color:#060e1c;margin:0 auto 12px;box-shadow:0 8px 20px rgba(0,200,180,0.3);}
+    .sidebar-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:4px;}
+    .sidebar-role{font-size:0.75rem;padding:3px 10px;background:var(--teal-dim);color:var(--teal);border:1px solid rgba(0,200,180,0.2);border-radius:20px;display:inline-block;}
+    .nav-section{padding:8px 0;}
+    .nav-label{padding:12px 20px 6px;font-size:0.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;color:var(--muted);text-decoration:none;font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;margin:2px 0;}
+    .nav-item i{width:18px;text-align:center;font-size:0.95rem;}
+    .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.04);border-left-color:var(--border);}
+    .nav-item.active{color:var(--teal);background:var(--teal-dim);border-left-color:var(--teal);}
+
+    /* ── MAIN ── */
+    .main{flex:1;overflow-y:auto;padding:28px;}
+    .page{display:none;}
+    .page.active{display:block;animation:fadeUp 0.4s ease;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .page-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:6px;}
+    .page-sub{color:var(--muted);font-size:0.875rem;margin-bottom:24px;}
+
+    /* ── CARDS ── */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:20px;}
+    .card-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .card-head-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:10px;}
+    .card-head-title i{color:var(--teal);}
+    .card-body{padding:24px;}
+
+    /* ── FORM ── */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-group{margin-bottom:18px;}
+    .form-group.full{grid-column:1/-1;}
+    .form-group label{display:block;font-size:0.77rem;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px;}
+    .form-group input,.form-group select,.form-group textarea{
+      width:100%;background:var(--surface);border:1.5px solid var(--border2);
+      border-radius:11px;padding:12px 14px;color:var(--text);
+      font-family:'DM Sans',sans-serif;font-size:0.9rem;transition:0.3s;outline:none;
+    }
+    .form-group input::placeholder,.form-group textarea::placeholder{color:var(--muted);}
+    .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--teal);background:rgba(0,200,180,0.04);box-shadow:0 0 0 3px var(--teal-glow);}
+    .form-group select{appearance:none;cursor:pointer; color: #5a7a8e;}
+    .form-group textarea{resize:vertical;min-height:80px;}
+
+    /* ── BUTTONS ── */
+    .btn{border:none;border-radius:10px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.3s;display:inline-flex;align-items:center;gap:7px;}
+    .btn-teal{background:linear-gradient(135deg,var(--teal),#00a896);color:#060e1c;}
+    .btn-teal:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,200,180,0.35);}
+    .btn-accent{background:linear-gradient(135deg,var(--accent),#0284c7);color:#fff;}
+    .btn-accent:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(79,172,254,0.35);}
+    .btn-danger{background:rgba(255,107,138,0.1);border:1px solid rgba(255,107,138,0.3);color:var(--danger);}
+    .btn-danger:hover{background:rgba(255,107,138,0.18);}
+    .btn-sm{padding:7px 14px;font-size:0.8rem;}
+    .btn-full{width:100%;}
+
+    /* ── APPOINTMENT CARDS ── */
+    .appt-card{background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:18px 20px;margin-bottom:12px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;transition:0.3s;}
+    .appt-card:hover{border-color:var(--border);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+    .appt-info h5{font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:700;margin-bottom:4px;}
+    .appt-info p{color:var(--muted);font-size:0.825rem;margin-bottom:3px;}
+    .appt-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+    .badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:600;}
+    .badge-confirmed{background:rgba(0,200,180,0.1);color:var(--teal);border:1px solid rgba(0,200,180,0.2);}
+    .badge-pending{background:rgba(255,165,82,0.1);color:var(--warn);border:1px solid rgba(255,165,82,0.2);}
+    .badge-cancelled{background:rgba(255,107,138,0.1);color:var(--danger);border:1px solid rgba(255,107,138,0.2);}
+    .badge-completed{background:rgba(79,172,254,0.1);color:var(--accent);border:1px solid rgba(79,172,254,0.2);}
+
+    /* ── DOCTOR GRID ── */
+    .doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+    .doc-card{background:var(--card2);border:1px solid var(--border2);border-radius:14px;padding:20px;text-align:center;transition:0.3s;cursor:pointer;}
+    .doc-card:hover{border-color:var(--teal);transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,0.3);}
+    .doc-avatar{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#0284c7);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;margin:0 auto 12px;}
+    .doc-name{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:4px;}
+    .doc-spec{color:var(--teal);font-size:0.8rem;margin-bottom:4px;}
+    .doc-exp{color:var(--muted);font-size:0.78rem;}
+
+    /* ── MODAL ── */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:0.3s;}
+    .modal-overlay.open{opacity:1;pointer-events:all;}
+    .modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;width:100%;max-width:460px;box-shadow:0 40px 80px rgba(0,0,0,0.6);transform:translateY(20px);transition:0.3s;}
+    .modal-overlay.open .modal-box{transform:translateY(0);}
+    .modal-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .modal-head h4{font-family:'Syne',sans-serif;font-size:1.05rem;font-weight:700;}
+    .modal-close{width:32px;height:32px;background:var(--surface);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);transition:0.2s;}
+    .modal-close:hover{color:var(--danger);border-color:rgba(255,107,138,0.3);}
+    .modal-body{padding:24px; }
+    .modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;}
+
+    /* ── ALERT ── */
+    .alert{border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.875rem;display:none;align-items:center;gap:8px;}
+    .alert-success{background:rgba(0,200,180,0.08);border:1px solid rgba(0,200,180,0.25);color:var(--success);}
+    .alert-error{background:rgba(255,107,138,0.08);border:1px solid rgba(255,107,138,0.25);color:var(--danger);}
+
+    /* ── EMPTY STATE ── */
+    .empty{text-align:center;padding:48px 24px;color:var(--muted);}
+    .empty i{font-size:3rem;margin-bottom:16px;opacity:0.4;}
+    .empty p{font-size:0.9rem;}
+
+    /* ── OVERLAY (mobile) ── */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:49;display:none;}
+    .overlay.show{display:block;}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px){
+      .sidebar{position:fixed;top:64px;left:0;bottom:0;z-index:50;transform:translateX(-100%);width:260px;}
+      .sidebar.open{transform:translateX(0);}
+      .main{padding:20px 16px;}
+      .form-grid{grid-template-columns:1fr;}
+      .form-group.full{grid-column:auto;}
+    }
+    @media(max-width:480px){
+      .topbar{padding:0 16px;}
+      .user-name{display:none;}
+      .appt-card{flex-direction:column;}
+    }
+
+    /* ── SPINNER ── */
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(0,200,180,0.2);border-top-color:var(--teal);border-radius:50%;animation:spin 0.8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-state{text-align:center;padding:40px;color:var(--muted);}
+
+
+    @media(max-width:768px){
+
+  .sidebar{
+    position:fixed;
+    top:64px;
+    left:0;
+    bottom:0;
+    z-index:50;
+    transform:translateX(-100%);
+    width:260px;
+  }
+
+  .sidebar.open{
+    transform:translateX(0);
+  }
+
+  .main{
+    padding:20px 16px;
+  }
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .form-group.full{
+    grid-column:auto;
+  }
+
+  /* TOPBAR MOBILE FIX */
+  .topbar{
+    padding:0 12px;
+    gap:10px;
+  }
+
+  .topbar-left{
+    flex:1;
+    min-width:0;
+  }
+
+  .topbar-right{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-shrink:0;
+  }
+
+  .brand-name{
+    font-size:1rem;
+    white-space:nowrap;
+  }
+
+  .btn-logout{
+    padding:7px 10px;
+    font-size:0.75rem;
+  }
+
+  .btn-logout span{
+    display:none;
+  }
+}
+
+@media(max-width:480px){
+
+  .topbar{
+    height:60px;
+    padding:0 10px;
+  }
+
+  .brand-name{
+    font-size:0.9rem;
+  }
+
+  .user-chip{
+    padding:4px 8px;
+    display: none;
+  }
+
+  .user-name{
+    display:none;
+  }
+
+  .btn-logout{
+    width:38px;
+    height:38px;
+    padding:0;
+    justify-content:center;
+    border-radius:10px;
+    border-color: transparent;
+  }
+
+  .btn-logout i{
+    margin:0;
+    font-size:14px;
+  }
+
+  .appt-card{
+    flex-direction:column;
+  }
+}
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
     </div>
-
-    <!-- ================= OVERLAY ================= -->
-    <div id="overlay" class="overlay"></div>
-
-    <!-- ================= MAIN CONTENT ================= -->
-    <div class="main-wrapper">
-      <main class="main-content" id="mainContent">
-        <!-- Profile Tab -->
-        <div id="profileTab" class="dashboard-tab active">
-          <div class="card">
-            <div class="card-header">
-              <i class="fas fa-user"></i> My Profile
-            </div>
-            <div class="card-body">
-              <form id="profileForm">
-                <div class="row g-4">
-                  <div class="col-md-6">
-                    <input
-                      type="text"
-                      class="form-control"
-                      id="profileName"
-                      placeholder="Full Name"
-                    />
-                  </div>
-                  <div class="col-md-6">
-                    <input
-                      type="email"
-                      class="form-control"
-                      id="profileEmail"
-                      placeholder="Email Address"
-                    />
-                  </div>
-                  <div class="col-md-6">
-                    <input
-                      type="number"
-                      class="form-control"
-                      id="profileAge"
-                      placeholder="Age"
-                    />
-                  </div>
-                  <div class="col-md-6">
-                    <select class="form-select" id="profileGender">
-                      <option value="">Select Gender</option>
-                      <option value="MALE">Male</option>
-                      <option value="FEMALE">Female</option>
-                      <option value="OTHER">Other</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="mt-4">
-                  <label class="form-label fw-semibold">Medical Records</label>
-                  <input
-                    type="file"
-                    class="form-control"
-                    id="medicalFile"
-                    accept=".pdf,image/*"
-                  />
-                  <div id="medicalRecordPreview" class="mt-3"></div>
-                </div>
-                <button
-                  type="submit"
-                  class="btn btn-primary mt-4 w-100 w-md-auto"
-                >
-                  <i class="fas fa-save me-2"></i> Update Profile
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
-
-        <!-- Appointments Tab -->
-        <div id="appointmentsTab" class="dashboard-tab">
-          <div class="card">
-            <div class="card-header">
-              <span><i class="fas fa-calendar me-2"></i> My Appointments</span>
-              <button
-                class="btn btn-success btn-sm ms-auto"
-                data-bs-toggle="modal"
-                data-bs-target="#bookModal"
-              >
-                <i class="fas fa-plus me-1"></i> Book New
-              </button>
-            </div>
-            <div class="card-body">
-              <div id="appointmentsList">Loading appointments...</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Doctors Tab -->
-        <div id="doctorsTab" class="dashboard-tab">
-          <div class="card">
-            <div class="card-header">
-              <i class="fas fa-stethoscope me-2"></i> Available Doctors
-            </div>
-            <div class="card-body">
-              <div id="doctorsList">Loading doctors...</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Admin Tab -->
-        <div id="adminTab" class="dashboard-tab">
-          <div class="row g-4">
-            <div class="col-lg-8">
-              <div class="card">
-                <div class="card-header">
-                  <i class="fas fa-chart-bar me-2"></i> Dashboard Stats
-                </div>
-                <div class="card-body">
-                  <div id="adminStats">Loading stats...</div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-4">
-              <div class="card">
-                <div class="card-header">
-                  <i class="fas fa-cogs me-2"></i> Quick Actions
-                </div>
-                <div class="card-body">
-                  <button
-                    class="btn btn-primary w-100 mb-3"
-                    onclick="loadUsers()"
-                  >
-                    <i class="fas fa-users me-2"></i> View Users
-                  </button>
-                  <button
-                    class="btn btn-success w-100 mb-3"
-                    onclick="loadAllDoctors()"
-                  >
-                    <i class="fas fa-user-md me-2"></i> View Doctors
-                  </button>
-                  <button
-                    class="btn btn-info w-100"
-                    data-bs-toggle="modal"
-                    data-bs-target="#createDoctorModal"
-                  >
-                    <i class="fas fa-plus me-2"></i> Add Doctor
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
+    <a href="#" class="brand">
+      <div class="brand-icon"><i class="fas fa-heartbeat"></i></div>
+      <div class="brand-name">Medi<span>Core</span></div>
+    </a>
+  </div>
+  <div class="topbar-right">
+    <div class="user-chip">
+      <div class="user-avatar" id="topAvatar">P</div>
+      <span class="user-name" id="topName">Patient</span>
     </div>
+    <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</div>
 
-    <!-- Book Appointment Modal -->
-    <div class="modal fade" id="bookModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form id="bookForm">
-            <div class="modal-header">
-              <h5 class="modal-title">
-                <i class="fas fa-calendar-plus me-2"></i>Book Appointment
-              </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="mb-4">
-                <label class="form-label fw-semibold">Select Doctor</label>
-                <select class="form-select" id="bookDoctor" required></select>
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><i class="fas fa-user"></i></div>
+      <div class="sidebar-name" id="sideName">Loading...</div>
+      <div class="sidebar-role">PATIENT</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="showPage('profile',this)"><i class="fas fa-user"></i> Profile</div>
+      <div class="nav-item" onclick="showPage('appointments',this)"><i class="fas fa-calendar-check"></i> Appointments</div>
+      <div class="nav-item" onclick="showPage('doctors',this)"><i class="fas fa-user-md"></i> Doctors</div>
+      <div class="nav-item" onclick="showPage('records',this)"><i class="fas fa-file-medical"></i> Medical Records</div>
+    </div>
+    <div class="nav-section" style="margin-top:auto;border-top:1px solid var(--border);padding-top:12px;">
+      <div class="nav-item" onclick="showPage('password',this)"><i class="fas fa-lock"></i> Change Password</div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- PROFILE PAGE -->
+    <div id="page-profile" class="page active">
+      <div class="page-title">My Profile</div>
+      <p class="page-sub">Manage your personal and medical information</p>
+      <div id="profileAlert" class="alert"></div>
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title" style="color: #dce9f0;"><i class="fas fa-user-circle"></i> Personal Information</div>
+        </div>
+        <div class="card-body">
+          <form id="profileForm" onsubmit="updateProfile(event)">
+            <div class="form-grid">
+              <div class="form-group"><label>Full Name</label><input type="text" id="pName" placeholder="Your name"/></div>
+              <div class="form-group"><label>Email Address</label><input type="email" id="pEmail" placeholder="Email"/></div>
+              <div class="form-group"><label>Age</label><input type="number" id="pAge" placeholder="Age" min="1" max="120"/></div>
+              <div class="form-group"><label>Gender</label>
+                <select id="pGender">
+                  <option value="">Select</option>
+                  <option value="MALE">Male</option>
+                  <option value="FEMALE">Female</option>
+                  <option value="OTHER">Other</option>
+                </select>
               </div>
-              <div class="mb-0">
-                <label class="form-label fw-semibold">Date & Time</label>
-                <input
-                  type="datetime-local"
-                  class="form-control"
-                  id="bookDate"
-                  required
-                />
+              <div class="form-group full"><label>Medical Record Upload <span style="color:var(--muted);font-size:0.75rem;">(PDF / Image)</span></label>
+                <input type="file" id="medFile" accept=".pdf,image/*" style="padding:10px;"/>
               </div>
             </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button type="submit" class="btn btn-success">
-                <i class="fas fa-check me-2"></i> Book Now
-              </button>
+            <div id="reportPreview" style="margin-bottom:16px;"></div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <button type="submit" class="btn btn-teal"><i class="fas fa-save"></i> Save Changes</button>
+              <button type="button" class="btn btn-accent" onclick="uploadReport()"><i class="fas fa-upload"></i> Upload Report</button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- Create Doctor Modal -->
-    <div class="modal fade" id="createDoctorModal" tabindex="-1">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <form id="createDoctorForm">
-            <div class="modal-header">
-              <h5 class="modal-title">
-                <i class="fas fa-user-md me-2 text-primary"></i>Add New Doctor
-              </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <div class="mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="doctorName"
-                  placeholder="Doctor's Name"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <input
-                  type="email"
-                  class="form-control"
-                  id="doctorEmail"
-                  placeholder="Email"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <input
-                  type="password"
-                  class="form-control"
-                  id="doctorPassword"
-                  placeholder="Password"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="doctorSpecialization"
-                  placeholder="Specialization"
-                  required
-                />
-              </div>
-              <div class="mb-3">
-                <input
-                  type="number"
-                  class="form-control"
-                  id="doctorExperience"
-                  placeholder="Experience (years)"
-                  required
-                />
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Cancel
-              </button>
-              <button type="submit" class="btn btn-primary">
-                Create Doctor
-              </button>
-            </div>
+    <!-- APPOINTMENTS PAGE -->
+    <div id="page-appointments" class="page">
+      <div class="page-title">My Appointments</div>
+      <p class="page-sub">View and manage your scheduled appointments</p>
+      <div style="margin-bottom:20px;">
+        <button class="btn btn-teal" onclick="openBookModal()"><i class="fas fa-plus"></i> Book Appointment</button>
+      </div>
+      <div id="apptList"><div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading appointments...</p></div></div>
+    </div>
+
+    <!-- DOCTORS PAGE -->
+    <div id="page-doctors" class="page">
+      <div class="page-title">Available Doctors</div>
+      <p class="page-sub">Browse our team of specialist doctors</p>
+      <div id="docList"><div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading doctors...</p></div></div>
+    </div>
+
+    <!-- RECORDS PAGE -->
+    <div id="page-records" class="page">
+      <div class="page-title">Medical Records</div>
+      <p class="page-sub">Your diagnosis and prescription history</p>
+      <div id="recordList"><div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading records...</p></div></div>
+    </div>
+
+    <!-- CHANGE PASSWORD PAGE -->
+    <div id="page-password" class="page">
+      <div class="page-title">Change Password</div>
+      <p class="page-sub">Update your account security</p>
+      <div id="pwAlert" class="alert"></div>
+      <div class="card" style="max-width:480px;">
+        <div class="card-body">
+          <form id="pwForm" onsubmit="changePassword(event)">
+            <div class="form-group"><label>Current Password</label><input type="password" id="curPw" placeholder="Current password"/></div>
+            <div class="form-group"><label>New Password</label><input type="password" id="newPw" placeholder="New password (min 6 chars)"/></div>
+            <div class="form-group"><label>Confirm New Password</label><input type="password" id="confPw" placeholder="Repeat new password"/></div>
+            <button type="submit" class="btn btn-teal btn-full"><i class="fas fa-shield-alt"></i> Update Password</button>
           </form>
         </div>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // ================= SIDEBAR TOGGLE =================
-      const toggleBtn = document.getElementById("toggleBtn");
-      const sidebar = document.getElementById("sidebar");
-      const overlay = document.getElementById("overlay");
+  </div><!-- /main -->
+</div><!-- /layout -->
 
-      function toggleSidebar() {
-        sidebar.classList.toggle("active");
-        overlay.classList.toggle("active");
-        toggleBtn.classList.toggle("active");
-        document.body.style.overflow = sidebar.classList.contains("active")
-          ? "hidden"
-          : "";
-      }
+<!-- BOOK APPOINTMENT MODAL -->
+<div class="modal-overlay" id="bookModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h4><i class="fas fa-calendar-plus" style="color:var(--teal);margin-right:8px;"></i>Book Appointment</h4>
+      <div class="modal-close" onclick="closeBookModal()"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label>Select Doctor</label>
+        <select id="bookDocSel"></select>
+      </div>
+      <div class="form-group"><label>Date & Time</label>
+        <input type="datetime-local" id="bookDate"/>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-sm" onclick="closeBookModal()" style="background:var(--surface);color:var(--muted);border:1px solid var(--border);">Cancel</button>
+      <button class="btn btn-teal btn-sm" onclick="bookAppointment()"><i class="fas fa-check"></i> Confirm Booking</button>
+    </div>
+  </div>
+</div>
 
-      toggleBtn.addEventListener("click", toggleSidebar);
-      overlay.addEventListener("click", () => {
-        sidebar.classList.remove("active");
-        overlay.classList.remove("active");
-        toggleBtn.classList.remove("active");
-        document.body.style.overflow = "";
-      });
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const API = 'http://localhost:8080/api';
+let currentUser = null;
+let allDoctors = [];
 
-      // Close sidebar on window resize (desktop)
-      window.addEventListener("resize", () => {
-        if (window.innerWidth >= 992) {
-          sidebar.classList.remove("active");
-          overlay.classList.remove("active");
-          toggleBtn.classList.remove("active");
-          document.body.style.overflow = "";
-        }
-      });
+function getToken(){ return localStorage.getItem('accessToken'); }
 
-      // ================= CLOSE SIDEBAR ON MOBILE NAV CLICK =================
-      function closeSidebarOnMobile() {
-        // Only close sidebar if screen width is less than 992px (mobile/tablet)
-        if (window.innerWidth < 992) {
-          sidebar.classList.remove("active");
-          overlay.classList.remove("active");
-          toggleBtn.classList.remove("active");
-          document.body.style.overflow = "";
-        }
-      }
+async function apiCall(url, options={}){
+  const token = getToken();
+  const resp = await fetch(url,{
+    ...options,
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,...(options.headers||{})}
+  });
+  if(resp.status===401){
+    await refreshToken();
+    return apiCall(url,options);
+  }
+  return resp;
+}
 
-      // Add click listeners to all sidebar navigation links
-      document.addEventListener("DOMContentLoaded", function () {
-        const navLinks = document.querySelectorAll(".sidebar .nav-link");
-        navLinks.forEach((link) => {
-          link.addEventListener("click", closeSidebarOnMobile);
-        });
-      });
+async function refreshToken(){
+  const rt = localStorage.getItem('refreshToken');
+  try{
+    const res = await fetch(`${API}/auth/refresh-token`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})});
+    const data = await res.json();
+    if(res.ok){ localStorage.setItem('accessToken',data.accessToken); }
+    else { doLogout(); }
+  } catch(e){ doLogout(); }
+}
 
-      // Also handle dynamic nav links (like admin nav that appears conditionally)
-      function updateNavListeners() {
-        const navLinks = document.querySelectorAll(".sidebar .nav-link");
-        navLinks.forEach((link) => {
-          link.addEventListener("click", closeSidebarOnMobile);
-        });
-      }
+function doLogout(){localStorage.clear();window.location.href='index.html';}
 
-      // ================= TAB SWITCHING =================
-      function showTab(tabName) {
-        // Hide all tabs
-        document.querySelectorAll(".dashboard-tab").forEach((tab) => {
-          tab.classList.remove("active");
-        });
+// Sidebar
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  const h=document.getElementById('hamburger');
+  const o=document.getElementById('overlay');
+  s.classList.toggle('open');h.classList.toggle('open');o.classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
 
-        // Show selected tab
-        document.getElementById(tabName + "Tab").classList.add("active");
+// Pages
+function showPage(name, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  closeSidebar();
+  if(name==='appointments') loadAppointments();
+  if(name==='doctors') loadDoctors();
+  if(name==='records') loadRecords();
+}
 
-        // Update active nav link
-        document.querySelectorAll(".sidebar .nav-link").forEach((link) => {
-          link.classList.remove("active");
-        });
-        event.target.classList.add("active");
+// Init
+async function init(){
+  const token = getToken();
+  if(!token){ window.location.href='index.html'; return; }
+  try{
+    const res = await apiCall(`${API}/patients/profile`);
+    if(!res.ok){ doLogout(); return; }
+    currentUser = await res.json();
+    document.getElementById('topName').textContent = currentUser.name;
+    document.getElementById('topAvatar').textContent = currentUser.name[0].toUpperCase();
+    document.getElementById('sideName').textContent = currentUser.name;
+    fillProfile(currentUser);
+    loadDoctors();
+    loadReport();
+  } catch(e){ doLogout(); }
+}
 
-        // Close sidebar on mobile only
-        closeSidebarOnMobile();
+// Profile
+function fillProfile(u){
+  document.getElementById('pName').value = u.name||'';
+  document.getElementById('pEmail').value = u.email||'';
+  document.getElementById('pAge').value = u.age||'';
+  document.getElementById('pGender').value = u.gender||'';
+}
 
-        // Update admin nav visibility based on user role (if needed)
-        updateNavListeners();
-      }
+async function updateProfile(e){
+  e.preventDefault();
+  const payload = {
+    name: document.getElementById('pName').value,
+    email: document.getElementById('pEmail').value,
+    age: parseInt(document.getElementById('pAge').value),
+    gender: document.getElementById('pGender').value
+  };
+  try{
+    const res = await apiCall(`${API}/patients/profile`,{method:'PUT',body:JSON.stringify(payload)});
+    if(res.ok){
+      showAlert('profileAlert','success','Profile updated successfully!');
+      currentUser = {...currentUser,...payload};
+      document.getElementById('topName').textContent = payload.name;
+      document.getElementById('sideName').textContent = payload.name;
+    } else {
+      const e2 = await res.json().catch(()=>({}));
+      showAlert('profileAlert','error', e2.message||'Update failed');
+    }
+  } catch(err){ showAlert('profileAlert','error','Network error'); }
+}
 
-      // ================= DASHBOARD FUNCTIONS (KEEP YOUR EXISTING SCRIPTS) =================
-      const token = localStorage.getItem("accessToken");
+// Upload report
+async function uploadReport(){
+  const file = document.getElementById('medFile').files[0];
+  if(!file){ showAlert('profileAlert','error','Please select a file first'); return; }
+  const fd = new FormData();
+  fd.append('file', file);
+  const token = getToken();
+  try{
+    const res = await fetch(`${API}/patients/${currentUser.patient_Id||currentUser.id}/report`,{
+      method:'POST',headers:{'Authorization':`Bearer ${token}`},body:fd
+    });
+    if(res.ok){ showAlert('profileAlert','success','Report uploaded successfully!'); loadReport(); }
+    else showAlert('profileAlert','error','Upload failed');
+  } catch(e){ showAlert('profileAlert','error','Network error'); }
+}
 
-      // ... [Keep all your existing JavaScript functions exactly as they are] ...
+async function loadReport(){
+  const uid = currentUser?.patient_Id||currentUser?.id;
+  if(!uid) return;
+  const token = getToken();
+  try{
+    const res = await fetch(`${API}/patients/${uid}/report`,{headers:{'Authorization':`Bearer ${token}`}});
+    if(!res.ok){ document.getElementById('reportPreview').innerHTML=''; return; }
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const ct = res.headers.get('content-type')||'';
+    const prev = document.getElementById('reportPreview');
+    if(ct.includes('image')){
+      prev.innerHTML=`<img src="${url}" style="max-width:200px;border-radius:10px;border:1px solid var(--border);" /><br><a href="${url}" target="_blank" style="color:var(--teal);font-size:0.8rem;">View Full Image</a>`;
+    } else if(ct.includes('pdf')){
+      prev.innerHTML=`<a href="${url}" target="_blank" class="btn btn-sm" style="background:var(--teal-dim);color:var(--teal);border:1px solid rgba(0,200,180,0.2);"><i class="fas fa-file-pdf" style="margin-right:6px;"></i>View PDF Report</a>`;
+    }
+  } catch(e){}
+}
 
-      // Your existing functions: checkLogin, startDashboard, showTab, loadProfile, etc.
-      // (I've kept the script structure clean - just add your existing JS here)
-
-      // Initialize
-      document.addEventListener("DOMContentLoaded", function () {
-        // Your existing initialization code
-        checkLogin();
-      });
-    </script>
-
-    <!-- Add your existing JavaScript functions here -->
-    <script>
-      // Paste all your existing JavaScript functions here (checkLogin, loadProfile, etc.)
-      // The structure is now fully responsive and ready!
-
-      function fillProfileForm(user) {
-        document.getElementById("profileName").value = user.name || "";
-        document.getElementById("profileEmail").value = user.email || "";
-        document.getElementById("profileAge").value = user.age || "";
-        document.getElementById("profileGender").value = user.gender || "MALE";
-        document.getElementById("profileMedical").value =
-          user.medicalRecord || "";
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        loadProfile();
-      });
-
-      const API_URL = "http://localhost:8080/api";
-      let currentUser = null;
-      let allDoctors = [];
-
-      // Get token
-      function getToken() {
-        return localStorage.getItem("accessToken");
-      }
-
-      // API call with auth
-      async function apiCall(url, options = {}) {
-        const token = getToken();
-        return fetch(url, {
-          ...options,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            ...options.headers,
-          },
-        });
-      }
-
-      // FIXED LOGIN CHECK - Uses PROFILE endpoint
-      async function checkLogin() {
-        const token = getToken();
-        if (!token) {
-          window.location.href = "index.html";
-          return;
-        }
-
-        try {
-          const response = await apiCall(`${API_URL}/patients/profile`);
-
-          if (response.ok) {
-            currentUser = await response.json();
-            startDashboard();
-          } else {
-            localStorage.clear();
-            window.location.href = "index.html";
-          }
-        } catch (e) {
-          console.error("Login check failed:", e);
-          localStorage.clear();
-          window.location.href = "index.html";
-        }
-      }
-
-      function startDashboard() {
-        // Update UI with real user data
-        document.getElementById("userName").textContent = currentUser.name;
-        document.getElementById("dashUserName").textContent = currentUser.name;
-        document.getElementById("dashUserRole").textContent =
-          currentUser.role || "PATIENT";
-
-        // Show admin nav if admin
-        if (currentUser.role === "ROLE_ADMIN") {
-          document.getElementById("adminNav").style.display = "block";
-        }
-
-        // Load all data
-        loadAppointments();
-        loadDoctors();
-      }
-
-      // Tab Navigation
-      function showTab(tabName) {
-        document.querySelectorAll(".dashboard-tab").forEach((tab) => {
-          tab.classList.remove("active");
-        });
-        document.querySelectorAll(".nav-link").forEach((link) => {
-          link.classList.remove("active");
-        });
-        document.getElementById(tabName + "Tab").classList.add("active");
-        event.target.classList.add("active");
-      }
-
-      // Load Profile
-      async function loadProfile() {
-        try {
-          const response = await apiCall(`${API_URL}/patients/profile`);
-          const data = await response.json();
-
-          currentUser = data;
-
-          document.getElementById("profileName").value = data.name || "";
-          document.getElementById("profileEmail").value = data.email || "";
-          document.getElementById("profileAge").value = data.age || "";
-          document.getElementById("profileGender").value = data.gender || "";
-        } catch (error) {
-          console.error(error);
-          alert("Failed to load profile");
-        }
-      }
-
-      // Update Profile
-      async function updateProfile(e) {
-        e.preventDefault();
-
-        const updatedData = {
-          name: document.getElementById("profileName").value,
-          email: document.getElementById("profileEmail").value,
-          age: document.getElementById("profileAge").value,
-          gender: document.getElementById("profileGender").value,
-        };
-
-        try {
-          const response = await apiCall(`${API_URL}/patients/profile`, {
-            method: "PUT",
-            body: JSON.stringify(updatedData),
-          });
-
-          console.log("STATUS:", response.status);
-
-          if (response.ok) {
-            alert("Updated ✅");
-            loadProfile(); // refresh after update
-          } else {
-            const err = await response.text();
-            console.log(err);
-            alert("Update failed ❌");
-          }
-        } catch (error) {
-          console.error(error);
-          alert("Error updating profile");
-        }
-      }
-
-      // Attach Event
-      document
-        .getElementById("profileForm")
-        .addEventListener("submit", updateProfile);
-
-      // Load on page start
-      loadProfile();
-
-      async function loadMedicalReport(patient_Id) {
-        const preview = document.getElementById("medicalRecordPreview");
-
-        try {
-          const res = await fetch(`${API_URL}/patients/${patient_Id}/report`, {
-            method: "GET",
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-          });
-
-          // If no file
-          if (!res.ok) {
-            preview.innerHTML = `<p class="text-muted">No medical record uploaded</p>`;
-            return;
-          }
-
-          const blob = await res.blob();
-          const fileURL = URL.createObjectURL(blob);
-
-          // FIX: handle null content-type
-          const contentType = res.headers.get("content-type") || "";
-
-          if (contentType.includes("image")) {
-            preview.innerHTML = `
-                <img src="${fileURL}" width="120" class="mb-2"/><br>
-                <a href="${fileURL}" target="_blank">Open Image</a>
-            `;
-          } else if (contentType.includes("pdf")) {
-            preview.innerHTML = `
-                <a href="${fileURL}" target="_blank" class="btn btn-outline-primary btn-sm">
-                    View PDF Report
-                </a>
-            `;
-          } else {
-            preview.innerHTML = `
-                <a href="${fileURL}" target="_blank">Download File</a>
-            `;
-          }
-        } catch (error) {
-          console.error("REPORT ERROR:", error);
-          preview.innerHTML = `<p class="text-danger">Error loading report</p>`;
-        }
-      }
-
-      // Load Appointments
-      async function loadAppointments() {
-        try {
-          const response = await apiCall(`${API_URL}/patients/appointments`);
-          const appointments = await response.json();
-          showAppointments(appointments);
-        } catch (e) {
-          document.getElementById("appointmentsList").innerHTML =
-            "No appointments";
-        }
-      }
-
-      function showAppointments(apps) {
-        const html =
-          apps
-            .map(
-              (app) => `
-        <div class="card mb-3">
-            <div class="card-body">
-              <h5>Appointment ID : ${app.appointment_Id}</h5>
-                <h6>Docter Name : ${app.docter || "Doctor"}</h6>
-                <h6>Specialization : ${app.specialization || "General Checkup"}</h6>
-                <h6>Appointment Date : ${new Date(app.appointment_Date).toLocaleString()}</h6>
-                
-              <span class="badge fs-6 px-2 py-1 
-                  ${
-                    app.status === "CONFIRMED"
-                      ? "text-success"
-                      : app.status === "COMPLETED"
-                        ? "text-primary"
-                        : app.status === "CANCELLED"
-                          ? "text-danger"
-                          : "text-warning"
-                  }">
-                  ${app.status}
-              </span>
-
-                <br><br>
-
-                <!-- ✅ Cancel Button hidden for COMPLETED & CANCELLED -->
-                ${
-                  app.status !== "COMPLETED" && app.status !== "CANCELLED"
-                    ? `
-                    <button 
-                        class="btn btn-danger btn-sm"
-                        onclick="cancelAppointment(${app.appointment_Id})">
-                        Cancel
-                    </button>
-                `
-                    : ""
-                }
-            </div>
+// Appointments
+async function loadAppointments(){
+  document.getElementById('apptList').innerHTML = `<div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading...</p></div>`;
+  try{
+    const res = await apiCall(`${API}/patients/appointments`);
+    const data = await res.json();
+    if(!data||data.length===0){
+      document.getElementById('apptList').innerHTML = `<div class="empty"><i class="fas fa-calendar-times"></i><p>No appointments found</p></div>`;
+      return;
+    }
+    document.getElementById('apptList').innerHTML = data.map(a=>`
+      <div class="appt-card">
+        <div class="appt-info">
+          <h5><i class="fas fa-user-md" style="color:var(--teal);margin-right:8px;"></i>${a.docter||'Doctor'}</h5>
+          <p><i class="fas fa-stethoscope" style="margin-right:6px;color:var(--muted);"></i>${a.specialization||'General'}</p>
+          <p><i class="fas fa-clock" style="margin-right:6px;color:var(--muted);"></i>${new Date(a.appointment_Date).toLocaleString()}</p>
+          <p style="color:var(--muted);font-size:0.78rem;">ID: #${a.appointment_Id}</p>
         </div>
-    `,
-            )
-            .join("") || "No appointments found";
+        <div class="appt-actions">
+          <span class="badge badge-${(a.status||'PENDING').toLowerCase()}">${a.status||'PENDING'}</span>
+          ${a.status!=='COMPLETED'&&a.status!=='CANCELLED'?`<button class="btn btn-danger btn-sm" onclick="cancelAppointment(${a.appointment_Id})"><i class="fas fa-times"></i> Cancel</button>`:''}
+        </div>
+      </div>
+    `).join('');
+  } catch(e){
+    document.getElementById('apptList').innerHTML = `<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Failed to load appointments</p></div>`;
+  }
+}
 
-        document.getElementById("appointmentsList").innerHTML = html;
-      }
+async function cancelAppointment(id){
+  if(!confirm('Cancel this appointment?')) return;
+  try{
+    await apiCall(`${API}/patients/appointments/${id}`,{method:'DELETE'});
+    loadAppointments();
+  } catch(e){ alert('Cancel failed'); }
+}
 
-      async function cancelAppointment(id) {
-        if (!confirm("Are you sure you want to cancel this appointment?"))
-          return;
+// Doctors
+async function loadDoctors(){
+  document.getElementById('docList').innerHTML = `<div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading...</p></div>`;
+  try{
+    const res = await apiCall(`${API}/patients/docters`);
+    allDoctors = await res.json();
+    if(!allDoctors||allDoctors.length===0){
+      document.getElementById('docList').innerHTML = `<div class="empty"><i class="fas fa-user-md"></i><p>No doctors available</p></div>`;
+      return;
+    }
+    fillDocDropdown();
+    document.getElementById('docList').innerHTML = `<div class="doc-grid">${allDoctors.map(d=>`
+      <div class="doc-card">
+        <div class="doc-avatar"><i class="fas fa-user-md"></i></div>
+        <div class="doc-name">${d.name}</div>
+        <div class="doc-spec">${d.specialization}</div>
+        <div class="doc-exp">${d.experianceInYears||d.experienceInYears||0} yrs experience</div>
+      </div>
+    `).join('')}</div>`;
+  } catch(e){
+    document.getElementById('docList').innerHTML = `<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Failed to load doctors</p></div>`;
+  }
+}
 
-        try {
-          await fetch(`http://localhost:8080/api/patients/appointments/${id}`, {
-            method: "DELETE",
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("accessToken"),
-            },
-          });
+function fillDocDropdown(){
+  document.getElementById('bookDocSel').innerHTML = allDoctors.map(d=>`<option value="${d.id}">${d.name} — ${d.specialization}</option>`).join('');
+}
 
-          alert("Appointment cancelled");
+// Records
+async function loadRecords(){
+  const uid = currentUser?.patient_Id||currentUser?.id;
+  if(!uid){ document.getElementById('recordList').innerHTML=`<div class="empty"><i class="fas fa-file-medical"></i><p>Profile not loaded</p></div>`; return; }
+  document.getElementById('recordList').innerHTML = `<div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading...</p></div>`;
+  // try via doctor records endpoint (patients can view via appointments)
+  try{
+    const res = await apiCall(`${API}/patients/appointments`);
+    const appts = await res.json();
+    if(!appts||appts.length===0){
+      document.getElementById('recordList').innerHTML = `<div class="empty"><i class="fas fa-file-medical"></i><p>No medical records found</p></div>`;
+      return;
+    }
+    document.getElementById('recordList').innerHTML = appts.filter(a=>a.status==='COMPLETED').map(a=>`
+      <div class="appt-card">
+        <div class="appt-info">
+          <h5><i class="fas fa-file-medical" style="color:var(--teal);margin-right:8px;"></i>Appointment #${a.appointment_Id}</h5>
+          <p><i class="fas fa-user-md" style="margin-right:6px;color:var(--muted);"></i>${a.docter||'Doctor'}</p>
+          <p><i class="fas fa-clock" style="margin-right:6px;color:var(--muted);"></i>${new Date(a.appointment_Date).toLocaleString()}</p>
+        </div>
+        <span class="badge badge-completed">COMPLETED</span>
+      </div>
+    `).join('') || `<div class="empty"><i class="fas fa-file-medical"></i><p>No completed appointments with records</p></div>`;
+  } catch(e){
+    document.getElementById('recordList').innerHTML = `<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Failed to load records</p></div>`;
+  }
+}
 
-          // reload appointments
-          loadAppointments();
-        } catch (error) {
-          console.log(error);
-          alert("Cancel failed");
-        }
-      }
+// Book Modal
+function openBookModal(){
+  if(!allDoctors.length){ loadDoctors().then(()=>document.getElementById('bookModal').classList.add('open')); }
+  else{ fillDocDropdown(); document.getElementById('bookModal').classList.add('open'); }
+}
+function closeBookModal(){ document.getElementById('bookModal').classList.remove('open'); }
 
-      // Load Doctors
-      async function loadDoctors() {
-        try {
-          const response = await apiCall(`${API_URL}/patients/docters`);
-          allDoctors = await response.json();
-          showDoctors(allDoctors);
-          fillDoctorDropdown();
-        } catch (e) {
-          document.getElementById("doctorsList").innerHTML = "No doctors found";
-        }
-      }
+async function bookAppointment(){
+  const docId = document.getElementById('bookDocSel').value;
+  const date = document.getElementById('bookDate').value;
+  if(!docId||!date){ alert('Please fill in all fields'); return; }
+  try{
+    const res = await apiCall(`${API}/patients/appointments`,{method:'POST',body:JSON.stringify({appointment_Date:date,docter_Id:docId})});
+    if(res.ok){
+      closeBookModal();
+      showAlert('profileAlert','success','Appointment booked successfully!');
+      document.getElementById('page-profile').scrollIntoView();
+    } else {
+      const e2=await res.json().catch(()=>({}));
+      alert(e2.message||'Booking failed');
+    }
+  } catch(e){ alert('Network error'); }
+}
 
-      function showDoctors(doctors) {
-        const html = doctors
-          .map(
-            (doc) => `
-            <div class="col-md-4 mb-3">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <i class="fas fa-user-md fa-2x text-primary mb-2"></i>
-                        <h5>${doc.name}</h5>
-                        <p class="text-primary">${doc.specialization}</p>
-                        <p>${doc.experianceInYears} years exp</p>
-                    </div>
-                </div>
-            </div>
-            
-        `,
-          )
-          .join("");
-        document.getElementById("doctorsList").innerHTML =
-          `<div class="row">${html}</div>`;
-      }
+// Change Password
+async function changePassword(e){
+  e.preventDefault();
+  const cur=document.getElementById('curPw').value;
+  const nw=document.getElementById('newPw').value;
+  const cf=document.getElementById('confPw').value;
+  if(nw.length<6) return showAlert('pwAlert','error','New password must be at least 6 characters');
+  if(nw!==cf) return showAlert('pwAlert','error','Passwords do not match');
+  try{
+    const res=await apiCall(`${API}/patients/change-password`,{method:'PUT',body:JSON.stringify({currentPassword:cur,newPassword:nw})});
+    if(res.ok){ showAlert('pwAlert','success','Password updated successfully!'); document.getElementById('pwForm').reset(); }
+    else { const e2=await res.json().catch(()=>({})); showAlert('pwAlert','error',e2.message||'Update failed'); }
+  } catch(e){ showAlert('pwAlert','error','Network error'); }
+}
 
-      function fillDoctorDropdown() {
-        const select = document.getElementById("bookDoctor");
-        select.innerHTML = allDoctors
-          .map(
-            (doc) =>
-              `<option value="${doc.id}">${doc.name} - ${doc.specialization}</option>`,
-          )
-          .join("");
-      }
+function showAlert(id, type, msg){
+  const el=document.getElementById(id);
+  el.className=`alert alert-${type}`;
+  el.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
+  el.style.display='flex';
+  setTimeout(()=>el.style.display='none',5000);
+}
 
-      // Book Appointment
-      document
-        .getElementById("bookForm")
-        .addEventListener("submit", async function (e) {
-          e.preventDefault();
-          const data = {
-            appointment_Date: document.getElementById("bookDate").value,
-            docter_Id: document.getElementById("bookDoctor").value,
-          };
+async function logout(){
+  if(!confirm('Sign out of MediCore?')) return;
+  const rt=localStorage.getItem('refreshToken');
+  try{ await fetch(`${API}/auth/logout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})}); } catch(e){}
+  doLogout();
+}
 
-          try {
-            const response = await apiCall(`${API_URL}/patients/appointments`, {
-              method: "POST",
-              body: JSON.stringify(data),
-            });
-            if (response.ok) {
-              bootstrap.Modal.getInstance(
-                document.getElementById("bookModal"),
-              ).hide();
-              alert("✅ Appointment booked!");
-              loadAppointments();
-              document.getElementById("bookForm").reset();
-            }
-          } catch (e) {
-            alert("Booking failed");
-          }
-        });
-
-      //logout function
-      async function logout() {
-        if (!confirm("Are you sure you want to logout?")) return;
-
-        const refreshToken = localStorage.getItem("refreshToken");
-
-        try {
-          await fetch("http://localhost:8080/api/auth/logout", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refreshToken }),
-          });
-        } catch (e) {
-          console.log("Logout API failed");
-        }
-
-        localStorage.clear();
-        window.location.href = "index.html";
-      }
-    </script>
-  </body>
+// Handle screen resize
+window.addEventListener('resize',()=>{ if(window.innerWidth>768) closeSidebar(); });
+init();
+</script>
+</body>
 </html>

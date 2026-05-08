@@ -1,915 +1,449 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Dashboard - MediCare Hospital</title>
-
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-
-    <style>
-      :root {
-        --primary: #2563eb;
-        --primary-dark: #1d4ed8;
-        --secondary: #1e293b;
-        --success: #10b981;
-        --danger: #ef4444;
-        --gray-50: #f9fafb;
-        --gray-100: #f3f4f6;
-        --gray-900: #111827;
-        --sidebar-w: 280px;
-        --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        --shadow-lg: 0 20px 50px -10px rgba(0, 0, 0, 0.15);
-      }
-
-      /* ================= BASE ================= */
-      * {
-        box-sizing: border-box;
-      }
-
-      html {
-        height: 100%;
-      }
-
-      body {
-        font-family:
-          "Inter",
-          -apple-system,
-          sans-serif;
-        background: linear-gradient(135deg, var(--gray-50) 0%, #9430d6 100%);
-        min-height: 100vh;
-        margin: 0;
-        overflow-x: hidden;
-        overflow-y: auto;
-      }
-
-      /* ================= NAVBAR ================= */
-      .navbar-custom {
-        background: white !important;
-        border-bottom: 1px solid #e5e7eb;
-        padding: 1rem 2rem;
-        box-shadow: var(--shadow);
-        position: sticky;
-        top: 0;
-        z-index: 1060;
-      }
-
-      .navbar-brand-custom {
-        font-size: 1.5rem;
-        font-weight: 800;
-        color: var(--primary) !important;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-      }
-
-      /* ================= HAMBURGER ================= */
-      .hamburger {
-        width: 48px;
-        height: 48px;
-        border: 1px solid #d1d5db;
-        background: white;
-        border-radius: 12px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 4px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow);
-      }
-
-      .hamburger:hover {
-        border-color: var(--primary);
-        box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
-      }
-
-      .hamburger span {
-        height: 3px;
-        width: 24px;
-        background: var(--secondary);
-        border-radius: 2px;
-        transition: all 0.3s ease;
-      }
-
-      .hamburger.active span:nth-child(1) {
-        transform: rotate(45deg) translate(6px, 6px);
-      }
-
-      .hamburger.active span:nth-child(2) {
-        opacity: 0;
-      }
-
-      .hamburger.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(6px, -6px);
-      }
-
-      /* ================= SIDEBAR ================= */
-      .sidebar-custom {
-        width: var(--sidebar-w);
-        height: 100vh;
-        position: fixed;
-        top: 0;
-        left: 0;
-        background: white;
-        border-right: 1px solid #e5e7eb;
-        padding: 2rem 0;
-        transition: all 0.3s ease;
-        z-index: 1050;
-        box-shadow: var(--shadow-lg);
-        overflow-y: auto;
-      }
-
-      .sidebar-user {
-        padding: 2.5rem 2rem;
-        text-align: center;
-        border-bottom: 1px solid #f3f4f6;
-        margin-bottom: 2rem;
-      }
-
-      .sidebar-user i {
-        font-size: 3.5rem;
-        color: var(--primary);
-        margin-bottom: 1rem;
-      }
-
-      .sidebar-user h3 {
-        color: var(--secondary);
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin: 0 0 0.5rem 0;
-      }
-
-      .sidebar-user p {
-        color: #6b7280;
-        font-size: 0.95rem;
-        margin: 0;
-      }
-
-      /* ================= SIDEBAR LINKS ================= */
-      .sidebar-link {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1.25rem 2rem;
-        color: #6b7280 !important;
-        text-decoration: none !important;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        border-left: 4px solid transparent;
-        margin: 0 1rem;
-        border-radius: 0 12px 12px 0;
-      }
-
-      .sidebar-link i {
-        font-size: 1.2rem;
-        width: 24px;
-        text-align: center;
-        color: #9ca3af;
-      }
-
-      .sidebar-link:hover {
-        color: var(--primary) !important;
-        background: #f8fafc;
-        border-left-color: var(--primary);
-        transform: translateX(8px);
-      }
-
-      .sidebar-link.active {
-        color: var(--primary) !important;
-        background: linear-gradient(90deg, rgba(37, 99, 235, 0.1), transparent);
-        border-left-color: var(--primary);
-        font-weight: 700;
-      }
-
-      .sidebar-link.active i {
-        color: var(--primary);
-      }
-
-      /* ================= MAIN CONTENT ================= */
-      .main-wrapper {
-        margin-left: var(--sidebar-w);
-        padding: 2.5rem;
-        min-height: 100vh;
-        transition: all 0.3s ease;
-        overflow-y: auto;
-      }
-
-      /* ================= STATS CARDS ================= */
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 2rem;
-        margin-bottom: 3rem;
-      }
-
-      .stat-card {
-        background: white;
-        border-radius: 20px;
-        padding: 2.5rem;
-        text-align: center;
-        border: 1px solid #f3f4f6;
-        box-shadow: var(--shadow);
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .stat-card::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(
-          90deg,
-          var(--primary),
-          var(--success),
-          var(--info)
-        );
-      }
-
-      .stat-card:hover {
-        transform: translateY(-8px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .stat-icon {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(
-          135deg,
-          var(--primary),
-          var(--primary-dark)
-        );
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 1.5rem;
-        font-size: 2rem;
-        color: white;
-        box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
-      }
-
-      .stat-card:nth-child(2) .stat-icon {
-        background: linear-gradient(135deg, var(--success), #059669);
-        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
-      }
-
-      .stat-card:nth-child(3) .stat-icon {
-        background: linear-gradient(135deg, var(--info), #0284c7);
-        box-shadow: 0 10px 30px rgba(56, 189, 248, 0.3);
-      }
-
-      .stat-card:nth-child(4) .stat-icon {
-        background: linear-gradient(135deg, var(--warning), #d97706);
-        box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
-      }
-
-      .stat-label {
-        color: #6b7280;
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 1rem;
-      }
-
-      .stat-number {
-        font-size: 3rem;
-        font-weight: 800;
-        color: var(--secondary);
-        margin: 0;
-        line-height: 1;
-      }
-
-      /* ================= CONTENT CARDS ================= */
-      .card-custom {
-        border: none !important;
-        border-radius: 20px !important;
-        background: white !important;
-        box-shadow: var(--shadow) !important;
-        margin-bottom: 2rem !important;
-        overflow: hidden;
-        text-align: center;
-      }
-
-      .card-header-custom {
-        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        border-bottom: 1px solid #e5e7eb;
-        padding: 2rem 2.5rem !important;
-        font-weight: 700 !important;
-        font-size: 1.3rem !important;
-        color: var(--secondary) !important;
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-      }
-
-      .card-body-custom {
-        padding: 2.5rem !important;
-        overflow-y: auto;
-        max-height: 70vh;
-      }
-
-      /* ================= FORM ELEMENTS ================= */
-      .form-control-custom,
-      .form-select-custom {
-        border-radius: 12px !important;
-        padding: 1rem 1.25rem !important;
-        border: 2px solid #e5e7eb !important;
-        background: white !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-        margin-bottom: 1.5rem !important;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      }
-
-      .form-control-custom:focus,
-      .form-select-custom:focus {
-        border-color: var(--primary) !important;
-        box-shadow:
-          0 0 0 3px rgba(37, 99, 235, 0.1),
-          var(--shadow);
-        transform: translateY(-2px);
-      }
-
-      /* ================= BUTTONS ================= */
-      .btn-custom {
-        padding: 1rem 2rem !important;
-        border-radius: 12px !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-        border: none !important;
-        transition: all 0.3s ease !important;
-        box-shadow: var(--shadow);
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      .btn-primary-custom {
-        background: linear-gradient(
-          135deg,
-          var(--primary),
-          var(--primary-dark)
-        ) !important;
-        color: white !important;
-      }
-
-      .btn-success-custom {
-        background: linear-gradient(135deg, var(--success), #059669) !important;
-        color: white !important;
-      }
-
-      .btn-danger-custom {
-        background: linear-gradient(135deg, var(--danger), #dc2626) !important;
-        color: white !important;
-      }
-
-      .btn-custom:hover {
-        transform: translateY(-3px);
-        box-shadow: var(--shadow-lg);
-      }
-
-      /* ================= LIST ITEMS ================= */
-      .list-item {
-        border: 1px solid #e5e7eb !important;
-        border-radius: 16px !important;
-        padding: 2rem !important;
-        margin-bottom: 1.5rem !important;
-        background: white !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-      }
-
-      .list-item:hover {
-        border-color: var(--primary) !important;
-        box-shadow: var(--shadow-lg);
-        transform: translateY(-2px);
-      }
-
-      /* ================= RESPONSIVE - SCROLL FIXED ================= */
-      @media (max-width: 991px) {
-        .sidebar-custom {
-          transform: translateX(-100%);
-          z-index: 1050;
-        }
-
-        .sidebar-custom.active {
-          transform: translateX(0);
-        }
-
-        .main-wrapper {
-          margin-left: 0 !important;
-          padding: 2rem 1.5rem !important;
-          /*FIXED: Always scrollable */
-          overflow-y: auto !important;
-          height: auto !important;
-        }
-
-        /* FIXED: Body scroll lock ONLY when sidebar active */
-        body.sidebar-open {
-          overflow: hidden !important;
-        }
-
-        /* FIXED: Overlay covers full screen */
-        .overlay {
-          z-index: 1045 !important;
-        }
-      }
-
-      @media (max-width: 768px) {
-        .main-wrapper {
-          padding: 1.5rem 1rem !important;
-          overflow-y: auto !important;
-        }
-
-        .stats-grid {
-          grid-template-columns: 1fr;
-          gap: 1.5rem !important;
-        }
-
-        .card-body-custom {
-          padding: 2rem 1.5rem !important;
-          max-height: none !important;
-          overflow-y: auto !important;
-        }
-
-        .btn-custom {
-          width: 100%;
-          margin-bottom: 1rem !important;
-        }
-      }
-
-      @media (max-width: 576px) {
-        :root {
-          --sidebar-w: 100vw;
-        }
-
-        .sidebar-custom {
-          width: 100vw !important;
-          /* FIXED: Sidebar scrolls independently */
-          overflow-y: auto !important;
-          overflow-x: hidden !important;
-        }
-
-        .main-wrapper {
-          padding: 1rem 0.75rem !important;
-          /* FIXED: Main always scrolls */
-          overflow-y: auto !important;
-          height: auto !important;
-        }
-
-        .list-item {
-          flex-direction: column;
-          gap: 1.5rem;
-          text-align: center;
-          padding: 1.75rem !important;
-        }
-
-        /* FIXED: Mobile card padding */
-        .card-body-custom {
-          padding: 1.75rem 1.25rem !important;
-        }
-
-        .stat-card {
-          padding: 2.5rem 1.5rem !important;
-          margin-bottom: 1.5rem !important;
-        }
-      }
-
-      /* ================= SCROLL LOCK - MOBILE ONLY ================= */
-      @media (max-width: 991px) {
-        /* FIXED: Lock body scroll when sidebar open */
-        .sidebar-custom.active ~ .main-wrapper,
-        .sidebar-custom.active ~ body {
-          overflow: hidden !important;
-        }
-
-        /* FIXED: Unlock when sidebar closed */
-        .sidebar-custom:not(.active) ~ .main-wrapper,
-        .sidebar-custom:not(.active) ~ body {
-          overflow-y: auto !important;
-        }
-      }
-
-      /* ================= SECTIONS ================= */
-      .section {
-        display: none;
-      }
-      .section.active {
-        display: block;
-      }
-
-      .col-md-3.col-sm-6 {
-        text-align: center;
-      }
-    </style>
-  </head>
-
-  <body>
-    <script></script>
-
-    <!-- NAVBAR -->
-    <nav class="navbar">
-      <div class="container-fluid">
-        <div class="d-flex align-items-center gap-3">
-          <button id="toggleBtn" class="menu-toggle">
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-          <span class="navbar-brand">
-            <i class="fas fa-chart-line"></i> Admin Dashboard
-          </span>
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediCore — Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#060e1c;--surface:#0b1829;--card:#101f36;--card2:#0d1a2f;
+      --border:rgba(160,80,255,0.15);--border2:rgba(255,255,255,0.06);
+      --purple:#a855f7;--purple-dim:rgba(168,85,247,0.08);--purple-glow:rgba(168,85,247,0.2);
+      --teal:#00c8b4;--teal-dim:rgba(0,200,180,0.08);
+      --accent:#4facfe;--text:#dce9f0;--muted:#5a7a8e;--danger:#ff6b8a;
+      --success:#00c8b4;--warn:#ffa552;--sidebar:260px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;overflow:hidden;}
+    body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--text);display:flex;flex-direction:column;}
+
+    .topbar{height:64px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.4);}
+    .topbar-left{display:flex;align-items:center;gap:16px;}
+    .hamburger{width:40px;height:40px;border:1px solid var(--border);background:var(--card);border-radius:10px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;cursor:pointer;transition:0.3s;flex-shrink:0;}
+    .hamburger:hover{border-color:var(--purple);}
+    .hamburger span{width:18px;height:2px;background:var(--text);border-radius:2px;transition:0.3s;}
+    .hamburger.open span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+    .hamburger.open span:nth-child(2){opacity:0;}
+    .hamburger.open span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .brand-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--purple),#7c3aed);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;box-shadow:0 4px 12px rgba(168,85,247,0.4);}
+    .brand-name{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--text);}
+    .brand-name span{color:var(--purple);}
+    .topbar-right{display:flex;align-items:center;gap:12px;}
+    .admin-badge{background:var(--purple-dim);border:1px solid rgba(168,85,247,0.25);color:var(--purple);border-radius:20px;padding:4px 12px;font-size:0.78rem;font-weight:600;letter-spacing:0.5px;}
+    .btn-logout{background:rgba(255,107,138,0.1);border:1px solid rgba(255,107,138,0.3);color:var(--danger);border-radius:10px;padding:7px 14px;font-size:0.825rem;font-weight:600;cursor:pointer;transition:0.3s;display:flex;align-items:center;gap:6px;}
+    .btn-logout:hover{background:rgba(255,107,138,0.18);}
+
+    .layout{display:flex;flex:1;overflow:hidden;}
+    .sidebar{width:var(--sidebar);flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);}
+    .sidebar-user{padding:24px 20px;border-bottom:1px solid var(--border);text-align:center;}
+    .sidebar-avatar{width:60px;height:60px;border-radius:16px;background:linear-gradient(135deg,var(--purple),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;margin:0 auto 12px;box-shadow:0 8px 20px rgba(168,85,247,0.3);}
+    .sidebar-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:4px;}
+    .sidebar-role{font-size:0.75rem;padding:3px 10px;background:var(--purple-dim);color:var(--purple);border:1px solid rgba(168,85,247,0.2);border-radius:20px;display:inline-block;}
+    .nav-label{padding:12px 20px 6px;font-size:0.7rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:11px 20px;color:var(--muted);font-size:0.9rem;font-weight:500;cursor:pointer;transition:all 0.2s;border-left:3px solid transparent;margin:2px 0;}
+    .nav-item i{width:18px;text-align:center;font-size:0.95rem;}
+    .nav-item:hover{color:var(--text);background:rgba(255,255,255,0.04);}
+    .nav-item.active{color:var(--purple);background:var(--purple-dim);border-left-color:var(--purple);}
+
+    .main{flex:1;overflow-y:auto;padding:28px;}
+    .page{display:none;}
+    .page.active{display:block;animation:fadeUp 0.4s ease;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .page-title{font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:6px;}
+    .page-sub{color:var(--muted);font-size:0.875rem;margin-bottom:24px;}
+
+    /* Stats */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:0.3s;}
+    .stat-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,0.3);}
+    .stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+    .stat-card:nth-child(1)::before{background:linear-gradient(90deg,var(--teal),var(--accent));}
+    .stat-card:nth-child(2)::before{background:linear-gradient(90deg,var(--purple),#ec4899);}
+    .stat-card:nth-child(3)::before{background:linear-gradient(90deg,var(--accent),#0284c7);}
+    .stat-card:nth-child(4)::before{background:linear-gradient(90deg,var(--warn),#f59e0b);}
+    .stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px;}
+    .si-1{background:rgba(0,200,180,0.1);color:var(--teal);}
+    .si-2{background:rgba(168,85,247,0.1);color:var(--purple);}
+    .si-3{background:rgba(79,172,254,0.1);color:var(--accent);}
+    .si-4{background:rgba(255,165,82,0.1);color:var(--warn);}
+    .stat-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;line-height:1;}
+    .stat-label{color:var(--muted);font-size:0.82rem;margin-top:4px;}
+
+    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;margin-bottom:20px;}
+    .card-head{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+    .card-head-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;display:flex;align-items:center;gap:10px;}
+    .card-head-title i{color:var(--purple);}
+    .card-body{padding:24px;}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block;font-size:0.77rem;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.8px;}
+    .form-group input,.form-group select{width:100%;background:var(--surface);border:1.5px solid var(--border2);border-radius:11px;padding:12px 14px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.9rem;transition:0.3s;outline:none;appearance:none;}
+    .form-group input::placeholder{color:var(--muted);}
+    .form-group input:focus,.form-group select:focus{border-color:var(--purple);background:var(--purple-dim);box-shadow:0 0 0 3px var(--purple-glow);}
+    .btn{border:none;border-radius:10px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:0.875rem;cursor:pointer;transition:all 0.3s;display:inline-flex;align-items:center;gap:7px;}
+    .btn-purple{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff;}
+    .btn-purple:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(168,85,247,0.4);}
+    .btn-success{background:linear-gradient(135deg,var(--teal),#00a896);color:#060e1c;}
+    .btn-success:hover{transform:translateY(-2px);}
+    .btn-danger-sm{background:rgba(255,107,138,0.1);border:1px solid rgba(255,107,138,0.3);color:var(--danger);border-radius:8px;padding:6px 12px;font-size:0.78rem;font-weight:600;cursor:pointer;transition:0.2s;display:inline-flex;align-items:center;gap:5px;}
+    .btn-danger-sm:hover{background:rgba(255,107,138,0.2);}
+    .btn-sm{padding:7px 14px;font-size:0.8rem;}
+    .btn-full{width:100%;}
+
+    .list-item{background:var(--card2);border:1px solid var(--border2);border-radius:13px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:16px;transition:0.3s;}
+    .list-item:hover{border-color:var(--border);box-shadow:0 4px 16px rgba(0,0,0,0.25);}
+    .list-item-info{display:flex;align-items:center;gap:14px;flex:1;}
+    .list-avatar{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;}
+    .la-doc{background:linear-gradient(135deg,var(--accent),#0284c7);color:#fff;}
+    .la-user{background:linear-gradient(135deg,var(--teal),#00a896);color:#060e1c;}
+    .la-admin{background:linear-gradient(135deg,var(--purple),#7c3aed);color:#fff;}
+    .list-name{font-weight:600;font-size:0.925rem;margin-bottom:2px;}
+    .list-meta{color:var(--muted);font-size:0.8rem;}
+    .badge-sm{font-size:0.72rem;padding:3px 8px;border-radius:16px;font-weight:600;margin-left:6px;}
+    .badge-admin{background:var(--purple-dim);color:var(--purple);border:1px solid rgba(168,85,247,0.2);}
+    .badge-doc{background:rgba(79,172,254,0.08);color:var(--accent);border:1px solid rgba(79,172,254,0.2);}
+    .badge-patient{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(0,200,180,0.2);}
+
+    .empty{text-align:center;padding:40px;color:var(--muted);}
+    .empty i{font-size:2.5rem;margin-bottom:12px;opacity:0.4;}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:49;display:none;}
+    .overlay.show{display:block;}
+    .alert{border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:0.875rem;display:none;align-items:center;gap:8px;}
+    .alert-success{background:rgba(0,200,180,0.08);border:1px solid rgba(0,200,180,0.25);color:var(--success);}
+    .alert-error{background:rgba(255,107,138,0.08);border:1px solid rgba(255,107,138,0.25);color:var(--danger);}
+
+    @media(max-width:900px){.stats-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:768px){
+      .sidebar{position:fixed;top:64px;left:0;bottom:0;z-index:50;transform:translateX(-100%);width:260px;}
+      .sidebar.open{transform:translateX(0);}
+      .main{padding:20px 16px;}
+      .form-grid{grid-template-columns:1fr;}
+    }
+    @media(max-width:560px){
+      .stats-grid{grid-template-columns:1fr 1fr;}
+      .topbar{padding:0 16px;}
+      .admin-badge{display:none;}
+      .list-item{flex-direction:column;align-items:flex-start;}
+    }
+    @media(max-width:380px){.stats-grid{grid-template-columns:1fr;}}
+    .spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(168,85,247,0.2);border-top-color:var(--purple);border-radius:50%;animation:spin 0.8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-state{text-align:center;padding:32px;color:var(--muted);}
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+      <span></span><span></span><span></span>
+    </div>
+    <a href="#" class="brand">
+      <div class="brand-icon"><i class="fas fa-shield-alt"></i></div>
+      <div class="brand-name">Medi<span>Core</span></div>
+    </a>
+  </div>
+  <div class="topbar-right">
+    <span class="admin-badge"><i class="fas fa-crown" style="margin-right:5px;"></i>SUPER ADMIN</span>
+    <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-user">
+      <div class="sidebar-avatar"><i class="fas fa-user-shield"></i></div>
+      <div class="sidebar-name">Super Admin</div>
+      <div class="sidebar-role"><i class="fas fa-crown" style="margin-right:4px;font-size:0.7rem;"></i>ADMINISTRATOR</div>
+    </div>
+    <div class="nav-label">Management</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><i class="fas fa-chart-line"></i> Dashboard</div>
+    <div class="nav-item" onclick="showPage('doctors',this)"><i class="fas fa-user-md"></i> Doctors</div>
+    <div class="nav-item" onclick="showPage('users',this)"><i class="fas fa-users"></i> Patients</div>
+    <div class="nav-item" onclick="showPage('create',this)"><i class="fas fa-user-plus"></i> Add Doctor</div>
+  </div>
+
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="page-title">Overview</div>
+      <p class="page-sub">Hospital management at a glance</p>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon si-1"><i class="fas fa-users"></i></div>
+          <div class="stat-num" id="statPatients">—</div>
+          <div class="stat-label">Total Patients</div>
         </div>
-        <button class="btn btn-danger" onclick="logout()">
-          <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </button>
+        <div class="stat-card">
+          <div class="stat-icon si-2"><i class="fas fa-user-md"></i></div>
+          <div class="stat-num" id="statDoctors">—</div>
+          <div class="stat-label">Total Doctors</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-3"><i class="fas fa-calendar-check"></i></div>
+          <div class="stat-num" id="statAppts">—</div>
+          <div class="stat-label">Total Appointments</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-4"><i class="fas fa-clock"></i></div>
+          <div class="stat-num" id="statToday">—</div>
+          <div class="stat-label">Today's Appointments</div>
+        </div>
       </div>
-    </nav>
 
-    <!-- OVERLAY -->
-    <div id="overlay" class="overlay"></div>
-
-    <!-- SIDEBAR -->
-    <div id="sidebar" class="sidebar">
-      <div class="sidebar-user">
-        <i class="fas fa-user-shield"></i>
-        <h4>Super Admin</h4>
-        <p>System Administrator</p>
-      </div>
-
-      <nav class="sidebar-nav">
-        <a href="#dashboard" class="active" onclick="showSection('dashboard')">
-          <i class="fas fa-tachometer-alt"></i>
-          <span>Dashboard</span>
-        </a>
-        <a href="#doctors" onclick="showSection('doctors')">
-          <i class="fas fa-user-md"></i>
-          <span>Doctors</span>
-        </a>
-        <a href="#users" onclick="showSection('users')">
-          <i class="fas fa-users"></i>
-          <span>Users</span>
-        </a>
-      </nav>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div class="main-content">
-      <div class="container py-4">
-        <!-- DASHBOARD SECTION -->
-        <section id="dashboardSection" class="section active">
-          <div class="row stats-row mb-5 g-4" id="statsRow">
-            <div class="col-md-3 col-sm-6">
-              <div class="card card-box fade-in">
-                <h5>Total Patients</h5>
-                <h3 id="patients">0</h3>
-              </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-              <div class="card card-box fade-in">
-                <h5>Total Doctors</h5>
-                <h3 id="doctors">0</h3>
-              </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-              <div class="card card-box fade-in">
-                <h5>Total Appointments</h5>
-                <h3 id="appointments">0</h3>
-              </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-              <div class="card card-box fade-in">
-                <h5>Today Appointments</h5>
-                <h3 id="today">0</h3>
-              </div>
-            </div>
-          </div>
-
-          <!-- CREATE DOCTOR -->
-          <div class="card mb-4">
-            <div class="card-header">
-              <i class="fas fa-user-plus text-primary"></i>
-              Create New Doctor
-            </div>
-            <div class="card-body">
-              <div class="row g-4">
-                <div class="col-md-6">
-                  <input
-                    id="dname"
-                    class="form-control"
-                    placeholder="Doctor Name"
-                  />
-                </div>
-                <div class="col-md-6">
-                  <input
-                    id="demail"
-                    type="email"
-                    class="form-control"
-                    placeholder="Email"
-                  />
-                </div>
-                <div class="col-md-6">
-                  <input
-                    id="dpassword"
-                    type="password"
-                    class="form-control"
-                    placeholder="Password"
-                  />
-                </div>
-                <div class="col-md-6">
-                  <input
-                    id="dspec"
-                    class="form-control"
-                    placeholder="Specialization"
-                  />
-                </div>
-                <div class="col-md-6">
-                  <input
-                    id="dexp"
-                    class="form-control"
-                    placeholder="Experience (e.g. 8 years)"
-                  />
-                </div>
-                <div class="col-md-6">
-                  <select id="dstatus" class="form-select">
-                    <option value="true">Available</option>
-                    <option value="false">Not Available</option>
-                  </select>
-                </div>
-                <div class="col-12">
-                  <button
-                    class="btn btn-success btn-lg"
-                    onclick="createDoctor()"
-                  >
-                    <i class="fas fa-plus me-2"></i> Create Doctor
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- DOCTORS SECTION -->
-        <section id="doctorsSection" class="section">
-          <div class="card">
-            <div class="card-header">
-              <i class="fas fa-user-md text-info"></i>
-              Doctors Management
-            </div>
-            <div class="card-body" id="doctorList">
-              <div class="text-center py-5">
-                <i class="fas fa-spinner fa-spin fa-3x text-muted mb-4"></i>
-                <h5 class="text-muted">Loading doctors...</h5>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- USERS SECTION -->
-        <section id="usersSection" class="section">
-          <div class="card">
-            <div class="card-header">
-              <i class="fas fa-users text-success"></i>
-              Users Management
-            </div>
-            <div class="card-body" id="userList">
-              <div class="text-center py-5">
-                <i class="fas fa-spinner fa-spin fa-3x text-muted mb-4"></i>
-                <h5 class="text-muted">Loading users...</h5>
-              </div>
-            </div>
-          </div>
-        </section>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" id="dashPreview">
+        <div class="card">
+          <div class="card-head"><div class="card-head-title"><i class="fas fa-user-md"></i> Recent Doctors</div></div>
+          <div class="card-body" id="dashDocList"><div class="loading-state"><div class="spinner"></div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-head-title" style="color:var(--text);"><i class="fas fa-users" style="color:var(--teal);"></i> Recent Patients</div></div>
+          <div class="card-body" id="dashUserList"><div class="loading-state"><div class="spinner"></div></div></div>
+        </div>
       </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-      // PERFECT MOBILE SCROLL HANDLER
-      function toggleSidebar() {
-        const sidebar = document.querySelector(".sidebar-custom");
-        const overlay = document.querySelector(".overlay");
-        const hamburger = document.querySelector(".hamburger");
-
-        sidebar.classList.toggle("active");
-        overlay.classList.toggle("active");
-        hamburger.classList.toggle("active");
-
-        // FIXED: Perfect mobile scroll lock
-        if (window.innerWidth <= 991) {
-          if (sidebar.classList.contains("active")) {
-            document.body.classList.add("sidebar-open");
-            document.body.style.overflow = "hidden";
-            document.documentElement.style.overflow = "hidden";
-          } else {
-            document.body.classList.remove("sidebar-open");
-            document.body.style.overflow = "";
-            document.documentElement.style.overflow = "";
-          }
-        }
-      }
-
-      // FIXED: Resize handler
-      window.addEventListener("resize", () => {
-        if (window.innerWidth > 991) {
-          document.querySelector(".sidebar-custom").classList.remove("active");
-          document.querySelector(".overlay").classList.remove("active");
-          document.querySelector(".hamburger").classList.remove("active");
-          document.body.classList.remove("sidebar-open");
-          document.body.style.overflow = "";
-          document.documentElement.style.overflow = "";
-        }
-      });
-
-      // FIXED: Touch move prevention on overlay
-      document.querySelector(".overlay").addEventListener(
-        "touchmove",
-        (e) => {
-          e.preventDefault();
-        },
-        { passive: false },
-      );
-
-      /* ================= SECTION SWITCHING ================= */
-      function showSection(sectionName) {
-        document.querySelectorAll(".section").forEach((section) => {
-          section.classList.remove("active");
-        });
-        document
-          .getElementById(sectionName + "Section")
-          .classList.add("active");
-
-        document.querySelectorAll(".sidebar-nav a").forEach((link) => {
-          link.classList.remove("active");
-        });
-        event.target.classList.add("active");
-      }
-
-      const API = "http://localhost:8080/api";
-
-      async function apiCall(url, options = {}) {
-        const token = localStorage.getItem("accessToken");
-
-        options.headers = {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        };
-
-        return fetch(url, options);
-      }
-
-      // ================= DASHBOARD =================
-      async function loadDashboard() {
-        const res = await apiCall(API + "/admin/dashboard");
-        const data = await res.json();
-
-        document.getElementById("patients").innerText = data.totalPatients;
-        document.getElementById("doctors").innerText = data.totalDocters;
-        document.getElementById("appointments").innerText =
-          data.totalAppointments;
-        document.getElementById("today").innerText = data.todayAppointments;
-      }
-
-      // ================= CREATE DOCTOR =================
-      async function createDoctor() {
-        const payload = {
-          name: document.getElementById("dname").value,
-          email: document.getElementById("demail").value,
-          password: document.getElementById("dpassword").value,
-          specialization: document.getElementById("dspec").value,
-          experianceInYears: document.getElementById("dexp").value, // match backend spelling
-          availibility_stutus:
-            document.getElementById("dstatus").value === "true",
-        };
-
-        console.log("Payload:", payload);
-
-        const res = await apiCall(API + "/admin/docter", {
-          method: "POST",
-          body: JSON.stringify(payload),
-        });
-
-        const data = await res.json().catch(() => null);
-
-        if (res.ok) {
-          alert("✅ Doctor Created Successfully");
-
-          // clear form
-          document.getElementById("dname").value = "";
-          document.getElementById("demail").value = "";
-          document.getElementById("dpassword").value = "";
-          document.getElementById("dspec").value = "";
-          document.getElementById("dexp").value = "";
-          document.getElementById("dstatus").value = "true";
-
-          loadDoctors();
-        } else {
-          alert("❌ Error: " + (data?.message || "Failed"));
-        }
-      }
-
-      // ================= GET DOCTORS =================
-      async function loadDoctors() {
-        const res = await apiCall(API + "/admin/docters");
-        const data = await res.json();
-
-        const html = data
-          .map(
-            (d) => `
-    <div class="border p-2 mb-2">
-      <b>${d.name}</b> (${d.specialization})
-      <button class="btn btn-danger btn-sm float-end"
-        onclick="deleteDoctor(${d.id})">Delete</button>
+    <!-- DOCTORS -->
+    <div id="page-doctors" class="page">
+      <div class="page-title">Doctors</div>
+      <p class="page-sub">Manage all registered doctors</p>
+      <div id="docList"><div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading doctors...</p></div></div>
     </div>
-  `,
-          )
-          .join("");
 
-        document.getElementById("doctorList").innerHTML = html;
-      }
-
-      // ================= DELETE DOCTOR =================
-      async function deleteDoctor(id) {
-        await apiCall(API + "/admin/docter/" + id, { method: "DELETE" });
-        loadDoctors();
-      }
-
-      // ================= USERS =================
-      async function loadUsers() {
-        const res = await apiCall(API + "/admin/users");
-        const data = await res.json();
-
-        const html = data
-          .map(
-            (u) => `
-    <div class="border p-2 mb-2">
-      <b>${u.name}</b> (${u.email})
-      <button class="btn btn-danger btn-sm float-end"
-        onclick="deleteUser(${u.id})">Delete</button>
+    <!-- USERS -->
+    <div id="page-users" class="page">
+      <div class="page-title">Patients</div>
+      <p class="page-sub">Manage all registered patients</p>
+      <div id="userList"><div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading patients...</p></div></div>
     </div>
-  `,
-          )
-          .join("");
 
-        document.getElementById("userList").innerHTML = html;
-      }
+    <!-- CREATE DOCTOR -->
+    <div id="page-create" class="page">
+      <div class="page-title">Add New Doctor</div>
+      <p class="page-sub">Register a new doctor to the system</p>
+      <div id="createAlert" class="alert"></div>
+      <div class="card" style="max-width:640px;">
+        <div class="card-head"><div class="card-head-title"><i class="fas fa-user-plus"></i> Doctor Information</div></div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group"><label>Full Name</label><input type="text" id="dname" placeholder="Dr. John Smith"/></div>
+            <div class="form-group"><label>Email</label><input type="email" id="demail" placeholder="doctor@hospital.com"/></div>
+            <div class="form-group"><label>Password</label><input type="password" id="dpassword" placeholder="Minimum 6 characters"/></div>
+            <div class="form-group"><label>Specialization</label><input type="text" id="dspec" placeholder="e.g. Cardiologist"/></div>
+            <div class="form-group"><label>Experience (Years)</label><input type="text" id="dexp" placeholder="Years of experience" min="0"/></div>
+            <div class="form-group"><label>Availability</label>
+              <select id="dstatus">
+                <option value="true">Available</option>
+                <option value="false">Not Available</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-purple btn-full" style="margin-top:8px;" onclick="createDoctor()"><i class="fas fa-plus"></i> Create Doctor Account</button>
+        </div>
+      </div>
+    </div>
 
-      // ================= DELETE USER =================
-      async function deleteUser(id) {
-        await apiCall(API + "/admin/user/" + id, { method: "DELETE" });
-        loadUsers();
-      }
+  </div>
+</div>
 
-      //================== LOGOUT =================
-      async function logout() {
-        if (!confirm("Are you sure you want to logout?")) return;
+<script>
+const API = 'http://localhost:8080/api';
 
-        const refreshToken = localStorage.getItem("refreshToken");
+function getToken(){ return localStorage.getItem('accessToken'); }
+async function apiCall(url, options={}){
+  const token = getToken();
+  return fetch(url,{
+    method:options.method||'GET',
+    headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,...(options.headers||{})},
+    body:options.body||null
+  });
+}
+function doLogout(){ localStorage.clear(); window.location.href='index.html'; }
 
-        try {
-          await fetch("http://localhost:8080/api/auth/logout", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refreshToken }),
-          });
-        } catch (e) {
-          console.log("Logout API failed");
-        }
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('hamburger').classList.toggle('open');
+  document.getElementById('overlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
 
-        localStorage.clear();
-        window.location.href = "index.html";
-      }
+function showPage(name, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  closeSidebar();
+  if(name==='doctors') loadDoctors();
+  if(name==='users') loadUsers();
+}
 
-      // INIT
-      window.onload = () => {
-        loadDashboard();
-        loadDoctors();
-        loadUsers();
-      };
-    </script>
-  </body>
+async function init(){
+  const token = getToken();
+  if(!token){ window.location.href='index.html'; return; }
+  loadDashboard();
+  loadDoctors();
+  loadUsers();
+}
+
+async function loadDashboard(){
+  try{
+    const res = await apiCall(`${API}/admin/dashboard`);
+    if(!res.ok) throw new Error();
+    const data = await res.json();
+    animateCount('statPatients', data.totalPatients||0);
+    animateCount('statDoctors', data.totalDocters||data.totalDoctors||0);
+    animateCount('statAppts', data.totalAppointments||0);
+    animateCount('statToday', data.todayAppointments||0);
+  } catch(e){}
+}
+
+function animateCount(id, target){
+  let n=0; const el=document.getElementById(id);
+  const step = Math.max(1,Math.floor(target/30));
+  const t = setInterval(()=>{
+    n=Math.min(n+step,target);
+    el.textContent=n;
+    if(n>=target) clearInterval(t);
+  },40);
+}
+
+async function loadDoctors(){
+  const list = document.getElementById('docList');
+  const dash = document.getElementById('dashDocList');
+  try{
+    const res = await apiCall(`${API}/admin/docters`);
+    const data = await res.json();
+    const renderItem = (d,small) => `
+      <div class="list-item">
+        <div class="list-item-info">
+          <div class="list-avatar la-doc">${(d.name||'D')[0].toUpperCase()}</div>
+          <div>
+            <div class="list-name">${d.name}<span class="badge-sm badge-doc">DOCTOR</span></div>
+            <div class="list-meta"><i class="fas fa-stethoscope" style="margin-right:4px;"></i>${d.specialization||'—'} &nbsp;·&nbsp; ${d.experianceInYears||d.experienceInYears||0} yrs exp &nbsp;·&nbsp; ${d.email||''}</div>
+          </div>
+        </div>
+        ${!small?`<button class="btn-danger-sm" onclick="deleteDoctor(${d.id},this)"><i class="fas fa-trash"></i> Remove</button>`:''}
+      </div>
+    `;
+    if(list) list.innerHTML = data.length ? data.map(d=>renderItem(d,false)).join('') : `<div class="empty"><i class="fas fa-user-md"></i><p>No doctors found</p></div>`;
+    if(dash) dash.innerHTML = data.slice(0,3).map(d=>renderItem(d,true)).join('') || `<div class="empty"><i class="fas fa-user-md"></i><p>No doctors</p></div>`;
+  } catch(e){
+    if(list) list.innerHTML=`<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Failed to load</p></div>`;
+  }
+}
+
+async function loadUsers(){
+  const list = document.getElementById('userList');
+  const dash = document.getElementById('dashUserList');
+  try{
+    const res = await apiCall(`${API}/admin/users`);
+    const data = await res.json();
+    const renderItem = (u,small) => `
+      <div class="list-item">
+        <div class="list-item-info">
+          <div class="list-avatar ${u.role==='ADMIN'?'la-admin':'la-user'}">${(u.name||'U')[0].toUpperCase()}</div>
+          <div>
+            <div class="list-name">${u.name}<span class="badge-sm ${u.role==='ADMIN'?'badge-admin':'badge-patient'}">${u.role||'PATIENT'}</span></div>
+            <div class="list-meta"><i class="fas fa-envelope" style="margin-right:4px;"></i>${u.email||'—'} &nbsp;·&nbsp; Age: ${u.age||'—'}</div>
+          </div>
+        </div>
+        ${!small&&u.role!=='ADMIN'?`<button class="btn-danger-sm" onclick="deleteUser(${u.id},this)"><i class="fas fa-trash"></i> Remove</button>`:''}
+      </div>
+    `;
+    if(list) list.innerHTML = data.length ? data.map(u=>renderItem(u,false)).join('') : `<div class="empty"><i class="fas fa-users"></i><p>No patients found</p></div>`;
+    if(dash) dash.innerHTML = data.slice(0,3).map(u=>renderItem(u,true)).join('') || `<div class="empty"><i class="fas fa-users"></i><p>No patients</p></div>`;
+  } catch(e){
+    if(list) list.innerHTML=`<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Failed to load</p></div>`;
+  }
+}
+
+async function deleteDoctor(id, btn){
+  if(!confirm('Permanently remove this doctor?')) return;
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+  try{
+    await apiCall(`${API}/admin/docter/${id}`,{method:'DELETE'});
+    loadDoctors();
+  } catch(e){ btn.disabled=false; btn.innerHTML='<i class="fas fa-trash"></i> Remove'; }
+}
+
+async function deleteUser(id, btn){
+  if(!confirm('Permanently remove this patient?')) return;
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+  try{
+    await apiCall(`${API}/admin/user/${id}`,{method:'DELETE'});
+    loadUsers();
+  } catch(e){ btn.disabled=false; btn.innerHTML='<i class="fas fa-trash"></i> Remove'; }
+}
+
+async function createDoctor(){
+  const name = document.getElementById('dname').value.trim();
+  const email = document.getElementById('demail').value.trim();
+  const password = document.getElementById('dpassword').value;
+  const spec = document.getElementById('dspec').value.trim();
+  const exp = document.getElementById('dexp').value;
+  const avail = document.getElementById('dstatus').value==='true';
+
+  if(!name||!email||!password||!spec||!exp) return showAlert('createAlert','error','Please fill in all fields');
+  if(password.length<6) return showAlert('createAlert','error','Password must be at least 6 characters');
+
+  const payload = {
+    name, email, password, specialization: spec,
+    experianceInYears: exp,
+    availibility_stutus: avail
+  };
+
+  try{
+    const res = await apiCall(`${API}/admin/docter`,{method:'POST',body:JSON.stringify(payload)});
+    const data = await res.json().catch(()=>({}));
+    if(res.ok){
+      showAlert('createAlert','success',`Doctor "${name}" created successfully!`);
+      document.getElementById('dname').value='';
+      document.getElementById('demail').value='';
+      document.getElementById('dpassword').value='';
+      document.getElementById('dspec').value='';
+      document.getElementById('dexp').value='';
+      loadDoctors();
+      loadDashboard();
+    } else {
+      showAlert('createAlert','error',data.message||'Failed to create doctor');
+    }
+  } catch(e){ showAlert('createAlert','error','Network error'); }
+}
+
+function showAlert(id, type, msg){
+  const el=document.getElementById(id);
+  el.className=`alert alert-${type}`;
+  el.innerHTML=`<i class="fas fa-${type==='success'?'check-circle':'exclamation-circle'}"></i> ${msg}`;
+  el.style.display='flex';
+  setTimeout(()=>el.style.display='none',6000);
+}
+
+async function logout(){
+  if(!confirm('Sign out of MediCore Admin?')) return;
+  const rt=localStorage.getItem('refreshToken');
+  try{ await fetch(`${API}/auth/logout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})}); } catch(e){}
+  doLogout();
+}
+
+// Dashboard responsive grid
+function adjustGrid(){
+  const grid = document.getElementById('dashPreview');
+  if(grid) grid.style.gridTemplateColumns = window.innerWidth<700?'1fr':'1fr 1fr';
+}
+window.addEventListener('resize',()=>{ if(window.innerWidth>768) closeSidebar(); adjustGrid(); });
+adjustGrid();
+init();
+</script>
+</body>
 </html>
