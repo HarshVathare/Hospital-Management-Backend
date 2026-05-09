@@ -19,7 +19,7 @@ public class SpringConfig {
         return (request, response, chain) -> {
             HttpServletResponse res = (HttpServletResponse) response;
 
-            res.setHeader("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+            res.setHeader("Access-Control-Allow-Origin", "https://medicore-hms-six.vercel.app");
             res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
             res.setHeader("Access-Control-Allow-Credentials", "true");
