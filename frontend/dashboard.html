@@ -310,7 +310,7 @@
       <div class="nav-label">Main</div>
       <div class="nav-item active" onclick="showPage('profile',this)"><i class="fas fa-user"></i> Profile</div>
       <div class="nav-item" onclick="showPage('appointments',this)"><i class="fas fa-calendar-check"></i> Appointments</div>
-      <div class="nav-item" onclick="showPage('doctors',this)"><i class="fas fa-user-md"></i> Doctors</div>
+      <div class="nav-item" onclick="showPage('doctors',this)"><i class="fas fa-user-md"></i> Docters</div>
       <div class="nav-item" onclick="showPage('records',this)"><i class="fas fa-file-medical"></i> Medical Records</div>
     </div>
     <div class="nav-section" style="margin-top:auto;border-top:1px solid var(--border);padding-top:12px;">
@@ -578,7 +578,7 @@ async function loadAppointments(){
       <div class="appt-card">
         <div class="appt-info">
           <h5><i class="fas fa-user-md" style="color:var(--teal);margin-right:8px;"></i>${a.docter||'Doctor'}</h5>
-          <p><i class="fas fa-stethoscope" style="margin-right:6px;color:var(--muted);"></i>${a.specialization||'General'}</p>
+          <p><i class="fas fa-stethoscope" style="margin-right:6px;color:var(--muted);"></i>${a.specialization||'General' }</p>
           <p><i class="fas fa-clock" style="margin-right:6px;color:var(--muted);"></i>${new Date(a.appointment_Date).toLocaleString()}</p>
           <p style="color:var(--muted);font-size:0.78rem;">ID: #${a.appointment_Id}</p>
         </div>
@@ -618,6 +618,7 @@ async function loadDoctors(){
         <div class="doc-name">${d.name}</div>
         <div class="doc-spec">${d.specialization}</div>
         <div class="doc-exp">${d.experianceInYears||d.experienceInYears||0} yrs experience</div>
+         <div style="color:var(--muted);font-size:0.78rem; ">Docter Id : ${d.id || d.docter_id || '-'} </div>
       </div>
     `).join('')}</div>`;
   } catch(e){
@@ -630,32 +631,149 @@ function fillDocDropdown(){
 }
 
 // Records
-async function loadRecords(){
-  const uid = currentUser?.patient_Id||currentUser?.id;
-  if(!uid){ document.getElementById('recordList').innerHTML=`<div class="empty"><i class="fas fa-file-medical"></i><p>Profile not loaded</p></div>`; return; }
-  document.getElementById('recordList').innerHTML = `<div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading...</p></div>`;
-  // try via doctor records endpoint (patients can view via appointments)
-  try{
-    const res = await apiCall(`${API}/patients/appointments`);
-    const appts = await res.json();
-    if(!appts||appts.length===0){
-      document.getElementById('recordList').innerHTML = `<div class="empty"><i class="fas fa-file-medical"></i><p>No medical records found</p></div>`;
+async function loadRecords() {
+
+  const uid = currentUser?.patient_Id || currentUser?.id;
+
+  if (!uid) {
+    document.getElementById('recordList').innerHTML = `
+      <div class="empty">
+        <i class="fas fa-file-medical"></i>
+        <p>Profile not loaded</p>
+      </div>
+    `;
+    return;
+  }
+
+  document.getElementById('recordList').innerHTML = `
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p style="margin-top:12px;">Loading medical records...</p>
+    </div>
+  `;
+
+  try {
+
+    // GET medical records API
+    const res = await apiCall(`${API}/patients/medical-record/${uid}`);
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch records");
+    }
+
+    const records = await res.json();
+
+    if (!records || records.length === 0) {
+      document.getElementById('recordList').innerHTML = `
+        <div class="empty">
+          <i class="fas fa-file-medical"></i>
+          <p>No medical records found</p>
+        </div>
+      `;
       return;
     }
-    document.getElementById('recordList').innerHTML = appts.filter(a=>a.status==='COMPLETED').map(a=>`
+
+    document.getElementById('recordList').innerHTML = records.map(r => `
       <div class="appt-card">
+
         <div class="appt-info">
-          <h5><i class="fas fa-file-medical" style="color:var(--teal);margin-right:8px;"></i>Appointment #${a.appointment_Id}</h5>
-          <p><i class="fas fa-user-md" style="margin-right:6px;color:var(--muted);"></i>${a.docter||'Doctor'}</p>
-          <p><i class="fas fa-clock" style="margin-right:6px;color:var(--muted);"></i>${new Date(a.appointment_Date).toLocaleString()}</p>
+
+          <h5>
+            <i class="fas fa-file-medical"
+               style="color:var(--teal);margin-right:8px;">
+            </i>
+            Medical-Record Id: ${r.medicalRecord_Id || r.id}
+          </h5>
+
+          <p>
+            <i class="fas fa-user-md"
+               style="margin-right:6px;color:var(--muted);">
+            </i>Docter: 
+            ${r.docter_Name || 'Doctor'}
+          </p>
+
+          <p>
+            <strong>Diagnosis:</strong>
+            ${r.diagnosis || 'N/A'}
+          </p>
+
+          <p>
+            <strong>Prescription:</strong>
+            ${r.medicine || 'N/A'}
+          </p>
+
+          <p>
+            <strong>Notes:</strong>
+            ${r.notes || 'N/A'}
+          </p>
+
+          <p>
+            <i class="fas fa-clock"
+               style="margin-right:6px;color:var(--muted);">
+            </i>Created: 
+            ${r.createdAt
+              ? new Date(r.createdAt).toLocaleString()
+              : 'No Date'}
+          </p>
+
         </div>
-        <span class="badge badge-completed">COMPLETED</span>
+
+        <span class="badge badge-completed">
+          RECORD CREATED
+        </span>
+
       </div>
-    `).join('') || `<div class="empty"><i class="fas fa-file-medical"></i><p>No completed appointments with records</p></div>`;
-  } catch(e){
-    document.getElementById('recordList').innerHTML = `<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Failed to load records</p></div>`;
+    `).join('');
+
+  } catch (e) {
+
+    document.getElementById('recordList').innerHTML = `
+      <div class="empty">
+        <i class="fas fa-exclamation-circle"></i>
+        <p>Failed to load records</p>
+      </div>
+    `;
+
+    console.error(e);
   }
 }
+
+
+
+
+
+
+// async function loadRecords(){
+//   const uid = currentUser?.patient_Id||currentUser?.id;
+//   if(!uid){ document.getElementById('recordList').innerHTML=`<div class="empty"><i class="fas fa-file-medical"></i><p>Profile not loaded</p></div>`; return; }
+//   document.getElementById('recordList').innerHTML = `<div class="loading-state"><div class="spinner"></div><p style="margin-top:12px;">Loading...</p></div>`;
+//   // try via doctor records endpoint (patients can view via appointments)
+//   try{
+//     const res = await apiCall(`${API}/patients/appointments`);
+//     const appts = await res.json();
+//     if(!appts||appts.length===0){
+//       document.getElementById('recordList').innerHTML = `<div class="empty"><i class="fas fa-file-medical"></i><p>No medical records found</p></div>`;
+//       return;
+//     }
+//     document.getElementById('recordList').innerHTML = appts.filter(a=>a.status==='COMPLETED').map(a=>`
+//       <div class="appt-card">
+//         <div class="appt-info">
+//           <h5><i class="fas fa-file-medical" style="color:var(--teal);margin-right:8px;"></i>Appointment #${a.appointment_Id}</h5>
+//           <p><i class="fas fa-user-md" style="margin-right:6px;color:var(--muted);"></i>${a.docter||'Doctor'}</p>
+//           <p><i class="fas fa-clock" style="margin-right:6px;color:var(--muted);"></i>${new Date(a.appointment_Date).toLocaleString()}</p>
+//         </div>
+//         <span class="badge badge-completed">COMPLETED</span>
+//       </div>
+//     `).join('') || `<div class="empty"><i class="fas fa-file-medical"></i><p>No completed appointments with records</p></div>`;
+//   } catch(e){
+//     document.getElementById('recordList').innerHTML = `<div class="empty"><i class="fas fa-exclamation-circle"></i><p>Failed to load records</p></div>`;
+//   }
+// }
+
+
+
+
+
 
 // Book Modal
 function openBookModal(){
