@@ -139,4 +139,9 @@ public class PatientController {
 //                .header(HttpHeaders.CONTENT_TYPE, patient.getFileType())
 //                .body(patient.getMedicalReport());
     }
+
+    @GetMapping("/medical-record/{Patient_Id}")
+    public ResponseEntity<List<MedicalRecordResponceDTO>>getMedicalRecordByPatientId(@PathVariable Long Patient_Id) {
+        return ResponseEntity.ok(patientServices.getMedicalRecordByPatientId(Patient_Id));
+    }
 }
