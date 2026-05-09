@@ -187,7 +187,7 @@ public class AuthService {
         userRepository.save(user);
 
         // ✅ IMPORTANT: frontend URL (NOT backend)
-        String link = "http://localhost:5500/reset-password.html?token=" + user.getResetToken();
+        String link = "https://medicore-hms-six.vercel.app/reset-password.html?token=" + user.getResetToken();
 
         emailService.sendEmailForForgotPassword(
                 user.getEmail(),
