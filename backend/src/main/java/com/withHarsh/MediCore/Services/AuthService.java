@@ -59,7 +59,7 @@ public class AuthService {
 
         userRepository.save(user);
 
-        String link = "http://localhost:8080/api/auth/verify?token=" + user.getVerificationToken();
+        String link = "https://medicore-p9x7.onrender.com/api/auth/verify?token=" + user.getVerificationToken();
 
         emailService.sendEmailForVerifyAccount(
                 user.getEmail(),
