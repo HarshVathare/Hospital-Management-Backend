@@ -46,13 +46,13 @@ public class SwaggerConfig {
                                 .description("Local Development Server")
                 ))
 
-                // Tag Definitions for grouping
-                .tags(List.of(
-                        new Tag().name("Auth APIs").description("Authentication & Authorization APIs"),
-                        new Tag().name("Patient APIs").description("Patient-related operations"),
-                        new Tag().name("Doctor APIs").description("Doctor dashboard & operations"),
-                        new Tag().name("Admin APIs").description("Admin management system")
-                ))
+                // // Tag Definitions for grouping
+                // .tags(List.of(
+                //         new Tag().name("Auth APIs").description("Authentication & Authorization APIs"),
+                //         new Tag().name("Patient APIs").description("Patient-related operations"),
+                //         new Tag().name("Doctor APIs").description("Doctor dashboard & operations"),
+                //         new Tag().name("Admin APIs").description("Admin management system")
+                // ))
 
                 // API Metadata
                 .info(new Info()
