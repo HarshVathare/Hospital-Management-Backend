@@ -11,6 +11,20 @@ Backend: [https://medicore-p9x7.onrender.com](https://medicore-p9x7.onrender.com
 Swagger Docs: [https://medicore-p9x7.onrender.com/swagger-ui/index.html](https://medicore-p9x7.onrender.com/swagger-ui/index.html)
 
 ---
+## Screenshots
+
+# Login Page
+![Login Page](screenshots/login.PNG)
+
+# Doctor Dashboard
+![Doctor Dashboard](screenshots/patient-dashboard.PNG)
+
+# Doctor Dashboard
+![Doctor Dashboard](screenshots/doctor-dashboard.PNG)
+
+# Admin Dashboard
+![Admin Dashboard](screenshots/admin-dashboard.PNG)
+
 
 ## About The Project
 
