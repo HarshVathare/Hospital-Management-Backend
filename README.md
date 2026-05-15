@@ -16,7 +16,7 @@ Swagger Docs: [https://medicore-p9x7.onrender.com/swagger-ui/index.html](https:/
 ### Login Page
 ![Login Page](screenshots/login.PNG)
 
-### Doctor Dashboard
+### Patient Dashboard
 ![Patient Dashboard](screenshots/patient-dashboard.PNG)
 
 ### Doctor Dashboard
