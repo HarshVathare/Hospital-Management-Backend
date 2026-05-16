@@ -1,16 +1,19 @@
- # MediCore
+# MediCore
 
-A full-stack Hospital Management System designed to handle real-world healthcare workflows such as appointment booking, doctor management, patient records, authentication, and role-based access control.
+A production-ready full-stack Hospital Management System built to manage healthcare workflows including appointment scheduling, doctor management, patient records, authentication, and role-based access control.
 
-## Live Demo
+## Live Project
 
-Frontend: [https://medicore-hms-six.vercel.app](https://medicore-hms-six.vercel.app)
+🔗 https://medicore-hms-six.vercel.app
 
-Backend: [https://medicore-p9x7.onrender.com](https://medicore-p9x7.onrender.com)
+> The application is deployed on free-tier hosting services.
+> Initial loading may take some time if the backend server is inactive.
 
-Swagger Docs: [https://medicore-p9x7.onrender.com/swagger-ui/index.html](https://medicore-p9x7.onrender.com/swagger-ui/index.html)
+## API Documentation
 
----
+ Swagger UI:
+https://medicore-p9x7.onrender.com/swagger-ui/index.html
+
 ## Screenshots
 
 ### Login Page
